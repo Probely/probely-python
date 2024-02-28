@@ -1,0 +1,3 @@
+class ProbelyRequestFailed(Exception):
+    pass
+
