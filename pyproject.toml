@@ -1,0 +1,35 @@
+[project]
+name = "probely-cli"
+version = "0.0.1"
+description = "Add your description here"
+authors = [
+    { name = "João Silva", email = "joao.silva@probely.com" }
+]
+dependencies = [
+    "requests",
+    "typer[all]",
+    "python-environ",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[project.optional-dependencies]
+test = [
+    "pytest >=2.7.3",
+    "pytest-cov",
+]
+doc = ["sphinx"]
+
+[project.scripts]
+hello = "probely_cli:hello"
+list = "probely_cli:list_targets"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/probely_cli"]
