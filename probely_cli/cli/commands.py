@@ -1,12 +1,11 @@
 import json
 
 import typer
+from probely_cli.exceptions import cli_exception_handler
+from probely_cli.sdk.targets import list_targets
 from rich.console import Console
 from rich.table import Table
 from typing_extensions import Annotated
-
-from probely_cli.exceptions import cli_exception_handler
-from probely_cli.sdk.targets import list_targets
 
 app = typer.Typer()
 targets_app = typer.Typer(pretty_exceptions_enable=False)
