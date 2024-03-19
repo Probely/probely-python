@@ -37,8 +37,8 @@ requires-python = ">= 3.8"
 
 dependencies = [
     "requests",
-    "typer[all]",
-    "python-environ",
+    "rich",
+    "rich-argparse",
 ]
 
 [project.scripts]

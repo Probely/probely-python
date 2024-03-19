@@ -8,10 +8,6 @@ certifi==2024.2.2
     # via requests
 charset-normalizer==3.3.2
     # via requests
-click==8.1.7
-    # via typer
-colorama==0.4.6
-    # via typer
 idna==3.6
     # via requests
 markdown-it-py==3.0.0
@@ -20,19 +16,15 @@ mdurl==0.1.2
     # via markdown-it-py
 pygments==2.17.2
     # via rich
-python-environ==0.4.54
-    # via probely_cli (pyproject.toml)
 requests==2.31.0
     # via probely_cli (pyproject.toml)
 rich==13.7.1
-    # via typer
-shellingham==1.5.4
-    # via typer
-typer[all]==0.9.0
+    # via
+    #   probely_cli (pyproject.toml)
+    #   rich-argparse
+rich-argparse==1.4.0
     # via probely_cli (pyproject.toml)
 typing-extensions==4.9.0
-    # via
-    #   rich
-    #   typer
+    # via rich
 urllib3==2.2.1
     # via requests

@@ -1,6 +1,6 @@
 from probely_cli.sdk.targets import list_targets
 
-from .config import init, probely_client
+from .sdk.client import probely_client
 from .exceptions import *
 
 # __all__ = [
