@@ -1,11 +1,5 @@
-import os
-
 import requests
-
 from probely_cli import settings
-
-_API_KEY = os.environ.get("PROBELY_API_KEY")
-_INIT_API_KEY = None
 
 
 def init(api_key):  # how many settings are we gonna support?
@@ -13,9 +7,10 @@ def init(api_key):  # how many settings are we gonna support?
     pass
 
 
-def _get_client():
+def _get_client(api_key=None):
     session = requests.Session()
-    session.headers.update({"Authorization": settings.PROBELY_API_TOKEN})
+    print(f"[{__name__}]---", "api key:", settings.PROBELY_API_KEY)
+    session.headers.update({"Authorization": "JWT " + settings.PROBELY_API_KEY})
 
     return session
 
