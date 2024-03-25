@@ -39,10 +39,8 @@ dependencies = [
     "requests",
     "rich",
     "rich-argparse",
+    "dynaconf",
 ]
-
-[project.scripts]
-probely = "probely_cli.cli:app"
 
 [project.optional-dependencies]
 test = [
@@ -52,6 +50,8 @@ test = [
 ]
 doc = ["sphinx"] # TODO: no decided yet
 
+[project.scripts]
+probely = "probely_cli.cli:app"
 # TODO
 #[project.urls]
 #Homepage = "https://example.com"

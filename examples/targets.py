@@ -2,9 +2,13 @@ import json
 from typing import List
 
 import probely_cli
+
 from probely_cli.exceptions import ProbelyRequestFailed
 
 if __name__ == "__main__":
+
+    # You can config programmatically
+    # probely_cli.Probely.init(api_key="add api_key here")
 
     targets_list: List[object] = []
 
