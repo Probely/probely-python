@@ -39,13 +39,12 @@ dependencies = [
     "requests",
     "rich",
     "rich-argparse",
-    "dynaconf",
 ]
 
 [project.optional-dependencies]
 test = [
     "pytest",
-    "pytest-cov",
+#    "pytest-cov",
     "tox",
 ]
 doc = ["sphinx"] # TODO: no decided yet

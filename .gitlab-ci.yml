@@ -1,0 +1,8 @@
+stages:
+  - tox_tests
+
+tox_tests:
+  stage: tox_tests
+  image: 31z4/tox:4-4
+  script:
+    - tox --colored yes
