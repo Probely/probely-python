@@ -11,7 +11,6 @@ CONFIG_PARSER.read(PROBELY_CONFIG_FILE_PATH)
 def _get_probely_api_key():
     env_var_api_key = os.getenv("PROBELY_API_KEY", None)
 
-    print("yes, this is api key:", env_var_api_key)
     if env_var_api_key:
         return env_var_api_key
 

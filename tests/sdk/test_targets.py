@@ -3,9 +3,6 @@ from unittest import mock
 from probely_cli.sdk.targets import list_targets
 
 
-# mock_client
-
-
 @mock.patch("probely_cli.sdk.client.requests.Session.get")
 def test_list_targets(mock_session):
     response_content = [{"list": "of objects1"}, {"list": "of objects2"}]
