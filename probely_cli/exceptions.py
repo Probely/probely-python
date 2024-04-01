@@ -4,3 +4,7 @@ class ProbelyException(Exception):
 
 class ProbelyRequestFailed(ProbelyException):
     pass
+
+
+class ProbelyMissConfig(ProbelyException):
+    pass
