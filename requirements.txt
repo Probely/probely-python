@@ -14,15 +14,13 @@ charset-normalizer==3.3.2
     # via requests
 colorama==0.4.6
     # via tox
-coverage[toml]==7.4.4
-    # via pytest-cov
 distlib==0.3.8
     # via virtualenv
-dynaconf==3.2.5
+environs==11.0.0
     # via probely_cli (pyproject.toml)
-exceptiongroup==1.2.0
+exceptiongroup==1.2.1
     # via pytest
-filelock==3.13.1
+filelock==3.14.0
     # via
     #   tox
     #   virtualenv
@@ -32,18 +30,21 @@ iniconfig==2.0.0
     # via pytest
 markdown-it-py==3.0.0
     # via rich
+marshmallow==3.21.2
+    # via environs
 mdurl==0.1.2
     # via markdown-it-py
 packaging==24.0
     # via
+    #   marshmallow
     #   pyproject-api
     #   pytest
     #   tox
-platformdirs==4.2.0
+platformdirs==4.2.1
     # via
     #   tox
     #   virtualenv
-pluggy==1.4.0
+pluggy==1.5.0
     # via
     #   pytest
     #   tox
@@ -51,12 +52,10 @@ pygments==2.17.2
     # via rich
 pyproject-api==1.6.1
     # via tox
-pytest==8.1.1
-    # via
-    #   probely_cli (pyproject.toml)
-    #   pytest-cov
-pytest-cov==4.1.0
+pytest==8.2.0
     # via probely_cli (pyproject.toml)
+python-dotenv==1.0.1
+    # via environs
 requests==2.31.0
     # via probely_cli (pyproject.toml)
 rich==13.7.1
@@ -67,15 +66,14 @@ rich-argparse==1.4.0
     # via probely_cli (pyproject.toml)
 tomli==2.0.1
     # via
-    #   coverage
     #   pyproject-api
     #   pytest
     #   tox
-tox==4.14.1
+tox==4.15.0
     # via probely_cli (pyproject.toml)
 typing-extensions==4.9.0
     # via rich
 urllib3==2.2.1
     # via requests
-virtualenv==20.25.1
+virtualenv==20.26.1
     # via tox
