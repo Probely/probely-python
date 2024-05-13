@@ -1,6 +1,10 @@
+import logging
+
 import requests
 from probely_cli import settings
 from probely_cli.exceptions import ProbelyMissConfig
+
+logger = logging.getLogger(__name__)
 
 
 class Probely:
@@ -40,8 +44,8 @@ class Probely:
 
 def _get_client() -> requests.Session:
     session = requests.Session()
-    print("who am I?", session)
     api_key = Probely().APP_CONFIG["api_key"]
 
+    logger.debug(f"Session setup with api_key {api_key[:5]}**************")
     session.headers.update({"Authorization": "JWT " + api_key})
     return session

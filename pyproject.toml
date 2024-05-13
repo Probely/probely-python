@@ -37,8 +37,10 @@ requires-python = ">= 3.8"
 
 dependencies = [
     "requests",
-    "rich",
-    "rich-argparse",
+    "rich", # TODO: is this still required?
+    "rich-argparse", #TODO: is this still required?
+    "environs",
+    "marshmallow",
 ]
 
 [project.optional-dependencies]
