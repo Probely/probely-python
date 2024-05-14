@@ -41,6 +41,8 @@ dependencies = [
     "rich-argparse", #TODO: is this still required?
     "environs",
     "marshmallow",
+    "pyyaml",
+    "mergedeep"
 ]
 
 [project.optional-dependencies]

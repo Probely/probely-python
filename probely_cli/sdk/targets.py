@@ -2,6 +2,7 @@ import json
 import logging
 from typing import List, Dict
 
+from mergedeep import merge, Strategy
 from requests import sessions, Request
 
 from .client import _get_client
@@ -25,17 +26,31 @@ def list_targets() -> List[Dict]:
     return output["results"]
 
 
-def add_target(site_url: str, site_name: str) -> dict:
+def add_target(
+    site_url: str,
+    site_name: str = None,
+    extra_payload: dict = None,
+) -> dict:
     create_target_url = (
         PROBELY_API_TARGETS_URL  # + "?duplicate_check=true&check_fullpath=true"
     )
-    body_data = {"site": {"name": site_name, "url": site_url}}
+
+    body_data = {}
+    if extra_payload:
+        body_data = extra_payload
+
+    arguments_settings = {"site": {"url": site_url}}
+    if site_name:
+        arguments_settings["site"]["name"] = site_name
+
+    merge(body_data, arguments_settings, strategy=Strategy.REPLACE)
+
+    logger.debug("Add target request content: %s", body_data)
     session: sessions.Session = _get_client()
     prepared_request = session.prepare_request(
         Request("post", url=create_target_url, json=body_data)
     )
 
-    logger.debug("Add target request content: %s", body_data)
     resp = session.send(prepared_request)
     output = json.loads(resp.content)
 

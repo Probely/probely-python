@@ -82,4 +82,12 @@ targets_create_parser.add_argument(
     default=None,
 )
 
+targets_create_parser.add_argument(
+    "-f",
+    "--yaml-file",
+    dest="yaml_file_path",
+    default=None,
+    help="Path to yaml file with target option. Accepts same options as in API docs",
+)
+
 targets_create_parser.set_defaults(func=add_targets)
