@@ -14,3 +14,7 @@ class ProbelyBadRequest(ProbelyException):
 
 class ProbelyMissConfig(ProbelyException):
     pass
+
+
+class ProbelyCLIValidation(ProbelyException):
+    pass

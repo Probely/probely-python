@@ -1,6 +1,7 @@
 import argparse
 from rich_argparse import RichHelpFormatter
 
+from probely_cli.cli.commands.apply.apply import apply_file
 from probely_cli.cli.commands.targets.add import add_targets
 from probely_cli.cli.commands.targets.list import list_targets
 from probely_cli.cli.common import show_help
@@ -14,6 +15,13 @@ configs_parser.add_argument(
     "--api-key",
     help="Override API KEY used for requests",
     default=None,
+)
+
+configs_parser.add_argument(
+    "--debug",
+    help="Override DEBUG MODE setting",
+    action="store_true",
+    default=False,
 )
 
 raw_response_parser = argparse.ArgumentParser(
@@ -41,7 +49,11 @@ probely_parser.set_defaults(
 
 commands_parser = probely_parser.add_subparsers()
 
-targets_parser = commands_parser.add_parser("targets")
+targets_parser = commands_parser.add_parser(
+    "targets",
+    parents=[configs_parser, raw_response_parser],
+    formatter_class=RichHelpFormatter,
+)
 targets_parser.set_defaults(
     func=show_help,
     is_no_action_parser=True,
@@ -61,17 +73,13 @@ targets_list_parser.add_argument(
     action="store_true",
     help="Returns count of target",
 )
-# targets_list_parser.add_argument(
-#     "--raw",
-#     action="store_true",
-#     help="Return JSON Objects as the API response",
-# )
 
 targets_list_parser.set_defaults(func=list_targets)
 
 targets_create_parser = targets_command_parser.add_parser(
     "add",
     parents=[configs_parser, raw_response_parser],
+    formatter_class=RichHelpFormatter,
 )
 
 targets_create_parser.add_argument(
@@ -91,3 +99,13 @@ targets_create_parser.add_argument(
 )
 
 targets_create_parser.set_defaults(func=add_targets)
+
+apply_parser = commands_parser.add_parser(
+    "apply",
+    parents=[configs_parser, raw_response_parser],
+    formatter_class=RichHelpFormatter,
+)
+apply_parser.add_argument("yaml_file")
+apply_parser.set_defaults(
+    func=apply_file,
+)

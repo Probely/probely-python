@@ -18,7 +18,7 @@ def add_targets(args):
     yaml_file_path = args.yaml_file_path
 
     extra_payload = {}
-    if yaml_file_path:
+    if yaml_file_path:  # TODO: validate is correct file
         with open(yaml_file_path, "r") as yaml_file:
             extra_payload = yaml.safe_load(yaml_file)
 

@@ -53,6 +53,9 @@ test = [
 ]
 doc = ["sphinx"] # TODO: no decided yet
 
+[tool.black]
+line-length = 88
+
 [project.scripts]
 probely = "probely_cli.cli:app"
 # TODO

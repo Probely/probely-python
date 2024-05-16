@@ -1,17 +1,22 @@
 import os
 import configparser
+from pathlib import Path
 from typing import Union
 
 from environs import Env
 import marshmallow
 
-env = Env()
 
-PROBELY_CONFIG_DIR_PATH = os.path.expanduser("~") + "/.probely/"
-PROBELY_CONFIG_FILE_PATH = PROBELY_CONFIG_DIR_PATH + "config"
+PROBELY_CONFIG_DIR = ".probely"
+PROBELY_CONFIG_DIR_PATH = Path.home() / PROBELY_CONFIG_DIR
+PROBELY_CONFIG_FILE = "config"
+PROBELY_CONFIG_FILE_PATH = PROBELY_CONFIG_DIR_PATH / PROBELY_CONFIG_FILE
 
 CONFIG_PARSER = configparser.ConfigParser()
 CONFIG_PARSER.read(PROBELY_CONFIG_FILE_PATH)
+
+
+env = Env()
 
 
 def _get_probely_api_key():
@@ -49,7 +54,7 @@ def _get_probely_debug():
     return False
 
 
-# TODO: never used, needs testing
+# TODO: first attempt of general implementation. Never used, needs testing
 def _get_config(
     env_var: str,
     config_file_setting_path: list,
@@ -75,8 +80,9 @@ def _get_config(
 
 
 PROBELY_API_KEY = _get_probely_api_key()
+IS_DEBUG_MODE = _get_probely_debug()
 
-DEBUG_MODE = _get_probely_debug()
+CLI_ACCEPTED_FILE_EXTENSIONS = [".yaml", ".yml"]
 
 PROBELY_API_URL_BASE = os.getenv(
     "PROBELY_API_URL_BASE", default="https://api.qa.eu.probely.com/"

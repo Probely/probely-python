@@ -27,6 +27,9 @@ class CliApp:
         if args_dict.get("api_key"):
             settings.PROBELY_API_KEY = args.api_key
 
+        if args_dict.get("debug"):
+            settings.IS_DEBUG_MODE = True
+
         self.args = args
 
     @cli_exception_handler

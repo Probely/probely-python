@@ -1,0 +1,7 @@
+version: 1.0.0
+action: "add_target"
+payload:
+  site:
+    url: "http://testphp.vulnweb.com"
+    name: "target created using add target"
+    desc: "Im just a description"
