@@ -6,7 +6,7 @@ from mergedeep import merge, Strategy
 from requests import sessions, Request
 
 from .client import _get_client
-from ..exceptions import ProbelyRequestFailed, ProbelyBadRequest
+from probely_cli.exceptions import ProbelyRequestFailed, ProbelyBadRequest
 from ..settings import PROBELY_API_TARGETS_URL
 
 

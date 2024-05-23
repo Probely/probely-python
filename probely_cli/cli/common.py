@@ -1,9 +1,6 @@
 import argparse
-
-import yaml
-
 import probely_cli.settings as settings
-from probely_cli.exceptions import ProbelyCLIValidation
+from probely_cli.exceptions import ProbelyException
 from functools import wraps
 
 from rich.console import Console

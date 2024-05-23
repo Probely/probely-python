@@ -1,9 +1,10 @@
 import argparse
 from rich_argparse import RichHelpFormatter
 
-from probely_cli.cli.commands.apply.apply import apply_file
-from probely_cli.cli.commands.targets.add import add_targets
-from probely_cli.cli.commands.targets.list import list_targets
+from probely_cli.cli.commands.apply.apply import apply_command_handler
+from probely_cli.cli.commands.scans.start import start_scans_command_handler
+from probely_cli.cli.commands.targets.add import add_targets_command_handler
+from probely_cli.cli.commands.targets.list import list_targets_command_handler
 from probely_cli.cli.common import show_help
 
 
@@ -76,7 +77,7 @@ def build_parser():
         help="Returns count of target",
     )
 
-    targets_list_parser.set_defaults(func=list_targets)
+    targets_list_parser.set_defaults(func=list_targets_command_handler)
 
     targets_create_parser = targets_command_parser.add_parser(
         "add",
@@ -100,7 +101,7 @@ def build_parser():
         help="Path to yaml file with target option. Accepts same options as in API docs",
     )
 
-    targets_create_parser.set_defaults(func=add_targets)
+    targets_create_parser.set_defaults(func=add_targets_command_handler)
 
     apply_parser = commands_parser.add_parser(
         "apply",
@@ -109,7 +110,41 @@ def build_parser():
     )
     apply_parser.add_argument("yaml_file")
     apply_parser.set_defaults(
-        func=apply_file,
+        func=apply_command_handler,
+    )
+
+    scans_parser = commands_parser.add_parser(
+        "scans",
+        parents=[configs_parser, raw_response_parser],
+        formatter_class=RichHelpFormatter,
+    )
+
+    scans_parser.set_defaults(
+        func=show_help,
+        is_no_action_parser=True,
+        parser=scans_parser,
+        formatter_class=RichHelpFormatter,
+    )
+    scans_command_parser = scans_parser.add_subparsers()
+
+    scans_start_parser = scans_command_parser.add_parser(
+        "start",
+        parents=[configs_parser, raw_response_parser],
+        formatter_class=probely_parser.formatter_class,
+    )
+    scans_start_parser.add_argument(
+        "target_id",
+    )
+    scans_start_parser.set_defaults(func=start_scans_command_handler)
+
+    apply_parser = commands_parser.add_parser(
+        "apply",
+        parents=[configs_parser, raw_response_parser],
+        formatter_class=RichHelpFormatter,
+    )
+    apply_parser.add_argument("yaml_file")
+    apply_parser.set_defaults(
+        func=apply_command_handler,
     )
 
     return probely_parser
