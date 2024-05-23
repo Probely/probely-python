@@ -3,10 +3,10 @@ import logging
 from rich.console import Console
 
 from probely_cli import sdk, ProbelyException, ProbelyBadRequest
+from probely_cli.cli.common import validate_and_retrieve_yaml_content
 
 err_console = Console(stderr=True)
 console = Console()
-import yaml
 
 
 logger = logging.getLogger(__name__)
@@ -19,8 +19,7 @@ def add_targets(args):
 
     extra_payload = {}
     if yaml_file_path:  # TODO: validate is correct file
-        with open(yaml_file_path, "r") as yaml_file:
-            extra_payload = yaml.safe_load(yaml_file)
+        extra_payload = validate_and_retrieve_yaml_content(yaml_file_path)
 
     logger.debug("extra_payload: {}".format(extra_payload))
 
