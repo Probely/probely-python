@@ -41,6 +41,8 @@ dependencies = [
     "rich-argparse", #TODO: is this still required?
     "environs",
     "marshmallow",
+    "pyyaml",
+    "mergedeep"
 ]
 
 [project.optional-dependencies]
@@ -50,6 +52,9 @@ test = [
     "tox",
 ]
 doc = ["sphinx"] # TODO: no decided yet
+
+[tool.black]
+line-length = 88
 
 [project.scripts]
 probely = "probely_cli.cli:app"
