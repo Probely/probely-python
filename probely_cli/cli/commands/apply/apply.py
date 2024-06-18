@@ -3,7 +3,8 @@ from pathlib import Path
 
 from rich.console import Console
 
-from probely_cli import sdk, ProbelyException, ProbelyBadRequest
+from probely_cli import sdk
+from probely_cli.exceptions import ProbelyException, ProbelyBadRequest
 from probely_cli.cli.commands.apply.schemas import ApplyFileSchema
 from probely_cli.cli.common import validate_and_retrieve_yaml_content
 
@@ -14,6 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 def apply_file(args):
+    """
+    This is a test
+
+    :param args:
+    """
     yaml_file_path: Path = Path(args.yaml_file)
 
     yaml_content = validate_and_retrieve_yaml_content(yaml_file_path)

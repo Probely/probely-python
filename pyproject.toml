@@ -51,7 +51,11 @@ test = [
 #    "pytest-cov",
     "tox",
 ]
-doc = ["sphinx"] # TODO: no decided yet
+docs = [  # TODO: not decided yet
+    "sphinx",
+    "sphinx-argparse-cli",
+    "sphinx-markdown-builder",
+]
 
 [tool.black]
 line-length = 88

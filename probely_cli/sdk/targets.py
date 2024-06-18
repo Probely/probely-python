@@ -14,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 
 def list_targets() -> List[Dict]:
+    """Lists existing account's targets
+
+    :return: All Targets of account
+    :rtype: List[Dict]
+
+    """
     # TODO: go through pagination
     # or maybe the option to return a generator for the sdk??
     r = _get_client().get(PROBELY_API_TARGETS_URL)
@@ -30,7 +36,20 @@ def add_target(
     site_url: str,
     site_name: str = None,
     extra_payload: dict = None,
-) -> dict:
+) -> Dict:
+    """Creates new target
+
+    :param site_url: url to be scanned.
+    :type site_url: str.
+    :param site_name: name of target.
+    :type site_name: str, optional.
+    :param extra_payload: allows customization of request. Content should follow api request body
+    :type extra_payload: Optional[dict].
+    :raise: ProbelyBadRequest.
+    :return: Created target content.
+
+    """
+
     create_target_url = (
         PROBELY_API_TARGETS_URL  # + "?duplicate_check=true&check_fullpath=true"
     )
