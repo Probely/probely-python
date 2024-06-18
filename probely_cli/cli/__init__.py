@@ -1,14 +1,14 @@
 import logging
 from argparse import Namespace
 
-from .commands.parsers import probely_parser
+from .commands.parsers import build_parser
 from .common import CliApp
 
 logger = logging.getLogger(__name__)
 
 
 def app():
-    args: Namespace = probely_parser.parse_args()
+    args: Namespace = build_parser().parse_args()
 
     cli_app = CliApp(args)
 

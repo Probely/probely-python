@@ -1,3 +1,7 @@
 # probely_cli
 
-Describe your project here.
+
+Generate docs:
+* go to docs/
+* make clean
+* make markdown

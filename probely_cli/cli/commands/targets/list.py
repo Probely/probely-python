@@ -23,6 +23,12 @@ def get_tabled_target_list(targets_list):
 
 
 def list_targets(args):
+    """
+    Lists targets
+
+    List all accessable targets
+    """
+
     targets_list = sdk.list_targets()
     if args.count_only:
         console.print(len(targets_list))

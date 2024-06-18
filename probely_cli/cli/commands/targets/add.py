@@ -2,7 +2,8 @@ import logging
 
 from rich.console import Console
 
-from probely_cli import sdk, ProbelyException, ProbelyBadRequest
+from probely_cli.sdk.targets import add_target
+from probely_cli.exceptions import ProbelyException, ProbelyBadRequest
 from probely_cli.cli.common import validate_and_retrieve_yaml_content
 
 err_console = Console(stderr=True)
@@ -24,7 +25,7 @@ def add_targets(args):
     logger.debug("extra_payload: {}".format(extra_payload))
 
     try:
-        target: dict = sdk.add_target(
+        target: dict = add_target(
             site_url,
             site_name=site_name,
             extra_payload=extra_payload,
