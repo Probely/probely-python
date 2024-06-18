@@ -39,7 +39,7 @@ def build_parser():
     )
 
     probely_parser = argparse.ArgumentParser(
-        prog="Probely",
+        prog="probely",
         description="Welcome to Probely's CLI",
         formatter_class=RichHelpFormatter,
     )
