@@ -1,16 +1,22 @@
+import logging
+
 from probely_cli.sdk.scans import start_scan
 from rich.console import Console
 
-err_console = Console(stderr=True)
 console = Console()
+
+
+logger = logging.getLogger(__name__)
 
 
 def start_scans_command_handler(args):
     target_id = args.target_id
 
-    console.print("starting scan for target id: {}".format(target_id))
+    logger.debug("Starting scan for target id: {}".format(target_id))
 
-    scan = start_scan(target_id)
+    body = {}
+    # TODO: option to add extra payload
+    scan = start_scan(target_id, body)
 
     if args.raw:
         console.print(scan)

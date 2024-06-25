@@ -1,9 +1,14 @@
 import argparse
+from pathlib import Path
+
+import yaml
+
 import probely_cli.settings as settings
-from probely_cli.exceptions import ProbelyException
 from functools import wraps
 
 from rich.console import Console
+
+from probely_cli.exceptions import ProbelyCLIValidation
 
 err_console = Console(stderr=True)
 
@@ -39,30 +44,30 @@ class CliApp:
 
 def show_help(args):
     if args.is_no_action_parser:
-        args.parser.print_help()
+        args.cli_parser.print_help()
 
 
 def validate_and_retrieve_yaml_content(yaml_file_path):
-    if not yaml_file_path.exists():
+    file_path = Path(yaml_file_path)
+
+    if not file_path.exists():
+        raise ProbelyCLIValidation("Provided path does not exist: {}".format(file_path))
+
+    if not file_path.is_file():
         raise ProbelyCLIValidation(
-            "Provided path does not exist: {}".format(yaml_file_path)
+            "Provided path is not a file: {}".format(file_path.absolute())
         )
 
-    if not yaml_file_path.is_file():
-        raise ProbelyCLIValidation(
-            "Provided path is not a file: {}".format(yaml_file_path.absolute())
-        )
-
-    if yaml_file_path.suffix not in settings.CLI_ACCEPTED_FILE_EXTENSIONS:
+    if file_path.suffix not in settings.CLI_ACCEPTED_FILE_EXTENSIONS:
         raise ProbelyCLIValidation(
             "Invalid file extension, must be one of the following: {}:".format(
                 settings.CLI_ACCEPTED_FILE_EXTENSIONS
             )
         )
 
-    with yaml_file_path.open() as yaml_file:
+    with file_path.open() as yaml_file:
         try:
-            # I need to validate and make sure what versions of yaml we support
+            # TODO: supported yaml versions?
             yaml_content = yaml.safe_load(yaml_file)
         except yaml.scanner.ScannerError as ex:
             raise ProbelyCLIValidation("Invalid yaml content in file: {}".format(ex))

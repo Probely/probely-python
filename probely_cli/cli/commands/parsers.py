@@ -19,7 +19,6 @@ def build_parser():
         help="Override API KEY used for requests",
         default=None,
     )
-
     configs_parser.add_argument(
         "--debug",
         help="Override DEBUG MODE setting",
@@ -69,7 +68,6 @@ def build_parser():
         "list",
         parents=[configs_parser, raw_response_parser],
         formatter_class=probely_parser.formatter_class,
-        # formatter_class=probely_parser.formatter_class,
     )
     targets_list_parser.add_argument(
         "--count-only",

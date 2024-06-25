@@ -46,6 +46,6 @@ def _get_client() -> requests.Session:
     session = requests.Session()
     api_key = Probely().APP_CONFIG["api_key"]
 
-    logger.debug(f"Session setup with api_key {api_key[:5]}**************")
+    logger.debug("Session setup with api_key ************{}".format(api_key[-4:]))
     session.headers.update({"Authorization": "JWT " + api_key})
     return session

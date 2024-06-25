@@ -19,7 +19,7 @@ def add_targets_command_handler(args):
     yaml_file_path = args.yaml_file_path
 
     extra_payload = {}
-    if yaml_file_path:  # TODO: validate is correct file
+    if yaml_file_path:
         extra_payload = validate_and_retrieve_yaml_content(yaml_file_path)
 
     logger.debug("extra_payload: {}".format(extra_payload))

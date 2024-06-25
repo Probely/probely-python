@@ -22,7 +22,7 @@ def apply_command_handler(args):
 
     :param args:
     """
-    yaml_file_path: Path = Path(args.yaml_file)
+    yaml_file_path: str = args.yaml_file
 
     yaml_content = validate_and_retrieve_yaml_content(yaml_file_path)
 
