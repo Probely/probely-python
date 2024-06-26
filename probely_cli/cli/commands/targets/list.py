@@ -3,7 +3,6 @@ from rich.console import Console
 from rich.table import Table
 
 
-err_console = Console(stderr=True)
 console = Console()
 
 
@@ -23,12 +22,12 @@ def get_tabled_target_list(targets_list):
 
 
 def list_targets_command_handler(args):
-    targets_list = list_targets()
     """
     Lists targets
 
-    List all accessable targets
+    List all accessible targets
     """
+    targets_list = list_targets()
 
     if args.count_only:
         console.print(len(targets_list))

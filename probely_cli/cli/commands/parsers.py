@@ -38,6 +38,19 @@ def build_parser():
         default=False,
     )
 
+    file_parser = argparse.ArgumentParser(
+        description="File allowing to send customized payload to Probely's API",
+        add_help=False,
+        formatter_class=RichHelpFormatter,
+    )
+    file_parser.add_argument(
+        "-f",
+        "--yaml-file",
+        dest="yaml_file_path",
+        default=None,
+        help="Path to yaml file. Accepts same payload as listed in API docs",
+    )
+
     probely_parser = argparse.ArgumentParser(
         prog="probely",
         description="Welcome to Probely's CLI",
@@ -79,7 +92,7 @@ def build_parser():
 
     targets_create_parser = targets_command_parser.add_parser(
         "add",
-        parents=[configs_parser, raw_response_parser],
+        parents=[configs_parser, raw_response_parser, file_parser],
         formatter_class=RichHelpFormatter,
     )
 
@@ -91,25 +104,7 @@ def build_parser():
         default=None,
     )
 
-    targets_create_parser.add_argument(
-        "-f",
-        "--yaml-file",
-        dest="yaml_file_path",
-        default=None,
-        help="Path to yaml file with target option. Accepts same options as in API docs",
-    )
-
     targets_create_parser.set_defaults(func=add_targets_command_handler)
-
-    apply_parser = commands_parser.add_parser(
-        "apply",
-        parents=[configs_parser, raw_response_parser],
-        formatter_class=RichHelpFormatter,
-    )
-    apply_parser.add_argument("yaml_file")
-    apply_parser.set_defaults(
-        func=apply_command_handler,
-    )
 
     scans_parser = commands_parser.add_parser(
         "scans",
@@ -127,7 +122,7 @@ def build_parser():
 
     scans_start_parser = scans_command_parser.add_parser(
         "start",
-        parents=[configs_parser, raw_response_parser],
+        parents=[configs_parser, raw_response_parser, file_parser],
         formatter_class=probely_parser.formatter_class,
     )
     scans_start_parser.add_argument(

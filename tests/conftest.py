@@ -1,4 +1,8 @@
+from pathlib import Path
+from typing import Callable, Dict
+
 import pytest
+import yaml
 
 from probely_cli.cli import build_parser
 
@@ -7,6 +11,24 @@ from probely_cli.cli import build_parser
 def cli_parser():
     command_parser = build_parser()
     return command_parser
+
+
+@pytest.fixture()
+def create_testable_yaml_file(tmp_path: Path) -> Callable:
+    """
+    Returns function that generates temporary yaml file ideal
+    to test file parameter of CLI commands.
+    """
+
+    def _create_testable_yaml_file(file_name: str, file_content: Dict) -> str:
+        yaml_content = yaml.dump(file_content)
+
+        testable_yaml_file: Path = tmp_path / file_name
+        testable_yaml_file.write_text(yaml_content)
+
+        return str(testable_yaml_file)
+
+    return _create_testable_yaml_file
 
 
 @pytest.fixture()

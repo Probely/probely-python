@@ -1,3 +1,4 @@
+from typing import Dict
 from unittest.mock import patch, Mock
 
 import pytest
@@ -6,8 +7,8 @@ from probely_cli.exceptions import ProbelyRequestFailed
 from probely_cli.sdk.scans import start_scan
 
 
-@patch("probely_cli.sdk.scans.RequestProbely.post")
-def test_start_scan(mock_client: Mock, valid_scans_start_api_response):
+@patch("probely_cli.sdk.client.ProbelyAPICaller.post")
+def test_start_scan(mock_client: Mock, valid_scans_start_api_response: Dict):
     response_content = valid_scans_start_api_response
     valid_status_code = 200
 
@@ -25,16 +26,32 @@ def test_start_scan(mock_client: Mock, valid_scans_start_api_response):
     assert scan == response_content
 
 
-@patch("probely_cli.sdk.scans.RequestProbely.post")
+@patch(
+    "probely_cli.sdk.client.ProbelyAPICaller.post",
+    return_value=(200, {"content": "not relevant"}),
+)
+def test_start_scan_with_extra_payload(mock_client: Mock):
+    random_id = "sdkfjsfhskfjhs"
+    extra_payload = {"some_example": "example value"}
+
+    start_scan(random_id, extra_payload)
+
+    mock_client.assert_called_once()
+
+    request_body = mock_client.call_args[0][1]
+    assert request_body == extra_payload
+
+
+@patch("probely_cli.sdk.client.ProbelyAPICaller.post")
 def test_start_scan_failed(mock_client):
-    response_content = {"error": "random error message"}
+    response_error_content = {"error": "random error message"}
     invalid_status_code = 400
 
-    mock_client.return_value = (invalid_status_code, response_content)
+    mock_client.return_value = (invalid_status_code, response_error_content)
 
     with pytest.raises(ProbelyRequestFailed) as exc_info:
         start_scan("random_id")
 
-        assert exc_info == response_content
+        assert exc_info == response_error_content
 
     mock_client.assert_called_once()

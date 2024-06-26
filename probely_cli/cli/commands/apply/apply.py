@@ -22,6 +22,7 @@ def apply_command_handler(args):
 
     :param args:
     """
+    # TODO: add docstring
     yaml_file_path: str = args.yaml_file
 
     yaml_content = validate_and_retrieve_yaml_content(yaml_file_path)
