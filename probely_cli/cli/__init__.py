@@ -1,14 +1,16 @@
 import logging
 from argparse import Namespace
 
-from .commands.parsers import build_parser
+from .commands.parsers import build_cli_parser
 from .common import CliApp
 
 logger = logging.getLogger(__name__)
 
 
 def app():
-    args: Namespace = build_parser().parse_args()
+    cli_parser = build_cli_parser()
+    args: Namespace = cli_parser.parse_args()
+    args.cli_parser = cli_parser
 
     cli_app = CliApp(args)
 

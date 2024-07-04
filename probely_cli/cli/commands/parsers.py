@@ -8,7 +8,7 @@ from probely_cli.cli.commands.targets.list import list_targets_command_handler
 from probely_cli.cli.common import show_help
 
 
-def build_parser():
+def build_cli_parser():
     configs_parser = argparse.ArgumentParser(
         description="Configs settings parser",
         add_help=False,  # avoids conflicts with --help child command
