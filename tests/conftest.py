@@ -4,12 +4,12 @@ from typing import Callable, Dict
 import pytest
 import yaml
 
-from probely_cli.cli import build_parser
+from probely_cli.cli import build_cli_parser
 
 
 @pytest.fixture
 def cli_parser():
-    command_parser = build_parser()
+    command_parser = build_cli_parser()
     return command_parser
 
 
