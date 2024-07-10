@@ -49,7 +49,13 @@ def _get_client() -> requests.Session:
     session = requests.Session()
     api_key = Probely().APP_CONFIG["api_key"]
 
-    logger.debug("Session setup with api_key ************{}".format(api_key[-4:]))
+    debug_message = (
+        "Session setup with api_key ************{}".format(api_key[-4:])
+        if api_key
+        else "No API Key provided"
+    )
+    logger.debug(debug_message)
+
     session.headers.update({"Authorization": "JWT " + api_key})
     return session
 
@@ -64,6 +70,7 @@ class ProbelyAPICaller:  # TODO: tests missing
 
         return self.call_probely_api(request)
 
+    # noinspection PyMethodMayBeStatic
     def call_probely_api(self, request):
         session: Session = _get_client()
         prepared_request = session.prepare_request(request)
