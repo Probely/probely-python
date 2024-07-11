@@ -2,9 +2,11 @@ import logging
 from pathlib import Path
 
 from rich.console import Console
-
-from probely_cli import sdk
-from probely_cli.exceptions import ProbelyException, ProbelyBadRequest
+from probely_cli.sdk.targets import add_target
+from probely_cli.exceptions import (
+    ProbelyException,
+    ProbelyBadRequest,
+)
 from probely_cli.cli.commands.apply.schemas import ApplyFileSchema
 from probely_cli.cli.common import validate_and_retrieve_yaml_content
 
@@ -14,13 +16,14 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 
-def apply_file(args):
+def apply_command_handler(args):
     """
     This is a test
 
     :param args:
     """
-    yaml_file_path: Path = Path(args.yaml_file)
+    # TODO: add docstring
+    yaml_file_path: str = args.yaml_file
 
     yaml_content = validate_and_retrieve_yaml_content(yaml_file_path)
 
@@ -35,7 +38,7 @@ def apply_file(args):
         try:
             # TODO: This is the same as in add_targets(). abstract?
             url = payload["site"]["url"]
-            target = sdk.add_target(url, extra_payload=payload)
+            target = add_target(url, extra_payload=payload)
             console.print(target["id"])
         except ProbelyException as probely_ex:
             err_console.print(str(probely_ex))

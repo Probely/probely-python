@@ -1,8 +1,11 @@
+import json
 import logging
 
 import requests
+from requests import Request, Session
+
 from probely_cli import settings
-from probely_cli.exceptions import ProbelyMissConfig
+from probely_cli.exceptions import ProbelyMissConfig, ProbelyApiUnavailable
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +49,43 @@ def _get_client() -> requests.Session:
     session = requests.Session()
     api_key = Probely().APP_CONFIG["api_key"]
 
-    logger.debug(f"Session setup with api_key {api_key[:5]}**************")
+    debug_message = (
+        "Session setup with api_key ************{}".format(api_key[-4:])
+        if api_key
+        else "No API Key provided"
+    )
+    logger.debug(debug_message)
+
     session.headers.update({"Authorization": "JWT " + api_key})
     return session
+
+
+class ProbelyAPICaller:  # TODO: tests missing
+    def post(self, url, payload: dict = None):
+        if payload is None:
+            payload = {}
+
+        logger.debug("Requesting probely. Payload: {}".format(payload))
+        request = Request("post", url=url, json=payload)
+
+        return self.call_probely_api(request)
+
+    # noinspection PyMethodMayBeStatic
+    def call_probely_api(self, request):
+        session: Session = _get_client()
+        prepared_request = session.prepare_request(request)
+
+        resp = session.send(prepared_request)
+
+        status_code = resp.status_code
+        try:
+            content = json.loads(resp.content)
+        except json.JSONDecodeError:  # todo: needs testing
+            logger.debug(
+                "Something wrong with the API. Response content is not valid JSON."
+            )
+            raise ProbelyApiUnavailable
+
+        logger.debug(f"Response content: {content}")
+
+        return status_code, content
