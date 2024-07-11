@@ -1,9 +1,8 @@
-from probely_cli import sdk
+from probely_cli.sdk.targets import list_targets
 from rich.console import Console
 from rich.table import Table
 
 
-err_console = Console(stderr=True)
 console = Console()
 
 
@@ -22,14 +21,14 @@ def get_tabled_target_list(targets_list):
     return table
 
 
-def list_targets(args):
+def list_targets_command_handler(args):
     """
     Lists targets
 
-    List all accessable targets
+    List all accessible targets
     """
+    targets_list = list_targets()
 
-    targets_list = sdk.list_targets()
     if args.count_only:
         console.print(len(targets_list))
         return
