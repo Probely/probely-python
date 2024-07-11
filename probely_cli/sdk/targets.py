@@ -5,7 +5,7 @@ from typing import List, Dict
 from mergedeep import merge, Strategy
 from requests import sessions, Request
 
-from .client import _get_client
+from .client import ProbelyAPIClient
 from probely_cli.exceptions import ProbelyRequestFailed, ProbelyBadRequest
 from ..settings import PROBELY_API_TARGETS_URL
 
@@ -13,7 +13,7 @@ from ..settings import PROBELY_API_TARGETS_URL
 logger = logging.getLogger(__name__)
 
 
-def list_targets() -> List[Dict]:
+def list_targets() -> List[Dict]:  # TODO: needs testing
     """Lists existing account's targets
 
     :return: All Targets of account
@@ -22,17 +22,16 @@ def list_targets() -> List[Dict]:
     """
     # TODO: go through pagination
     # or maybe the option to return a generator for the sdk??
-    r = _get_client().get(PROBELY_API_TARGETS_URL)
+    # r = _get_client().get(PROBELY_API_TARGETS_URL)
+    resp_status_code, resp_content = ProbelyAPIClient().get(PROBELY_API_TARGETS_URL)
 
-    output = json.loads(r.content)
+    if resp_status_code != 200:
+        raise ProbelyRequestFailed(resp_content["detail"])
 
-    if r.status_code != 200:
-        raise ProbelyRequestFailed(output["detail"])
-
-    return output["results"]
+    return resp_content["results"]
 
 
-def add_target(
+def add_target(  # TODO: needs testing
     site_url: str,
     site_name: str = None,
     extra_payload: dict = None,
@@ -65,21 +64,17 @@ def add_target(
     merge(body_data, arguments_settings, strategy=Strategy.REPLACE)
 
     logger.debug("Add target request content: %s", body_data)
-    session: sessions.Session = _get_client()
-    prepared_request = session.prepare_request(
-        Request("post", url=create_target_url, json=body_data)
+    resp_status_code, resp_content = ProbelyAPIClient().post(
+        url=create_target_url, payload=body_data
     )
 
-    resp = session.send(prepared_request)
-    output = json.loads(resp.content)
-
-    logger.debug("Add target request response code: %s", resp.status_code)
-    if resp.status_code == 400:
-        ex = ProbelyBadRequest(response_payload=output)
+    logger.debug("Add target request response code: %s", resp_status_code)
+    if resp_status_code == 400:
+        ex = ProbelyBadRequest(response_payload=resp_content)
         raise ex
 
-    if resp.status_code != 201:
-        raise ProbelyRequestFailed(output["detail"])
+    if resp_status_code != 201:
+        raise ProbelyRequestFailed(resp_content["detail"])
 
-    created_target = output
+    created_target = resp_content
     return created_target
