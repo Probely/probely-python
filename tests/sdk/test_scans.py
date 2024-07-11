@@ -7,7 +7,7 @@ from probely_cli.exceptions import ProbelyRequestFailed
 from probely_cli.sdk.scans import start_scan
 
 
-@patch("probely_cli.sdk.client.ProbelyAPICaller.post")
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
 def test_start_scan(mock_client: Mock, valid_scans_start_api_response: Dict):
     response_content = valid_scans_start_api_response
     valid_status_code = 200
@@ -27,7 +27,7 @@ def test_start_scan(mock_client: Mock, valid_scans_start_api_response: Dict):
 
 
 @patch(
-    "probely_cli.sdk.client.ProbelyAPICaller.post",
+    "probely_cli.sdk.client.ProbelyAPIClient.post",
     return_value=(200, {"content": "not relevant"}),
 )
 def test_start_scan_with_extra_payload(mock_client: Mock):
@@ -42,7 +42,7 @@ def test_start_scan_with_extra_payload(mock_client: Mock):
     assert request_body == extra_payload
 
 
-@patch("probely_cli.sdk.client.ProbelyAPICaller.post")
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
 def test_start_scan_failed(mock_client):
     response_error_content = {"error": "random error message"}
     invalid_status_code = 400

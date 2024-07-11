@@ -1,9 +1,7 @@
-import json
 import logging
 from typing import List, Dict
 
 from mergedeep import merge, Strategy
-from requests import sessions, Request
 
 from .client import ProbelyAPIClient
 from probely_cli.exceptions import ProbelyRequestFailed, ProbelyBadRequest
@@ -13,7 +11,7 @@ from ..settings import PROBELY_API_TARGETS_URL
 logger = logging.getLogger(__name__)
 
 
-def list_targets() -> List[Dict]:  # TODO: needs testing
+def list_targets() -> List[Dict]:
     """Lists existing account's targets
 
     :return: All Targets of account
@@ -22,10 +20,9 @@ def list_targets() -> List[Dict]:  # TODO: needs testing
     """
     # TODO: go through pagination
     # or maybe the option to return a generator for the sdk??
-    # r = _get_client().get(PROBELY_API_TARGETS_URL)
     resp_status_code, resp_content = ProbelyAPIClient().get(PROBELY_API_TARGETS_URL)
 
-    if resp_status_code != 200:
+    if resp_status_code != 200:  # TODO: needs testing
         raise ProbelyRequestFailed(resp_content["detail"])
 
     return resp_content["results"]
