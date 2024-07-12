@@ -45,35 +45,35 @@ class Probely:
         instance.__init__(*args, **kwargs)
 
 
-def _get_client() -> requests.Session:
-    session = requests.Session()
-    api_key = Probely().APP_CONFIG["api_key"]
+class ProbelyAPIClient:
 
-    logger.debug("Session setup with api_key ************{}".format(api_key[-4:]))
-    session.headers.update({"Authorization": "JWT " + api_key})
-    return session
+    def get(self, url):
+        request = Request("get", url=url)
 
+        return self._call_probely_api(request)
 
-class ProbelyAPICaller:  # TODO: tests missing
     def post(self, url, payload: dict = None):
         if payload is None:
             payload = {}
 
-        logger.debug("Requesting probely. Payload: {}".format(payload))
+        logger.debug("Requesting probely API. Payload: {}".format(payload))
         request = Request("post", url=url, json=payload)
 
-        return self.call_probely_api(request)
+        return self._call_probely_api(request)
 
-    def call_probely_api(self, request):
-        session: Session = _get_client()
+    # noinspection PyMethodMayBeStatic
+    def _call_probely_api(self, request):
+        session: Session = self._build_session()
         prepared_request = session.prepare_request(request)
 
+        logger.debug("Requesting probely API in {}".format(prepared_request.url))
         resp = session.send(prepared_request)
 
         status_code = resp.status_code
         try:
             content = json.loads(resp.content)
         except json.JSONDecodeError:  # todo: needs testing
+            print(resp.content)
             logger.debug(
                 "Something wrong with the API. Response content is not valid JSON."
             )
@@ -82,3 +82,18 @@ class ProbelyAPICaller:  # TODO: tests missing
         logger.debug(f"Response content: {content}")
 
         return status_code, content
+
+    # noinspection PyMethodMayBeStatic
+    def _build_session(self) -> requests.Session:
+        session = requests.Session()
+        api_key = Probely().APP_CONFIG["api_key"]
+
+        debug_message = (
+            "Session setup with api_key ************{}".format(api_key[-4:])
+            if api_key
+            else "No API Key provided"
+        )
+        logger.debug(debug_message)
+
+        session.headers.update({"Authorization": "JWT " + api_key})
+        return session

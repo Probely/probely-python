@@ -85,9 +85,9 @@ IS_DEBUG_MODE = _get_probely_debug()
 CLI_ACCEPTED_FILE_EXTENSIONS = [".yaml", ".yml"]
 
 PROBELY_API_URL_BASE = os.getenv(
-    "PROBELY_API_URL_BASE", default="https://api.qa.eu.probely.com/"
+    "PROBELY_API_URL_BASE",
+    default="https://api.qa.eu.probely.dev/",
 )
-
 # URLs
 PROBELY_API_TARGETS_URL = PROBELY_API_URL_BASE + "targets/"
 PROBELY_API_SCANS_URL = PROBELY_API_URL_BASE + "targets/"

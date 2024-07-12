@@ -1,18 +1,33 @@
 import json
-from unittest import mock
+from unittest.mock import Mock, patch
+
+import pytest
+
+from probely_cli.exceptions import ProbelyRequestFailed
 from probely_cli.sdk.targets import list_targets
 
 
-@mock.patch("probely_cli.sdk.client.requests.Session.get")
-def test_list_targets(mock_session):
-    response_content = [{"list": "of objects1"}, {"list": "of objects2"}]
-    expected_content = str.encode(json.dumps({"results": response_content}))
+@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+def test_list_targets_ok(api_client_mock: Mock):
+    expected_content = [{"list": "of objects1"}, {"list": "of objects2"}]
+    response_content = {"results": expected_content}
 
-    mock_response = mock.Mock()
-    mock_response.status_code = 200
-    mock_response.content = expected_content
-
-    mock_session.return_value = mock_response
+    api_client_mock.return_value = (200, response_content)
 
     r = list_targets()
-    assert r == response_content
+    assert r == expected_content
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+def test_list_targets_unsuccessful(api_client_mock: Mock):
+    invalid_status_code = 400
+    error_message = "request invalid"
+    error_response_content = {"detail": error_message}
+
+    api_client_mock.return_value = (invalid_status_code, error_response_content)
+
+    with pytest.raises(ProbelyRequestFailed) as exc:
+        list_targets()
+
+        raised_exception = exc.value
+        assert str(raised_exception) == error_message
