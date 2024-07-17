@@ -1,5 +1,6 @@
 import json
 import logging
+from urllib.parse import urlencode
 
 import requests
 from requests import Request, Session
@@ -47,12 +48,18 @@ class Probely:
 
 class ProbelyAPIClient:
 
-    def get(self, url):
+    def get(self, url, query_params=None):
+        if query_params:
+            url = f"{url}?{urlencode(query_params)}"
+
         request = Request("get", url=url)
 
         return self._call_probely_api(request)
 
-    def post(self, url, payload: dict = None):
+    def post(self, url, payload: dict = None, query_params: dict = None):
+        if query_params:
+            url = f"{url}?{urlencode(query_params)}"
+
         if payload is None:
             payload = {}
 

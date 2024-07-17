@@ -1,4 +1,5 @@
 import argparse
+from enum import Enum
 from pathlib import Path
 
 import yaml
@@ -73,3 +74,11 @@ def validate_and_retrieve_yaml_content(yaml_file_path):
             raise ProbelyCLIValidation("Invalid yaml content in file: {}".format(ex))
 
     return yaml_content
+
+
+class RiskEnum(Enum):
+    NA = None
+    NO_RISK = 0  # not applicable
+    LOW = 10
+    NORMAL = 20
+    HIGH = 30

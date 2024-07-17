@@ -45,7 +45,8 @@ dependencies = [
     "environs",
     "marshmallow",
     "pyyaml",
-    "mergedeep"
+    "mergedeep",
+    "python-dateutil", # 3.8's datetime dont recognize probely API's iso date format
 ]
 
 [project.optional-dependencies]

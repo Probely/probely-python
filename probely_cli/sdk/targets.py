@@ -11,16 +11,26 @@ from ..settings import PROBELY_API_TARGETS_URL
 logger = logging.getLogger(__name__)
 
 
-def list_targets() -> List[Dict]:
+def get_targets() -> List[Dict]:
     """Lists existing account's targets
 
     :return: All Targets of account
     :rtype: List[Dict]
 
     """
-    # TODO: go through pagination
+
+    query_params = {
+        "length": 50,
+        "ordering": "-changed",
+        "page": 1,
+    }
+
+    # TODO: go through pagination?
     # or maybe the option to return a generator for the sdk??
-    resp_status_code, resp_content = ProbelyAPIClient().get(PROBELY_API_TARGETS_URL)
+    resp_status_code, resp_content = ProbelyAPIClient().get(
+        PROBELY_API_TARGETS_URL,
+        query_params=query_params,
+    )
 
     if resp_status_code != 200:  # TODO: needs testing
         raise ProbelyRequestFailed(resp_content["detail"])

@@ -4,7 +4,7 @@ from rich_argparse import RichHelpFormatter
 from probely_cli.cli.commands.apply.apply import apply_command_handler
 from probely_cli.cli.commands.scans.start import start_scans_command_handler
 from probely_cli.cli.commands.targets.add import add_targets_command_handler
-from probely_cli.cli.commands.targets.list import list_targets_command_handler
+from probely_cli.cli.commands.targets.get import targets_get_command_handler
 from probely_cli.cli.common import show_help
 
 
@@ -26,6 +26,7 @@ def build_cli_parser():
         default=False,
     )
 
+    # TODO: kill in exchange of -o/--output option
     raw_response_parser = argparse.ArgumentParser(
         description="Returns JSON http response",
         add_help=False,
@@ -78,17 +79,12 @@ def build_cli_parser():
     targets_command_parser = targets_parser.add_subparsers()
 
     targets_list_parser = targets_command_parser.add_parser(
-        "list",
-        parents=[configs_parser, raw_response_parser],
+        "get",
+        parents=[configs_parser],
         formatter_class=probely_parser.formatter_class,
     )
-    targets_list_parser.add_argument(
-        "--count-only",
-        action="store_true",
-        help="Returns count of target",
-    )
 
-    targets_list_parser.set_defaults(func=list_targets_command_handler)
+    targets_list_parser.set_defaults(func=targets_get_command_handler)
 
     targets_create_parser = targets_command_parser.add_parser(
         "add",
