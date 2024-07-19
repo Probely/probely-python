@@ -56,10 +56,7 @@ class ProbelyAPIClient:
 
         return self._call_probely_api(request)
 
-    def post(self, url, payload: dict = None, query_params: dict = None):
-        if query_params:
-            url = f"{url}?{urlencode(query_params)}"
-
+    def post(self, url, payload: dict = None):
         if payload is None:
             payload = {}
 

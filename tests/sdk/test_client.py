@@ -1,6 +1,7 @@
 import json
 from unittest import mock
 from unittest.mock import patch, Mock
+from urllib.parse import urlencode
 
 import pytest
 import requests
@@ -60,6 +61,29 @@ def test_call_probely_api_correct_content_and_url_are_request(session_send_mock:
     assert args.body == str.encode(testable_content)
     assert args.path_url == "/"
     assert args.url == random_url
+
+
+@patch("probely_cli.sdk.client.requests.Session.send")
+def test_call_probely_api_url_is_populated_with_query_params(
+    session_send_mock: Mock,
+):
+    random_url = "https://randomurl.com/"
+    query_params = {"key1": "value1", "key2": "value2"}
+    expected_url_query_params = urlencode(query_params)
+
+    session_send_mock.return_value = Mock(
+        status_code=200,
+        content='{"not": "relevant"}',
+    )
+
+    ProbelyAPIClient().get(url=random_url, query_params=query_params)
+
+    args = session_send_mock.call_args.args[0]
+
+    assert isinstance(args, PreparedRequest)
+
+    assert args.path_url == "/?" + expected_url_query_params
+    assert args.url == random_url + "?" + expected_url_query_params
 
 
 @patch("probely_cli.sdk.client.requests.Session.send")

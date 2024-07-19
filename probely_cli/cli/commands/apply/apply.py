@@ -10,8 +10,6 @@ from probely_cli.exceptions import (
 from probely_cli.cli.commands.apply.schemas import ApplyFileSchema
 from probely_cli.cli.common import validate_and_retrieve_yaml_content
 
-err_console = Console(stderr=True)
-console = Console()
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +37,8 @@ def apply_command_handler(args):
             # TODO: This is the same as in add_targets(). abstract?
             url = payload["site"]["url"]
             target = add_target(url, extra_payload=payload)
-            console.print(target["id"])
+            args.console.print(target["id"])
         except ProbelyException as probely_ex:
-            err_console.print(str(probely_ex))
+            args.err_console.print(str(probely_ex))
             if isinstance(probely_ex, ProbelyBadRequest):
-                err_console.print(str(probely_ex.response_payload))
+                args.err_console.print(str(probely_ex.response_payload))

@@ -26,7 +26,7 @@ def test_start_scans_command_handler(
 
 
 @patch("probely_cli.cli.commands.scans.start.start_scan")
-def test_start_scans_yaml_file_argument(
+def test_scans_start_yaml_file_argument(
     sdk_start_scan_mock: Mock,
     valid_scans_start_api_response: Dict,
     cli_parser,
@@ -61,8 +61,10 @@ def test_start_scans_yaml_file_argument(
 
 
 @patch("probely_cli.cli.commands.scans.start.start_scan")
-def test_start_scans_request_with_exception(
-    sdk_start_scan_mock: Mock, cli_parser, capsys
+def test_scans_start_request_with_exception(
+    sdk_start_scan_mock: Mock,
+    cli_parser,
+    capsys,
 ):
     exception_message = "An error occurred"
 

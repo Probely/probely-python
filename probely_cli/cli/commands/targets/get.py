@@ -8,8 +8,6 @@ from rich.console import Console
 from rich.table import Table
 
 
-console = Console()
-
 TARGET_NEVER_SCANNED_OUTPUT: str = "Never scanned"
 
 
@@ -53,18 +51,18 @@ def _get_printable_labels(target: Dict) -> str:
 def get_tabled_targets(targets_list: List[Dict]):
     table = Table(box=None)
     table.add_column("ID")
-    table.add_column("Name")
-    table.add_column("Url")
-    table.add_column("Risk")
-    table.add_column("Last Scan")
-    table.add_column("Labels")
+    table.add_column("NAME")
+    table.add_column("URL")
+    table.add_column("RISK")
+    table.add_column("LAST_SCAN")
+    table.add_column("LABELS")
 
     for target in targets_list:
         asset = target.get("site")
 
         table.add_row(
             target.get("id"),
-            asset.get("name"),
+            asset.get("name", "N/D"),
             asset.get("url"),
             _get_printable_risk(target),
             _get_printable_last_scan_date(target),
@@ -79,6 +77,5 @@ def targets_get_command_handler(args):
     Lists all accessible targets of client
     """
     targets_list = get_targets()
-    print(len(targets_list))
     table = get_tabled_targets(targets_list)
-    console.print(table)
+    args.console.print(table)

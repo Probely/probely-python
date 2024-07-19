@@ -14,17 +14,6 @@ from probely_cli.exceptions import ProbelyCLIValidation
 err_console = Console(stderr=True)
 
 
-def cli_exception_handler(func):
-    @wraps(func)
-    def func_wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            err_console.print(e)
-
-    return func_wrapper
-
-
 class CliApp:
     args: argparse.Namespace
 
@@ -38,9 +27,11 @@ class CliApp:
 
         self.args = args
 
-    @cli_exception_handler
-    def run(self, func):
-        return func(self.args)
+    def run(self, command_handler):
+        try:
+            return command_handler(self.args)
+        except Exception as e:
+            self.args.err_console.print(e)
 
 
 def show_help(args):
