@@ -4,7 +4,6 @@ from dateutil import parser
 
 from probely_cli.cli.common import RiskEnum
 from probely_cli.sdk.targets import get_targets
-from rich.console import Console
 from rich.table import Table
 
 

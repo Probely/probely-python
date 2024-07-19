@@ -8,18 +8,15 @@ import pytest
 def test_start_scans_command_handler(
     sdk_start_scan_mock: Mock,
     valid_scans_start_api_response: Dict,
-    cli_parser,
-    capsys,
+    probely_cli,
 ):
     sdk_start_scan_mock.return_value = valid_scans_start_api_response
-    args = cli_parser.parse_args(["scans", "start", "random_target_id"])
-    args.func(args)
+    stdout, stderr = probely_cli("scans", "start", "random_target_id")
 
     expected_id = valid_scans_start_api_response["id"]
 
-    captured = capsys.readouterr()
-    assert captured.out == expected_id + "\n"
-    assert captured.err == ""
+    assert stdout == expected_id + "\n"
+    assert stderr == ""
 
 
 # todo: test raw response
@@ -29,8 +26,7 @@ def test_start_scans_command_handler(
 def test_scans_start_yaml_file_argument(
     sdk_start_scan_mock: Mock,
     valid_scans_start_api_response: Dict,
-    cli_parser,
-    capsys,
+    probely_cli,
     create_testable_yaml_file,
 ):
     file_content = {
@@ -45,16 +41,14 @@ def test_scans_start_yaml_file_argument(
     )
 
     sdk_start_scan_mock.return_value = valid_scans_start_api_response
-    args = cli_parser.parse_args(
-        [
-            "scans",
-            "start",
-            "random_target_id",
-            "-f",
-            testable_yaml_file_path,
-        ]
+
+    probely_cli(
+        "scans",
+        "start",
+        "random_target_id",
+        "-f",
+        testable_yaml_file_path,
     )
-    args.func(args)
 
     extra_payload_arg = sdk_start_scan_mock.call_args[0][1]
     assert extra_payload_arg == file_content
@@ -63,18 +57,15 @@ def test_scans_start_yaml_file_argument(
 @patch("probely_cli.cli.commands.scans.start.start_scan")
 def test_scans_start_request_with_exception(
     sdk_start_scan_mock: Mock,
-    cli_parser,
-    capsys,
+    probely_cli,
 ):
     exception_message = "An error occurred"
 
     sdk_start_scan_mock.side_effect = Exception(exception_message)
-    captured = capsys.readouterr()
 
     with pytest.raises(Exception):
-        args = cli_parser.parse_args(["scans", "start", "random_target_id"])
-        args.func(args)
-        assert captured.out == ""
-        assert captured.err == exception_message
+        stdout, stderr = probely_cli("scans", "start", "random_target_id")
+        assert stdout == ""
+        assert stderr == exception_message
 
     sdk_start_scan_mock.assert_called_once()

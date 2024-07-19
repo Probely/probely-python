@@ -40,7 +40,7 @@ def probely_cli(cli_parser, capsys):
         # noinspection PyUnresolvedReferences
         raw_stdout = testable_console.file.getvalue()
         # noinspection PyUnresolvedReferences
-        raw_stderr = testable_console.file.getvalue()
+        raw_stderr = testable_err_console.file.getvalue()
 
         if return_list:
             stdout_lines_list = raw_stdout.splitlines()
