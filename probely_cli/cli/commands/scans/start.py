@@ -4,8 +4,6 @@ from probely_cli.cli.common import validate_and_retrieve_yaml_content
 from probely_cli.sdk.scans import start_scan
 from rich.console import Console
 
-console = Console()
-
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +20,7 @@ def start_scans_command_handler(args):
     scan = start_scan(target_id, extra_payload)
 
     if args.raw:
-        console.print(scan)
+        args.console.print(scan)
         return
 
-    console.print(scan["id"])
+    args.console.print(scan["id"])

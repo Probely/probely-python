@@ -6,9 +6,6 @@ from probely_cli.exceptions import ProbelyException, ProbelyBadRequest
 from probely_cli.sdk.targets import add_target
 from probely_cli.cli.common import validate_and_retrieve_yaml_content
 
-err_console = Console(stderr=True)
-console = Console()
-
 
 logger = logging.getLogger(__name__)
 
@@ -31,13 +28,13 @@ def add_targets_command_handler(args):
             extra_payload=extra_payload,
         )
     except ProbelyException as probely_ex:
-        err_console.print(str(probely_ex))
+        args.err_console.print(str(probely_ex))
         if isinstance(probely_ex, ProbelyBadRequest):
-            err_console.print(probely_ex.response_payload)
+            args.err_console.print(probely_ex.response_payload)
         return
 
     if args.raw:
-        console.print(target)
+        args.console.print(target)
         return
 
-    console.print(target["id"])
+    args.console.print(target["id"])

@@ -1,16 +1,23 @@
 import logging
 from argparse import Namespace
 
+from rich.console import Console
+
 from .commands.parsers import build_cli_parser
 from .common import CliApp
 
 logger = logging.getLogger(__name__)
+
+console = Console()
+err_console = Console(stderr=True)
 
 
 def app():
     cli_parser = build_cli_parser()
     args: Namespace = cli_parser.parse_args()
     args.cli_parser = cli_parser
+    args.console = console
+    args.err_console = err_console
 
     cli_app = CliApp(args)
 
