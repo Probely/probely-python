@@ -5,7 +5,7 @@ from probely_cli.cli.commands.apply.apply import apply_command_handler
 from probely_cli.cli.commands.scans.start import start_scans_command_handler
 from probely_cli.cli.commands.targets.add import add_targets_command_handler
 from probely_cli.cli.commands.targets.get import targets_get_command_handler
-from probely_cli.cli.common import show_help
+from probely_cli.cli.common import show_help, RiskEnum
 
 
 def build_cli_parser():
@@ -39,6 +39,48 @@ def build_cli_parser():
         default=False,
     )
 
+    target_filters_parser = argparse.ArgumentParser(
+        description="Filters usable in Targets commands",
+        add_help=False,
+        formatter_class=RichHelpFormatter,
+    )
+
+    bool_input_help_text = (
+        "Accepts falsy/truly values: 'true', 'false', 't', 'f', 'yes', 'no', etc"
+    )
+    # enabled (deprecated)
+    # label (moved to next iteration)
+    # label_logical_operator (moved to next iteration)
+    # risk
+    # scan_profile (moved to next iteration)
+    # search
+    # team (moved to next iteration)
+    # exclude_teams (moved to next iteration)
+    # type
+    # unlimited
+    # verified
+    target_filters_parser.add_argument(
+        "--f-has-unlimited-scans",
+        help="Filter if target has unlimited scans. " + bool_input_help_text,
+        action="store",
+        default=None,
+    )
+    target_filters_parser.add_argument(
+        "--f-is-url-verified",
+        help="Filter if target URL has verification. " + bool_input_help_text,
+        action="store",
+        default=None,
+    )
+
+    accepted_risk_values = ", ".join([str(risk.value) for risk in RiskEnum])
+
+    target_filters_parser.add_argument(
+        "--f-risk",
+        help="Filter targets by risk. Accepted values: " + accepted_risk_values,
+        action="store",
+        default=None,
+    )
+
     file_parser = argparse.ArgumentParser(
         description="File allowing to send customized payload to Probely's API",
         add_help=False,
@@ -67,7 +109,7 @@ def build_cli_parser():
 
     targets_parser = commands_parser.add_parser(
         "targets",
-        parents=[configs_parser, raw_response_parser],
+        parents=[configs_parser],
         formatter_class=RichHelpFormatter,
     )
     targets_parser.set_defaults(
@@ -80,7 +122,7 @@ def build_cli_parser():
 
     targets_list_parser = targets_command_parser.add_parser(
         "get",
-        parents=[configs_parser],
+        parents=[configs_parser, target_filters_parser],
         formatter_class=probely_parser.formatter_class,
     )
 
@@ -104,7 +146,7 @@ def build_cli_parser():
 
     scans_parser = commands_parser.add_parser(
         "scans",
-        parents=[configs_parser, raw_response_parser],
+        parents=[configs_parser],
         formatter_class=RichHelpFormatter,
     )
 
@@ -128,7 +170,7 @@ def build_cli_parser():
 
     apply_parser = commands_parser.add_parser(
         "apply",
-        parents=[configs_parser, raw_response_parser],
+        parents=[configs_parser],
         formatter_class=RichHelpFormatter,
     )
     apply_parser.add_argument("yaml_file")

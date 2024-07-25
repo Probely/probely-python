@@ -7,7 +7,7 @@ import pytest
 import yaml
 from rich.console import Console
 
-from probely_cli.cli import build_cli_parser
+from probely_cli.cli import build_cli_parser, CliApp
 from tests.testable_api_responses import (
     START_SCAN_200_RESPONSE,
     GET_TARGETS_200_RESPONSE,
@@ -28,6 +28,7 @@ def probely_cli(cli_parser, capsys):
             width=sys.maxsize,  # avoids word wrapping
         )
         testable_err_console = Console(
+            stderr=True,
             file=StringIO(),
             width=sys.maxsize,  # avoids word wrapping
         )
@@ -35,12 +36,14 @@ def probely_cli(cli_parser, capsys):
         args = cli_parser.parse_args(cmd_command)
         args.console = testable_console
         args.err_console = testable_err_console
-        args.func(args)
+
+        cli_app = CliApp(args)
+        cli_app.run()
 
         # noinspection PyUnresolvedReferences
-        raw_stdout = testable_console.file.getvalue()
+        raw_stdout: str = testable_console.file.getvalue()
         # noinspection PyUnresolvedReferences
-        raw_stderr = testable_err_console.file.getvalue()
+        raw_stderr: str = testable_err_console.file.getvalue()
 
         if return_list:
             stdout_lines_list = raw_stdout.splitlines()

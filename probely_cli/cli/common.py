@@ -5,13 +5,8 @@ from pathlib import Path
 import yaml
 
 import probely_cli.settings as settings
-from functools import wraps
-
-from rich.console import Console
 
 from probely_cli.exceptions import ProbelyCLIValidation
-
-err_console = Console(stderr=True)
 
 
 class CliApp:
@@ -27,9 +22,9 @@ class CliApp:
 
         self.args = args
 
-    def run(self, command_handler):
+    def run(self):
         try:
-            return command_handler(self.args)
+            return self.args.func(self.args)
         except Exception as e:
             self.args.err_console.print(e)
 
@@ -73,3 +68,7 @@ class RiskEnum(Enum):
     LOW = 10
     NORMAL = 20
     HIGH = 30
+
+    def __init__(self, value, label):
+        self._value_ = value
+        self.label = label

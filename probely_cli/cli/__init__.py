@@ -27,4 +27,4 @@ def app():
     logging.basicConfig(level=logging_level)
     logger.debug("DEBUG MODE IS ON")
 
-    return cli_app.run(args.func)
+    return cli_app.run()

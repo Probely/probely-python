@@ -1,18 +1,19 @@
+import json
 import re
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, call
 
 import pytest
 
 from probely_cli.cli.common import RiskEnum
 
 
-@patch("probely_cli.cli.commands.targets.get.get_targets")
+@patch("probely_cli.cli.commands.targets.get.list_targets")
 def test_targets_get__table_headers_output(
-    sdk_get_targets_mock: Mock,
+    sdk_list_targets_mock: Mock,
     valid_get_targets_api_response: dict,
     probely_cli,
 ) -> None:
-    sdk_get_targets_mock.return_value = valid_get_targets_api_response["results"]
+    sdk_list_targets_mock.return_value = valid_get_targets_api_response["results"]
 
     stdout, stderr = probely_cli("targets", "get", return_list=True)
 
@@ -36,9 +37,9 @@ def test_targets_get__table_headers_output(
         ({"started": "2024-07-15T15:47:52.608557Z"}, "2024-07-15 15:07"),
     ],
 )
-@patch("probely_cli.cli.commands.targets.get.get_targets")
+@patch("probely_cli.cli.commands.targets.get.list_targets")
 def test_targets_get__table_last_scan_date_output(
-    sdk_get_targets_mock: Mock,
+    sdk_list_targets_mock: Mock,
     testing_value,
     expected_output,
     probely_cli,
@@ -47,7 +48,7 @@ def test_targets_get__table_last_scan_date_output(
     testable_target_result = valid_get_targets_api_response["results"][0]
     testable_target_result["last_scan"] = testing_value
 
-    sdk_get_targets_mock.return_value = [testable_target_result]
+    sdk_list_targets_mock.return_value = [testable_target_result]
 
     stdout, stderr = probely_cli("targets", "get", return_list=True)
 
@@ -77,9 +78,9 @@ def test_targets_get__table_last_scan_date_output(
         ("323232320", "Unknown"),
     ],
 )
-@patch("probely_cli.cli.commands.targets.get.get_targets")
+@patch("probely_cli.cli.commands.targets.get.list_targets")
 def test_targets_get__table_risk_output(
-    sdk_get_targets_mock: Mock,
+    sdk_list_targets_mock: Mock,
     testing_value,
     expected_output,
     valid_get_targets_api_response,
@@ -87,7 +88,7 @@ def test_targets_get__table_risk_output(
 ):
     testable_target_result = valid_get_targets_api_response["results"][0]
     testable_target_result["risk"] = testing_value
-    sdk_get_targets_mock.return_value = [testable_target_result]
+    sdk_list_targets_mock.return_value = [testable_target_result]
 
     stdout, stderr = probely_cli("targets", "get", return_list=True)
 
@@ -114,9 +115,9 @@ def test_targets_get__table_risk_output(
         ([{"no_name_key": "no"}], "Unknown labels"),
     ],
 )
-@patch("probely_cli.cli.commands.targets.get.get_targets")
+@patch("probely_cli.cli.commands.targets.get.list_targets")
 def test_targets_get__table_labels_output(
-    sdk_get_targets_mock: Mock,
+    sdk_list_targets_mock: Mock,
     testing_value,
     expected_output,
     valid_get_targets_api_response,
@@ -124,7 +125,7 @@ def test_targets_get__table_labels_output(
 ):
     testable_target_result = valid_get_targets_api_response["results"][0]
     testable_target_result["labels"] = testing_value
-    sdk_get_targets_mock.return_value = [testable_target_result]
+    sdk_list_targets_mock.return_value = [testable_target_result]
 
     stdout, stderr = probely_cli("targets", "get", return_list=True)
 
@@ -139,3 +140,70 @@ def test_targets_get__table_labels_output(
     target_line = re.sub(r" {3,}", "  ", target_line)
     target_columns = target_line.split(column_separator)
     assert target_columns[5] == expected_output
+
+
+@pytest.mark.parametrize(
+    "filter_arg, expected_filter_request",
+    [
+        ("--f-has-unlimited-scans=True", {"unlimited": True}),
+        ("--f-has-unlimited-scans=False", {"unlimited": False}),
+        ("--f-is-url-verified=1", {"verified": True}),
+        ("--f-is-url-verified=0", {"verified": False}),
+    ],
+)
+@patch("probely_cli.cli.commands.targets.get.list_targets")
+def test_targets_get__arg_filters_success(
+    sdk_list_targets_mock: Mock,
+    filter_arg,
+    expected_filter_request,
+    probely_cli,
+):
+    probely_cli("targets", "get", filter_arg)
+
+    expected_call_args = call(target_filters=expected_filter_request)
+    assert sdk_list_targets_mock.call_args == expected_call_args
+
+
+@pytest.mark.parametrize(
+    "filter_arg, expected_error_message",
+    [
+        (
+            "--f-has-unlimited-scans=None",
+            "{'f_has_unlimited_scans': ['Not a valid boolean.']}",
+        ),
+        (
+            "--f-has-unlimited-scans=meh",
+            "{'f_has_unlimited_scans': ['Not a valid boolean.']}",
+        ),
+        (
+            "--f-has-unlimited-scans=",
+            "{'f_has_unlimited_scans': ['Not a valid boolean.']}",
+        ),
+        (
+            "--f-is-url-verified=None",
+            "{'f_is_url_verified': ['Not a valid boolean.']}",
+        ),
+        (
+            "--f-is-url-verified=meh",
+            "{'f_is_url_verified': ['Not a valid boolean.']}",
+        ),
+        (
+            "--f-is-url-verified=",
+            "{'f_is_url_verified': ['Not a valid boolean.']}",
+        ),
+    ],
+)
+@patch("probely_cli.cli.commands.targets.get.list_targets")
+def test_targets_get__arg_filters_validations(
+    # sdk_list_targets_mock: Mock,
+    _: Mock,
+    filter_arg,
+    expected_error_message,
+    probely_cli,
+):
+    _, stderr_lines = probely_cli("targets", "get", filter_arg, return_list=True)
+
+    assert len(stderr_lines) == 1
+
+    error_message = stderr_lines[0]
+    assert error_message == expected_error_message

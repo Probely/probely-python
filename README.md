@@ -1,5 +1,6 @@
 # probely_cli
 
+## So far this is more like 
 
 Generate docs:
 * go to docs/
@@ -14,3 +15,6 @@ Development guidelines:
   * Tests
   * Docs
   * Multiple version CI
+* Custom tooling, developers should be aware
+  * `probely_cli` fixture (to test CLI OUTPUT)
+  * `rich.console` is always available on the `args` 
