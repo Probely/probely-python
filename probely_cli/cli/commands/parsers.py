@@ -48,6 +48,9 @@ def build_cli_parser():
     bool_input_help_text = (
         "Accepts falsy/truly values: 'true', 'false', 't', 'f', 'yes', 'no', etc"
     )
+    multiple_values_help_text = (
+        "You can select multiple values separated by comma. eg: Value1, Value2"
+    )
     # enabled (deprecated)
     # label (moved to next iteration)
     # label_logical_operator (moved to next iteration)
@@ -57,8 +60,8 @@ def build_cli_parser():
     # team (moved to next iteration)
     # exclude_teams (moved to next iteration)
     # type
-    # unlimited
-    # verified
+    # unlimited (done)
+    # verified (done)
     target_filters_parser.add_argument(
         "--f-has-unlimited-scans",
         help="Filter if target has unlimited scans. " + bool_input_help_text,
@@ -72,11 +75,23 @@ def build_cli_parser():
         default=None,
     )
 
-    accepted_risk_values = ", ".join([str(risk.value) for risk in RiskEnum])
+    accepted_risk_values = ", ".join([str(risk.name) for risk in RiskEnum])
+    accepted_risk_values_help_text = "Accepted values: " + accepted_risk_values + ". "
 
     target_filters_parser.add_argument(
         "--f-risk",
-        help="Filter targets by risk. Accepted values: " + accepted_risk_values,
+        help="Filter targets by risk. "
+        + accepted_risk_values_help_text
+        + multiple_values_help_text,
+        action="store",
+        default=None,
+    )
+
+    target_filters_parser.add_argument(
+        "--f-type",
+        help="Filter targets by . "
+        + accepted_risk_values_help_text
+        + multiple_values_help_text,
         action="store",
         default=None,
     )

@@ -11,14 +11,14 @@ from ..settings import PROBELY_API_TARGETS_URL
 logger = logging.getLogger(__name__)
 
 
-def list_targets(target_filters: dict = None) -> List[Dict]:
+def list_targets(targets_filters: dict = None) -> List[Dict]:
     """Lists existing account's targets
 
     :return: All Targets of account
     :rtype: List[Dict]
 
     """
-    filters = target_filters or {}
+    filters = targets_filters or {}
 
     query_params = {
         "length": 50,

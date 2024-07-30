@@ -63,12 +63,16 @@ def validate_and_retrieve_yaml_content(yaml_file_path):
 
 
 class RiskEnum(Enum):
-    NA = None
-    NO_RISK = 0  # not applicable
-    LOW = 10
-    NORMAL = 20
-    HIGH = 30
+    NA = (None, "null")
+    NO_RISK = (0, "0")
+    LOW = (10, "10")
+    NORMAL = (20, "20")
+    HIGH = (30, "30")
 
-    def __init__(self, value, label):
-        self._value_ = value
-        self.label = label
+    def __init__(self, api_response_value, api_filter_value):
+        self._value_ = api_response_value
+        self._api_filter_value = api_filter_value
+
+    @property
+    def api_filter_value(self):
+        return self._api_filter_value

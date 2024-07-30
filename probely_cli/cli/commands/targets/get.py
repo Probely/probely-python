@@ -10,7 +10,6 @@ from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.targets import list_targets
 from rich.table import Table
 
-
 TARGET_NEVER_SCANNED_OUTPUT: str = "Never scanned"
 
 
@@ -75,32 +74,57 @@ def get_tabled_targets(targets_list: List[Dict]):
     return table
 
 
-class TargetFilters(Schema):
-    f_has_unlimited_scans = marshmallow.fields.Boolean(
+class RiskEnumField(marshmallow.fields.Field):
+    def _serialize(self, value, attr, obj, **kwargs):
+        raise NotImplementedError()
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        value = value.replace(" ", "")
+        values = value.split(",")
+        risks: list = []
+        try:
+            for v in values:
+                v = v.upper()
+                enum_v = RiskEnum[v]
+                risks.append(enum_v.api_filter_value)
+        except:
+            raise marshmallow.ValidationError("Values not within the accepted values.")
+
+        return risks
+
+
+class TargetApiFiltersSchema(Schema):
+    unlimited = marshmallow.fields.Boolean(
         required=False,
         allow_none=True,
-        attribute="unlimited",
+        data_key="f_has_unlimited_scans",
     )
-    f_is_url_verified = marshmallow.fields.Boolean(
+    verified = marshmallow.fields.Boolean(
         required=False,
         allow_none=True,
-        attribute="verified",
+        data_key="f_is_url_verified",
+    )
+    risk = RiskEnumField(
+        required=False,
+        allow_none=True,
+        data_key="f_risk",
     )
 
     @post_load
-    def ignore_nones(self, data, **kwargs):
-        return {f: v for f, v in data.items() if v is not None}
+    def ignore_unused_filters(self, data, **kwargs):
+        command_filters = {f: v for f, v in data.items() if v is not None}
+        return command_filters
 
     class Meta:
         unknown = EXCLUDE
 
 
 def target_filters_handler(args):
-    filters_schema: Schema = TargetFilters()
+    filters_schema: Schema = TargetApiFiltersSchema()
     try:
         api_ready_filters = filters_schema.load(vars(args))
     except marshmallow.ValidationError as e:
-
+        # TODO: translate validations?
         raise ProbelyCLIValidation(str(e))
 
     return api_ready_filters
@@ -113,8 +137,6 @@ def targets_get_command_handler(args):
 
     filters = target_filters_handler(args)
 
-    filters["risk"] = "null"
-
-    targets_list = list_targets(target_filters=filters)
+    targets_list = list_targets(targets_filters=filters)
     table = get_tabled_targets(targets_list)
     args.console.print(table)
