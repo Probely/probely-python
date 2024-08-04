@@ -154,6 +154,8 @@ def test_targets_get__table_labels_output(
         ("--f-risk=NA, LOW", {"risk": ["null", "10"]}),
         ("--f-risk=high,normal", {"risk": ["30", "20"]}),
         ("--f-risk=na,      low", {"risk": ["null", "10"]}),
+        ("--f-search=meh", {"search": "meh"}),
+        ("--f-search=", {"search": ""}),
     ],
 )
 @patch("probely_cli.cli.commands.targets.get.list_targets")
@@ -215,7 +217,6 @@ def test_targets_get__arg_filters_success(
 )
 @patch("probely_cli.cli.commands.targets.get.list_targets")
 def test_targets_get__arg_filters_validations(
-    # sdk_list_targets_mock: Mock,
     _: Mock,
     filter_arg,
     expected_error_message,
@@ -228,34 +229,3 @@ def test_targets_get__arg_filters_validations(
 
     error_message = stderr_lines[0]
     assert error_message == expected_error_message
-
-
-@patch("probely_cli.cli.commands.targets.get.list_targets")
-def test_targets_get__arg_filter_risk(sdk_list_targets_mock: Mock, probely_cli):
-    stdout, stderr = probely_cli("targets", "get", "--f-risk=low", return_list=True)
-
-    assert len(stderr) == 0
-    expected_filter = {
-        "risk": [
-            RiskEnum.LOW.api_filter_value,
-        ]
-    }
-
-    sdk_list_targets_mock.assert_called_once_with(targets_filters=expected_filter)
-
-    sdk_list_targets_mock.reset_mock()
-
-    stdout, stderr = probely_cli("targets", "get", "--f-risk=NA, HIgh")
-
-    expected_filters = {
-        "risk": [
-            RiskEnum.NA.api_filter_value,
-            RiskEnum.HIGH.api_filter_value,
-        ]
-    }
-
-    assert len(stderr) == 0
-    sdk_list_targets_mock.assert_called_once_with(targets_filters=expected_filters)
-
-    stdout, stderr = probely_cli("targets", "get", "--f-risk=random")
-    sdk_list_targets_mock.reset_mock()

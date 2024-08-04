@@ -110,6 +110,12 @@ class TargetApiFiltersSchema(Schema):
         data_key="f_risk",
     )
 
+    search = marshmallow.fields.Str(
+        required=False,
+        allow_none=True,
+        data_key="f_search",
+    )
+
     @post_load
     def ignore_unused_filters(self, data, **kwargs):
         command_filters = {f: v for f, v in data.items() if v is not None}

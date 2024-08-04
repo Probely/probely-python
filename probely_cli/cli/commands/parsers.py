@@ -96,6 +96,13 @@ def build_cli_parser():
         default=None,
     )
 
+    target_filters_parser.add_argument(
+        "--f-search",
+        help="Keyword to match with name, url and labels",
+        action="store",
+        default=None,
+    )
+
     file_parser = argparse.ArgumentParser(
         description="File allowing to send customized payload to Probely's API",
         add_help=False,
