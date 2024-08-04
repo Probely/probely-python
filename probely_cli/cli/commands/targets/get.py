@@ -1,4 +1,3 @@
-import json
 from typing import List, Dict, Union
 
 import marshmallow
@@ -31,7 +30,7 @@ def _get_printable_last_scan_date(target: Dict) -> str:
 def _get_printable_risk(target: Dict) -> str:
     target_risk_value = target.get("risk", None)
     try:
-        risk_name: str = RiskEnum(target_risk_value).name
+        risk_name: str = RiskEnum.get_by_api_response_value(target_risk_value).name
         return risk_name
     except ValueError:
         return "Unknown"  # TODO: scenario that risk enum updated but CLI is forgotten

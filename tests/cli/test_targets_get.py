@@ -100,9 +100,9 @@ def test_targets_get__table_risk_output(
     assert table_columns[3] == "RISK"
 
     target_line = stdout[1]
-    target_line = re.sub(r" {3,}", "  ", target_line)
-    target_line = target_line.strip()
-    target_columns = target_line.split(column_separator)
+    target_line_without_extra_spaces = re.sub(r" {3,}", "  ", target_line)
+    target_line_without_extra_spaces = target_line_without_extra_spaces.strip()
+    target_columns = target_line_without_extra_spaces.split(column_separator)
     assert target_columns[3] == expected_output
 
 

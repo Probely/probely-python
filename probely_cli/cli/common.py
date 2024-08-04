@@ -76,3 +76,11 @@ class RiskEnum(Enum):
     @property
     def api_filter_value(self):
         return self._api_filter_value
+
+    @classmethod
+    def get_by_api_response_value(cls, value):
+        for enum_element in cls:
+            if enum_element.value == value:
+                return enum_element
+
+        raise ValueError("{} is not a valid Risk Enum".format(value))
