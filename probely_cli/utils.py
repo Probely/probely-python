@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class ProbelyCLIEnum(Enum):  # TODO: TEST ME
+class ProbelyCLIEnum(Enum):
     def __init__(self, api_response_value, api_filter_value=None):
         self._value_ = api_response_value
         self._api_filter_value = api_filter_value or api_response_value

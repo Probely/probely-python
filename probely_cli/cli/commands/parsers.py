@@ -5,7 +5,7 @@ from probely_cli.cli.commands.apply.apply import apply_command_handler
 from probely_cli.cli.commands.scans.start import start_scans_command_handler
 from probely_cli.cli.commands.targets.add import add_targets_command_handler
 from probely_cli.cli.commands.targets.get import targets_get_command_handler
-from probely_cli.cli.common import show_help, TargetRiskEnum
+from probely_cli.cli.common import show_help, TargetRiskEnum, TargetTypeEnum
 
 
 def build_targets_parser(
@@ -26,17 +26,7 @@ def build_targets_parser(
     multiple_values_help_text = (
         "You can select multiple values separated by comma. eg: Value1, Value2"
     )
-    # enabled (deprecated)
-    # label (moved to next iteration)
-    # label_logical_operator (moved to next iteration)
-    # risk
-    # scan_profile (moved to next iteration)
-    # search
-    # team (moved to next iteration)
-    # exclude_teams (moved to next iteration)
-    # type
-    # unlimited (done)
-    # verified (done)
+
     target_filters_parser.add_argument(
         "--f-has-unlimited-scans",
         help="Filter if target has unlimited scans. " + bool_input_help_text,
@@ -62,11 +52,14 @@ def build_targets_parser(
         default=None,
     )
 
-    types_options = "TODO: DO ME"
+    accepted_type_values = ", ".join([str(risk.name) for risk in TargetTypeEnum])
+    accepted_risk_values_help_text = "Accepted values: " + accepted_type_values + ". "
 
     target_filters_parser.add_argument(
         "--f-type",
-        help="Filter targets by . " + types_options,
+        help="Filter targets by type. "
+        + accepted_risk_values_help_text
+        + multiple_values_help_text,
         action="store",
         default=None,
     )
