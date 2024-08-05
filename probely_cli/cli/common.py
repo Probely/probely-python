@@ -1,5 +1,4 @@
 import argparse
-from enum import Enum
 from pathlib import Path
 
 import yaml
@@ -7,6 +6,7 @@ import yaml
 import probely_cli.settings as settings
 
 from probely_cli.exceptions import ProbelyCLIValidation
+from probely_cli.utils import ProbelyCLIEnum
 
 
 class CliApp:
@@ -62,25 +62,14 @@ def validate_and_retrieve_yaml_content(yaml_file_path):
     return yaml_content
 
 
-class RiskEnum(Enum):
+class TargetRiskEnum(ProbelyCLIEnum):
     NA = (None, "null")
     NO_RISK = (0, "0")
     LOW = (10, "10")
     NORMAL = (20, "20")
     HIGH = (30, "30")
 
-    def __init__(self, api_response_value, api_filter_value):
-        self._value_ = api_response_value
-        self._api_filter_value = api_filter_value
 
-    @property
-    def api_filter_value(self):
-        return self._api_filter_value
-
-    @classmethod
-    def get_by_api_response_value(cls, value):
-        for enum_element in cls:
-            if enum_element.value == value:
-                return enum_element
-
-        raise ValueError("{} is not a valid Risk Enum".format(value))
+class TargetTypeEnum(ProbelyCLIEnum):
+    WEB = "single"
+    API = "api"

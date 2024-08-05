@@ -4,7 +4,7 @@ from unittest.mock import patch, Mock, call
 
 import pytest
 
-from probely_cli.cli.common import RiskEnum
+from probely_cli.cli.common import TargetRiskEnum, TargetTypeEnum
 
 
 @patch("probely_cli.cli.commands.targets.get.list_targets")
@@ -69,13 +69,14 @@ def test_targets_get__table_last_scan_date_output(
 @pytest.mark.parametrize(
     "testing_value,expected_output",
     [
-        (0, RiskEnum.NO_RISK.name),
-        (10, RiskEnum.LOW.name),
-        (20, RiskEnum.NORMAL.name),
-        (30, RiskEnum.HIGH.name),
-        (None, RiskEnum.NA.name),
+        (0, TargetRiskEnum.NO_RISK.name),
+        (10, TargetRiskEnum.LOW.name),
+        (20, TargetRiskEnum.NORMAL.name),
+        (30, TargetRiskEnum.HIGH.name),
+        (None, TargetRiskEnum.NA.name),
         (323232320, "Unknown"),
         ("323232320", "Unknown"),
+        ("10", "Unknown"),
     ],
 )
 @patch("probely_cli.cli.commands.targets.get.list_targets")
@@ -150,12 +151,57 @@ def test_targets_get__table_labels_output(
         ("--f-is-url-verified=1", {"verified": True}),
         ("--f-is-url-verified=0", {"verified": False}),
         ("--f-risk=NA", {"risk": ["null"]}),
-        ("--f-risk=no_risk", {"risk": ["0"]}),
-        ("--f-risk=NA, LOW", {"risk": ["null", "10"]}),
-        ("--f-risk=high,normal", {"risk": ["30", "20"]}),
-        ("--f-risk=na,      low", {"risk": ["null", "10"]}),
+        ("--f-risk=no_risk", {"risk": [TargetRiskEnum.NO_RISK.api_filter_value]}),
+        (
+            "--f-risk=NA, LOW",
+            {
+                "risk": [
+                    TargetRiskEnum.NA.api_filter_value,
+                    TargetRiskEnum.LOW.api_filter_value,
+                ]
+            },
+        ),
+        (
+            "--f-risk=high,normal",
+            {
+                "risk": [
+                    TargetRiskEnum.HIGH.api_filter_value,
+                    TargetRiskEnum.NORMAL.api_filter_value,
+                ]
+            },
+        ),
+        (
+            "--f-risk=na,      low",
+            {
+                "risk": [
+                    TargetRiskEnum.NA.api_filter_value,
+                    TargetRiskEnum.LOW.api_filter_value,
+                ]
+            },
+        ),
         ("--f-search=meh", {"search": "meh"}),
         ("--f-search=", {"search": ""}),
+        ("--f-type=WEB", {"type": [TargetTypeEnum.WEB.api_filter_value]}),
+        ("--f-type=API", {"type": [TargetTypeEnum.API.api_filter_value]}),
+        ("--f-type=weB", {"type": [TargetTypeEnum.WEB.api_filter_value]}),
+        (
+            "--f-type=weB,API",
+            {
+                "type": [
+                    TargetTypeEnum.WEB.api_filter_value,
+                    TargetTypeEnum.API.api_filter_value,
+                ]
+            },
+        ),
+        (
+            "--f-type=API,          weB",
+            {
+                "type": [
+                    TargetTypeEnum.API.api_filter_value,
+                    TargetTypeEnum.WEB.api_filter_value,
+                ]
+            },
+        ),
     ],
 )
 @patch("probely_cli.cli.commands.targets.get.list_targets")
@@ -210,8 +256,12 @@ def test_targets_get__arg_filters_success(
             "{'f_risk': ['Values not within the accepted values.']}",
         ),
         (
-            "--f-risk=random_value, ",
-            "{'f_risk': ['Values not within the accepted values.']}",
+            "--f-type=random_value, ",
+            "{'f_type': ['Values not within the accepted values.']}",
+        ),
+        (
+            "--f-type=",
+            "{'f_type': ['Values not within the accepted values.']}",
         ),
     ],
 )

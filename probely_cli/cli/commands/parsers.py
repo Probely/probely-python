@@ -5,39 +5,14 @@ from probely_cli.cli.commands.apply.apply import apply_command_handler
 from probely_cli.cli.commands.scans.start import start_scans_command_handler
 from probely_cli.cli.commands.targets.add import add_targets_command_handler
 from probely_cli.cli.commands.targets.get import targets_get_command_handler
-from probely_cli.cli.common import show_help, RiskEnum
+from probely_cli.cli.common import show_help, TargetRiskEnum
 
 
-def build_cli_parser():
-    configs_parser = argparse.ArgumentParser(
-        description="Configs settings parser",
-        add_help=False,  # avoids conflicts with --help child command
-        formatter_class=RichHelpFormatter,
-    )
-    configs_parser.add_argument(
-        "--api-key",
-        help="Override API KEY used for requests",
-        default=None,
-    )
-    configs_parser.add_argument(
-        "--debug",
-        help="Override DEBUG MODE setting",
-        action="store_true",
-        default=False,
-    )
-
-    # TODO: kill in exchange of -o/--output option
-    raw_response_parser = argparse.ArgumentParser(
-        description="Returns JSON http response",
-        add_help=False,
-        formatter_class=RichHelpFormatter,
-    )
-    raw_response_parser.add_argument(
-        "--raw",
-        help="Show raw JSON api response",
-        action="store_true",
-        default=False,
-    )
+def build_targets_parser(
+    commands_parser,
+    configs_parser,
+    file_parser,
+):
 
     target_filters_parser = argparse.ArgumentParser(
         description="Filters usable in Targets commands",
@@ -75,7 +50,7 @@ def build_cli_parser():
         default=None,
     )
 
-    accepted_risk_values = ", ".join([str(risk.name) for risk in RiskEnum])
+    accepted_risk_values = ", ".join([str(risk.name) for risk in TargetRiskEnum])
     accepted_risk_values_help_text = "Accepted values: " + accepted_risk_values + ". "
 
     target_filters_parser.add_argument(
@@ -87,11 +62,11 @@ def build_cli_parser():
         default=None,
     )
 
+    types_options = "TODO: DO ME"
+
     target_filters_parser.add_argument(
         "--f-type",
-        help="Filter targets by . "
-        + accepted_risk_values_help_text
-        + multiple_values_help_text,
+        help="Filter targets by . " + types_options,
         action="store",
         default=None,
     )
@@ -101,6 +76,75 @@ def build_cli_parser():
         help="Keyword to match with name, url and labels",
         action="store",
         default=None,
+    )
+
+    targets_parser = commands_parser.add_parser(
+        "targets",
+        parents=[configs_parser],
+        formatter_class=RichHelpFormatter,
+    )
+    targets_parser.set_defaults(
+        func=show_help,
+        is_no_action_parser=True,
+        parser=targets_parser,
+        formatter_class=RichHelpFormatter,
+    )
+    targets_command_parser = targets_parser.add_subparsers()
+
+    targets_list_parser = targets_command_parser.add_parser(
+        "get",
+        parents=[configs_parser, target_filters_parser],
+        formatter_class=RichHelpFormatter,
+    )
+
+    targets_list_parser.set_defaults(func=targets_get_command_handler)
+
+    targets_create_parser = targets_command_parser.add_parser(
+        "add",
+        parents=[configs_parser, file_parser],
+        formatter_class=RichHelpFormatter,
+    )
+
+    targets_create_parser.add_argument(
+        "site_url",
+    )
+    targets_create_parser.add_argument(
+        "--site-name",
+        default=None,
+    )
+
+    targets_create_parser.set_defaults(func=add_targets_command_handler)
+
+
+def build_cli_parser():
+    configs_parser = argparse.ArgumentParser(
+        description="Configs settings parser",
+        add_help=False,  # avoids conflicts with --help child command
+        formatter_class=RichHelpFormatter,
+    )
+    configs_parser.add_argument(
+        "--api-key",
+        help="Override API KEY used for requests",
+        default=None,
+    )
+    configs_parser.add_argument(
+        "--debug",
+        help="Override DEBUG MODE setting",
+        action="store_true",
+        default=False,
+    )
+
+    # TODO: kill in exchange of -o/--output option
+    raw_response_parser = argparse.ArgumentParser(
+        description="Returns JSON http response",
+        add_help=False,
+        formatter_class=RichHelpFormatter,
+    )
+    raw_response_parser.add_argument(
+        "--raw",
+        help="Show raw JSON api response",
+        action="store_true",
+        default=False,
     )
 
     file_parser = argparse.ArgumentParser(
@@ -129,42 +173,11 @@ def build_cli_parser():
 
     commands_parser = probely_parser.add_subparsers()
 
-    targets_parser = commands_parser.add_parser(
-        "targets",
-        parents=[configs_parser],
-        formatter_class=RichHelpFormatter,
+    build_targets_parser(
+        commands_parser,
+        configs_parser,
+        file_parser,
     )
-    targets_parser.set_defaults(
-        func=show_help,
-        is_no_action_parser=True,
-        parser=targets_parser,
-        formatter_class=RichHelpFormatter,
-    )
-    targets_command_parser = targets_parser.add_subparsers()
-
-    targets_list_parser = targets_command_parser.add_parser(
-        "get",
-        parents=[configs_parser, target_filters_parser],
-        formatter_class=probely_parser.formatter_class,
-    )
-
-    targets_list_parser.set_defaults(func=targets_get_command_handler)
-
-    targets_create_parser = targets_command_parser.add_parser(
-        "add",
-        parents=[configs_parser, raw_response_parser, file_parser],
-        formatter_class=RichHelpFormatter,
-    )
-
-    targets_create_parser.add_argument(
-        "site_url",
-    )
-    targets_create_parser.add_argument(
-        "--site-name",
-        default=None,
-    )
-
-    targets_create_parser.set_defaults(func=add_targets_command_handler)
 
     scans_parser = commands_parser.add_parser(
         "scans",

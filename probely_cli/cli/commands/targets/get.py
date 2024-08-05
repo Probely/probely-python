@@ -1,13 +1,15 @@
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Type
 
 import marshmallow
 from dateutil import parser
 from marshmallow import Schema, EXCLUDE, post_load
 
-from probely_cli.cli.common import RiskEnum
+from probely_cli.cli.common import TargetRiskEnum, TargetTypeEnum
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.targets import list_targets
 from rich.table import Table
+
+from probely_cli.utils import ProbelyCLIEnum
 
 TARGET_NEVER_SCANNED_OUTPUT: str = "Never scanned"
 
@@ -30,7 +32,9 @@ def _get_printable_last_scan_date(target: Dict) -> str:
 def _get_printable_risk(target: Dict) -> str:
     target_risk_value = target.get("risk", None)
     try:
-        risk_name: str = RiskEnum.get_by_api_response_value(target_risk_value).name
+        risk_name: str = TargetRiskEnum.get_by_api_response_value(
+            target_risk_value
+        ).name
         return risk_name
     except ValueError:
         return "Unknown"  # TODO: scenario that risk enum updated but CLI is forgotten
@@ -73,7 +77,13 @@ def get_tabled_targets(targets_list: List[Dict]):
     return table
 
 
-class RiskEnumField(marshmallow.fields.Field):
+class ProbelyCLIEnumField(marshmallow.fields.Field):
+    enum_class: Type[ProbelyCLIEnum]
+
+    def __init__(self, enum_class: Type[ProbelyCLIEnum], *args, **kwargs):
+        self.enum_class = enum_class
+        super().__init__(*args, **kwargs)
+
     def _serialize(self, value, attr, obj, **kwargs):
         raise NotImplementedError()
 
@@ -84,7 +94,7 @@ class RiskEnumField(marshmallow.fields.Field):
         try:
             for v in values:
                 v = v.upper()
-                enum_v = RiskEnum[v]
+                enum_v = self.enum_class[v]
                 risks.append(enum_v.api_filter_value)
         except:
             raise marshmallow.ValidationError("Values not within the accepted values.")
@@ -103,10 +113,18 @@ class TargetApiFiltersSchema(Schema):
         allow_none=True,
         data_key="f_is_url_verified",
     )
-    risk = RiskEnumField(
+    risk = ProbelyCLIEnumField(
+        enum_class=TargetRiskEnum,
         required=False,
         allow_none=True,
         data_key="f_risk",
+    )
+
+    type = ProbelyCLIEnumField(
+        enum_class=TargetTypeEnum,
+        required=False,
+        allow_none=True,
+        data_key="f_type",
     )
 
     search = marshmallow.fields.Str(
