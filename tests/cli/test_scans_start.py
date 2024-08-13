@@ -5,7 +5,7 @@ import pytest
 
 
 @patch("probely_cli.cli.commands.scans.start.start_scan")
-def test_start_scans_command_handler(
+def test_start_scans__command_handler(
     sdk_start_scan_mock: Mock,
     valid_scans_start_api_response: Dict,
     probely_cli,

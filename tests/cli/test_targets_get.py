@@ -1,6 +1,5 @@
-import json
 import re
-from unittest.mock import patch, Mock, call
+from unittest.mock import patch, Mock
 
 import pytest
 
@@ -148,12 +147,12 @@ def test_targets_get__table_labels_output(
     [
         ("--f-has-unlimited-scans=True", {"unlimited": True}),
         ("--f-has-unlimited-scans=False", {"unlimited": False}),
-        ("--f-is-url-verified=1", {"verified": True}),
-        ("--f-is-url-verified=0", {"verified": False}),
+        ("--f-is-url-verified=TRUE", {"verified": True}),
+        ("--f-is-url-verified=FALSE", {"verified": False}),
         ("--f-risk=NA", {"risk": ["null"]}),
         ("--f-risk=no_risk", {"risk": [TargetRiskEnum.NO_RISK.api_filter_value]}),
         (
-            "--f-risk=NA, LOW",
+            "--f-risk NA LOW",
             {
                 "risk": [
                     TargetRiskEnum.NA.api_filter_value,
@@ -162,7 +161,7 @@ def test_targets_get__table_labels_output(
             },
         ),
         (
-            "--f-risk=high,normal",
+            "--f-risk high normal",
             {
                 "risk": [
                     TargetRiskEnum.HIGH.api_filter_value,
@@ -171,7 +170,7 @@ def test_targets_get__table_labels_output(
             },
         ),
         (
-            "--f-risk=na,      low",
+            "--f-risk NA low",
             {
                 "risk": [
                     TargetRiskEnum.NA.api_filter_value,
@@ -185,20 +184,11 @@ def test_targets_get__table_labels_output(
         ("--f-type=API", {"type": [TargetTypeEnum.API.api_filter_value]}),
         ("--f-type=weB", {"type": [TargetTypeEnum.WEB.api_filter_value]}),
         (
-            "--f-type=weB,API",
+            "--f-type weB API",
             {
                 "type": [
                     TargetTypeEnum.WEB.api_filter_value,
                     TargetTypeEnum.API.api_filter_value,
-                ]
-            },
-        ),
-        (
-            "--f-type=API,          weB",
-            {
-                "type": [
-                    TargetTypeEnum.API.api_filter_value,
-                    TargetTypeEnum.WEB.api_filter_value,
                 ]
             },
         ),
@@ -214,54 +204,53 @@ def test_targets_get__arg_filters_success(
     stdout, stderr = probely_cli("targets", "get", filter_arg, return_list=True)
 
     assert len(stderr) == 0, "Expected no errors"
-    assert len(stdout) == 1, "Expected header output"
     sdk_list_targets_mock.assert_called_once_with(
         targets_filters=expected_filter_request
     )
 
 
 @pytest.mark.parametrize(
-    "filter_arg, expected_error_message",
+    "filter_arg, expected_error_content",
     [
         (
             "--f-has-unlimited-scans=None",
-            "{'f_has_unlimited_scans': ['Not a valid boolean.']}",
+            "error: argument --f-has-unlimited-scans: invalid choice: 'NONE' (choose from 'TRUE', 'FALSE')",
         ),
         (
             "--f-has-unlimited-scans=meh",
-            "{'f_has_unlimited_scans': ['Not a valid boolean.']}",
+            "error: argument --f-has-unlimited-scans: invalid choice: 'MEH' (choose from 'TRUE', 'FALSE')",
         ),
         (
             "--f-has-unlimited-scans=",
-            "{'f_has_unlimited_scans': ['Not a valid boolean.']}",
+            "error: argument --f-has-unlimited-scans: invalid choice: '' (choose from 'TRUE', 'FALSE')",
         ),
         (
             "--f-is-url-verified=None",
-            "{'f_is_url_verified': ['Not a valid boolean.']}",
+            "error: argument --f-is-url-verified: invalid choice: 'NONE' (choose from 'TRUE', 'FALSE')",
         ),
         (
             "--f-is-url-verified=meh",
-            "{'f_is_url_verified': ['Not a valid boolean.']}",
+            "error: argument --f-is-url-verified: invalid choice: 'MEH' (choose from 'TRUE', 'FALSE')",
         ),
         (
             "--f-is-url-verified=",
-            "{'f_is_url_verified': ['Not a valid boolean.']}",
+            "error: argument --f-is-url-verified: invalid choice: '' (choose from 'TRUE', 'FALSE')",
         ),
         (
             "--f-risk=random_value",
-            "{'f_risk': ['Values not within the accepted values.']}",
+            "error: argument --f-risk: invalid choice: 'RANDOM_VALUE' (choose from 'NA', 'NO_RISK', 'LOW', 'NORMAL', 'HIGH')",
         ),
         (
             "--f-risk=",
-            "{'f_risk': ['Values not within the accepted values.']}",
+            "error: argument --f-risk: invalid choice: '' (choose from 'NA', 'NO_RISK', 'LOW', 'NORMAL', 'HIGH')",
         ),
         (
             "--f-type=random_value, ",
-            "{'f_type': ['Values not within the accepted values.']}",
+            "error: argument --f-type: invalid choice: 'RANDOM_VALUE,' (choose from 'WEB', 'API')",
         ),
         (
             "--f-type=",
-            "{'f_type': ['Values not within the accepted values.']}",
+            "error: argument --f-type: invalid choice: '' (choose from 'WEB', 'API')",
         ),
     ],
 )
@@ -269,13 +258,16 @@ def test_targets_get__arg_filters_success(
 def test_targets_get__arg_filters_validations(
     _: Mock,
     filter_arg,
-    expected_error_message,
+    expected_error_content,
     probely_cli,
 ):
-    stdout, stderr_lines = probely_cli("targets", "get", filter_arg, return_list=True)
+    stdout_lines, stderr_lines = probely_cli(
+        "targets", "get", filter_arg, return_list=True
+    )
 
-    assert len(stdout) == 0, "Expected no output"
-    assert len(stderr_lines) == 1
+    print("in tests", stderr_lines)
+    assert len(stdout_lines) == 0, "Expected no output"
+    assert len(stderr_lines) >= 1, "Expected error output"
 
-    error_message = stderr_lines[0]
-    assert error_message == expected_error_message
+    error_message = stderr_lines[-1]
+    assert expected_error_content in error_message

@@ -3,8 +3,8 @@ from argparse import Namespace
 
 from rich.console import Console
 
+from .app import CliApp
 from .commands.parsers import build_cli_parser
-from .common import CliApp
 
 logger = logging.getLogger(__name__)
 

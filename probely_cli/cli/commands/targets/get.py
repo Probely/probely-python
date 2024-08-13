@@ -3,12 +3,11 @@ from typing import List, Dict, Union, Type
 import marshmallow
 from dateutil import parser
 from marshmallow import Schema, EXCLUDE, post_load
+from rich.table import Table
 
 from probely_cli.cli.common import TargetRiskEnum, TargetTypeEnum
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.targets import list_targets
-from rich.table import Table
-
 from probely_cli.utils import ProbelyCLIEnum
 
 TARGET_NEVER_SCANNED_OUTPUT: str = "Never scanned"
@@ -77,29 +76,22 @@ def get_tabled_targets(targets_list: List[Dict]):
     return table
 
 
-class ProbelyCLIEnumField(marshmallow.fields.Field):
+class ProbelyCLIEnumField(marshmallow.fields.Enum):
     enum_class: Type[ProbelyCLIEnum]
 
     def __init__(self, enum_class: Type[ProbelyCLIEnum], *args, **kwargs):
         self.enum_class = enum_class
-        super().__init__(*args, **kwargs)
+        super().__init__(enum=enum_class, *args, **kwargs)
 
     def _serialize(self, value, attr, obj, **kwargs):
         raise NotImplementedError()
 
     def _deserialize(self, value, attr, data, **kwargs):
-        value = value.replace(" ", "")
-        values = value.split(",")
-        risks: list = []
+        print(self.enum_class[value].api_filter_value)
         try:
-            for v in values:
-                v = v.upper()
-                enum_v = self.enum_class[v]
-                risks.append(enum_v.api_filter_value)
+            return self.enum_class[value].api_filter_value
         except:
             raise marshmallow.ValidationError("Values not within the accepted values.")
-
-        return risks
 
 
 class TargetApiFiltersSchema(Schema):
@@ -113,15 +105,15 @@ class TargetApiFiltersSchema(Schema):
         allow_none=True,
         data_key="f_is_url_verified",
     )
-    risk = ProbelyCLIEnumField(
-        enum_class=TargetRiskEnum,
+    risk = marshmallow.fields.List(
+        ProbelyCLIEnumField(TargetRiskEnum),
         required=False,
         allow_none=True,
         data_key="f_risk",
     )
 
-    type = ProbelyCLIEnumField(
-        enum_class=TargetTypeEnum,
+    type = marshmallow.fields.List(
+        ProbelyCLIEnumField(TargetTypeEnum),
         required=False,
         allow_none=True,
         data_key="f_type",

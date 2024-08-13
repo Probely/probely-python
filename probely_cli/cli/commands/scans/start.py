@@ -2,8 +2,6 @@ import logging
 
 from probely_cli.cli.common import validate_and_retrieve_yaml_content
 from probely_cli.sdk.scans import start_scan
-from rich.console import Console
-
 
 logger = logging.getLogger(__name__)
 

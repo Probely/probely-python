@@ -29,3 +29,8 @@ class ProbelyCLIEnum(Enum):
                 return enum_element
 
         raise ValueError("{} is not a valid {}".format(api_filter_value, cls.__name__))
+
+    @classmethod
+    def cli_input_choices(cls):
+        input_choices = [enum_element.name for enum_element in cls]
+        return input_choices

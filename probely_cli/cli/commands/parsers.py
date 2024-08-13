@@ -1,11 +1,18 @@
 import argparse
+
 from rich_argparse import RichHelpFormatter
 
 from probely_cli.cli.commands.apply.apply import apply_command_handler
 from probely_cli.cli.commands.scans.start import start_scans_command_handler
 from probely_cli.cli.commands.targets.add import add_targets_command_handler
 from probely_cli.cli.commands.targets.get import targets_get_command_handler
-from probely_cli.cli.common import show_help, TargetRiskEnum, TargetTypeEnum
+from probely_cli.cli.common import (
+    TargetRiskEnum,
+    TargetTypeEnum,
+    lowercase_acceptable_parser_type,
+    show_help,
+)
+from probely_cli.settings import TRULY_VALUES, FALSY_VALUES
 
 
 def build_targets_parser(
@@ -20,48 +27,43 @@ def build_targets_parser(
         formatter_class=RichHelpFormatter,
     )
 
-    bool_input_help_text = (
-        "Accepts falsy/truly values: 'true', 'false', 't', 'f', 'yes', 'no', etc"
-    )
     multiple_values_help_text = (
-        "You can select multiple values separated by comma. eg: Value1, Value2"
+        "You can chose multiple options separated by space. eg: '--f Value1 Value2'"
     )
 
     target_filters_parser.add_argument(
         "--f-has-unlimited-scans",
-        help="Filter if target has unlimited scans. " + bool_input_help_text,
+        type=lowercase_acceptable_parser_type,
+        choices=TRULY_VALUES + FALSY_VALUES,
+        help="Filter if target has unlimited scans. ",
         action="store",
         default=None,
     )
     target_filters_parser.add_argument(
         "--f-is-url-verified",
-        help="Filter if target URL has verification. " + bool_input_help_text,
+        type=lowercase_acceptable_parser_type,
+        choices=TRULY_VALUES + FALSY_VALUES,
+        help="Filter if target URL has verification. ",
         action="store",
         default=None,
     )
-
-    accepted_risk_values = ", ".join([str(risk.name) for risk in TargetRiskEnum])
-    accepted_risk_values_help_text = "Accepted values: " + accepted_risk_values + ". "
 
     target_filters_parser.add_argument(
         "--f-risk",
-        help="Filter targets by risk. "
-        + accepted_risk_values_help_text
-        + multiple_values_help_text,
+        type=lowercase_acceptable_parser_type,
+        choices=TargetRiskEnum.cli_input_choices(),
+        help="Filter targets by risk. " + multiple_values_help_text,
+        nargs="+",
         action="store",
-        default=None,
     )
-
-    accepted_type_values = ", ".join([str(risk.name) for risk in TargetTypeEnum])
-    accepted_risk_values_help_text = "Accepted values: " + accepted_type_values + ". "
 
     target_filters_parser.add_argument(
         "--f-type",
-        help="Filter targets by type. "
-        + accepted_risk_values_help_text
-        + multiple_values_help_text,
+        type=lowercase_acceptable_parser_type,
+        choices=TargetTypeEnum.cli_input_choices(),
+        help="Filter targets by type. " + multiple_values_help_text,
+        nargs="+",
         action="store",
-        default=None,
     )
 
     target_filters_parser.add_argument(
@@ -103,13 +105,28 @@ def build_targets_parser(
     )
     targets_create_parser.add_argument(
         "--site-name",
-        default=None,
     )
 
     targets_create_parser.set_defaults(func=add_targets_command_handler)
 
 
-def build_cli_parser():
+def build_file_parser():
+    file_parser = argparse.ArgumentParser(
+        description="File allowing to send customized payload to Probely's API",
+        add_help=False,
+        formatter_class=RichHelpFormatter,
+    )
+    file_parser.add_argument(
+        "-f",
+        "--yaml-file",
+        dest="yaml_file_path",
+        default=None,
+        help="Path to yaml file. Accepts same payload as listed in API docs",
+    )
+    return file_parser
+
+
+def build_configs_parser():
     configs_parser = argparse.ArgumentParser(
         description="Configs settings parser",
         add_help=False,  # avoids conflicts with --help child command
@@ -126,6 +143,12 @@ def build_cli_parser():
         action="store_true",
         default=False,
     )
+    return configs_parser
+
+
+def build_cli_parser():
+    file_parser = build_file_parser()
+    configs_parser = build_configs_parser()
 
     # TODO: kill in exchange of -o/--output option
     raw_response_parser = argparse.ArgumentParser(
@@ -138,19 +161,6 @@ def build_cli_parser():
         help="Show raw JSON api response",
         action="store_true",
         default=False,
-    )
-
-    file_parser = argparse.ArgumentParser(
-        description="File allowing to send customized payload to Probely's API",
-        add_help=False,
-        formatter_class=RichHelpFormatter,
-    )
-    file_parser.add_argument(
-        "-f",
-        "--yaml-file",
-        dest="yaml_file_path",
-        default=None,
-        help="Path to yaml file. Accepts same payload as listed in API docs",
     )
 
     probely_parser = argparse.ArgumentParser(

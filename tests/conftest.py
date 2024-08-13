@@ -1,13 +1,13 @@
 import sys
 from io import StringIO
 from pathlib import Path
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Tuple, Union
 
 import pytest
 import yaml
 from rich.console import Console
 
-from probely_cli.cli import build_cli_parser, CliApp
+from probely_cli.cli import CliApp, build_cli_parser
 from tests.testable_api_responses import (
     START_SCAN_200_RESPONSE,
     GET_TARGETS_200_RESPONSE,
@@ -20,9 +20,40 @@ def cli_parser():
     return command_parser
 
 
+def prepare_cmd_command_for_parsing(cmd_command: Union[str, Tuple[str]]) -> List[str]:
+    """
+    This adds some flexibility to the way we call commands using the probely_cli fixture.
+    All the following options are valid:
+    "probely targets get --f-risk NA"
+    "targets get --f-risk NA"
+    ["probely", "targets", "get", "--f-risk NA"]
+    ["targets", "get", "--f-risk NA"]
+    ["targets", "get", "--f-risk", "NA"]
+    etc..
+    """
+
+    prepared_cmd_command = []
+    for item in cmd_command:
+        if " " in item:
+            prepared_cmd_command.extend(item.split())
+            continue
+
+        prepared_cmd_command.append(item)
+
+    if prepared_cmd_command[0] == "probely":
+        # In cmd command "probely" is to call the script, we don't need it as we're it
+        prepared_cmd_command.pop(0)
+
+    return prepared_cmd_command
+
+
 @pytest.fixture
 def probely_cli(cli_parser, capsys):
-    def run_command(*cmd_command: List[str], return_list=False):
+    def run_command(*cmd_command: Union[str, Tuple[str]], return_list=False):
+
+        if len(cmd_command) == 0:
+            raise pytest.UsageError("probely_cli can't run without cmd_command")
+
         testable_console = Console(
             file=StringIO(),
             width=sys.maxsize,  # avoids word wrapping
@@ -33,17 +64,24 @@ def probely_cli(cli_parser, capsys):
             width=sys.maxsize,  # avoids word wrapping
         )
 
-        args = cli_parser.parse_args(cmd_command)
-        args.console = testable_console
-        args.err_console = testable_err_console
+        cmd_as_list = prepare_cmd_command_for_parsing(cmd_command)
 
-        cli_app = CliApp(args)
-        cli_app.run()
+        try:
+            args = cli_parser.parse_args(cmd_as_list)
+            args.console = testable_console
+            args.err_console = testable_err_console
+            cli_app = CliApp(args)
+            cli_app.run()
 
-        # noinspection PyUnresolvedReferences
-        raw_stdout: str = testable_console.file.getvalue()
-        # noinspection PyUnresolvedReferences
-        raw_stderr: str = testable_err_console.file.getvalue()
+            # noinspection PyUnresolvedReferences
+            raw_stdout: str = testable_console.file.getvalue()
+            # noinspection PyUnresolvedReferences
+            raw_stderr: str = testable_err_console.file.getvalue()
+
+        except SystemExit:  # meaning the argparse found an error
+            # argparse writes directly to std.err and exist execution
+            # when a parsing error is found
+            raw_stdout, raw_stderr = capsys.readouterr()
 
         if return_list:
             stdout_lines_list = raw_stdout.splitlines()

@@ -1,11 +1,10 @@
-import os
 import configparser
+import os
 from pathlib import Path
 from typing import Union
 
-from environs import Env
 import marshmallow
-
+from environs import Env
 
 PROBELY_CONFIG_DIR = ".probely"
 PROBELY_CONFIG_DIR_PATH = Path.home() / PROBELY_CONFIG_DIR
@@ -14,6 +13,10 @@ PROBELY_CONFIG_FILE_PATH = PROBELY_CONFIG_DIR_PATH / PROBELY_CONFIG_FILE
 
 CONFIG_PARSER = configparser.ConfigParser()
 CONFIG_PARSER.read(PROBELY_CONFIG_FILE_PATH)
+
+
+TRULY_VALUES = ["TRUE"]
+FALSY_VALUES = ["FALSE"]
 
 
 env = Env()

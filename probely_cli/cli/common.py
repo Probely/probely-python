@@ -1,32 +1,14 @@
-import argparse
 from pathlib import Path
 
 import yaml
 
 import probely_cli.settings as settings
-
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.utils import ProbelyCLIEnum
 
 
-class CliApp:
-    args: argparse.Namespace
-
-    def __init__(self, args: argparse.Namespace):
-        args_dict = vars(args)
-        if args_dict.get("api_key"):
-            settings.PROBELY_API_KEY = args.api_key
-
-        if args_dict.get("debug"):
-            settings.IS_DEBUG_MODE = True
-
-        self.args = args
-
-    def run(self):
-        try:
-            return self.args.func(self.args)
-        except Exception as e:
-            self.args.err_console.print(e)
+def lowercase_acceptable_parser_type(value: str):
+    return value.upper()
 
 
 def show_help(args):
