@@ -12,7 +12,7 @@ from probely_cli.cli.common import (
     lowercase_acceptable_parser_type,
     show_help,
 )
-from probely_cli.settings import TRULY_VALUES, FALSY_VALUES
+from probely_cli.settings import TRUTHY_VALUES, FALSY_VALUES
 
 
 def build_targets_parser(
@@ -34,7 +34,7 @@ def build_targets_parser(
     target_filters_parser.add_argument(
         "--f-has-unlimited-scans",
         type=lowercase_acceptable_parser_type,
-        choices=TRULY_VALUES + FALSY_VALUES,
+        choices=TRUTHY_VALUES + FALSY_VALUES,
         help="Filter if target has unlimited scans. ",
         action="store",
         default=None,
@@ -42,7 +42,7 @@ def build_targets_parser(
     target_filters_parser.add_argument(
         "--f-is-url-verified",
         type=lowercase_acceptable_parser_type,
-        choices=TRULY_VALUES + FALSY_VALUES,
+        choices=TRUTHY_VALUES + FALSY_VALUES,
         help="Filter if target URL is verified. ",
         action="store",
         default=None,
