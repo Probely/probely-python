@@ -43,7 +43,7 @@ def build_targets_parser(
         "--f-is-url-verified",
         type=lowercase_acceptable_parser_type,
         choices=TRULY_VALUES + FALSY_VALUES,
-        help="Filter if target URL has verification. ",
+        help="Filter if target URL is verified. ",
         action="store",
         default=None,
     )
