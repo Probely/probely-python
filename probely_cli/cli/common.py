@@ -1,37 +1,14 @@
-import argparse
-from enum import Enum
 from pathlib import Path
 
 import yaml
 
 import probely_cli.settings as settings
-from functools import wraps
-
-from rich.console import Console
-
 from probely_cli.exceptions import ProbelyCLIValidation
+from probely_cli.utils import ProbelyCLIEnum
 
-err_console = Console(stderr=True)
 
-
-class CliApp:
-    args: argparse.Namespace
-
-    def __init__(self, args: argparse.Namespace):
-        args_dict = vars(args)
-        if args_dict.get("api_key"):
-            settings.PROBELY_API_KEY = args.api_key
-
-        if args_dict.get("debug"):
-            settings.IS_DEBUG_MODE = True
-
-        self.args = args
-
-    def run(self, command_handler):
-        try:
-            return command_handler(self.args)
-        except Exception as e:
-            self.args.err_console.print(e)
+def lowercase_acceptable_parser_type(value: str):
+    return value.upper()
 
 
 def show_help(args):
@@ -67,9 +44,14 @@ def validate_and_retrieve_yaml_content(yaml_file_path):
     return yaml_content
 
 
-class RiskEnum(Enum):
-    NA = None
-    NO_RISK = 0  # not applicable
-    LOW = 10
-    NORMAL = 20
-    HIGH = 30
+class TargetRiskEnum(ProbelyCLIEnum):
+    NA = (None, "null")
+    NO_RISK = (0, "0")
+    LOW = (10, "10")
+    NORMAL = (20, "20")
+    HIGH = (30, "30")
+
+
+class TargetTypeEnum(ProbelyCLIEnum):
+    WEB = "single"
+    API = "api"

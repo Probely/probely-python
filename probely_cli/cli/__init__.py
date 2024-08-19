@@ -3,8 +3,8 @@ from argparse import Namespace
 
 from rich.console import Console
 
+from .app import CliApp
 from .commands.parsers import build_cli_parser
-from .common import CliApp
 
 logger = logging.getLogger(__name__)
 
@@ -27,4 +27,4 @@ def app():
     logging.basicConfig(level=logging_level)
     logger.debug("DEBUG MODE IS ON")
 
-    return cli_app.run(args.func)
+    return cli_app.run()

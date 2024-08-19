@@ -11,18 +11,20 @@ from ..settings import PROBELY_API_TARGETS_URL
 logger = logging.getLogger(__name__)
 
 
-def get_targets() -> List[Dict]:
+def list_targets(targets_filters: dict = None) -> List[Dict]:
     """Lists existing account's targets
 
     :return: All Targets of account
     :rtype: List[Dict]
 
     """
+    filters = targets_filters or {}
 
     query_params = {
         "length": 50,
         "ordering": "-changed",
         "page": 1,
+        **filters,
     }
 
     # TODO: go through pagination?

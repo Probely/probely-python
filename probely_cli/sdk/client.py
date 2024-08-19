@@ -50,7 +50,7 @@ class ProbelyAPIClient:
 
     def get(self, url, query_params=None):
         if query_params:
-            url = f"{url}?{urlencode(query_params)}"
+            url = f"{url}?{urlencode(query_params, True)}"
 
         request = Request("get", url=url)
 

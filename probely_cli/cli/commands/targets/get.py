@@ -1,11 +1,14 @@
 from typing import List, Dict, Union
 
+import marshmallow
 from dateutil import parser
-
-from probely_cli.cli.common import RiskEnum
-from probely_cli.sdk.targets import get_targets
+from marshmallow import Schema
 from rich.table import Table
 
+from probely_cli.cli.commands.targets.schemas import TargetApiFiltersSchema
+from probely_cli.cli.common import TargetRiskEnum
+from probely_cli.exceptions import ProbelyCLIValidation
+from probely_cli.sdk.targets import list_targets
 
 TARGET_NEVER_SCANNED_OUTPUT: str = "Never scanned"
 
@@ -28,7 +31,9 @@ def _get_printable_last_scan_date(target: Dict) -> str:
 def _get_printable_risk(target: Dict) -> str:
     target_risk_value = target.get("risk", None)
     try:
-        risk_name: str = RiskEnum(target_risk_value).name
+        risk_name: str = TargetRiskEnum.get_by_api_response_value(
+            target_risk_value
+        ).name
         return risk_name
     except ValueError:
         return "Unknown"  # TODO: scenario that risk enum updated but CLI is forgotten
@@ -71,10 +76,24 @@ def get_tabled_targets(targets_list: List[Dict]):
     return table
 
 
+def target_filters_handler(args):
+    filters_schema: Schema = TargetApiFiltersSchema()
+    try:
+        api_ready_filters = filters_schema.load(vars(args))
+    except marshmallow.ValidationError as e:
+        # TODO: translate validations?
+        raise ProbelyCLIValidation(str(e))
+
+    return api_ready_filters
+
+
 def targets_get_command_handler(args):
     """
     Lists all accessible targets of client
     """
-    targets_list = get_targets()
+
+    filters = target_filters_handler(args)
+
+    targets_list = list_targets(targets_filters=filters)
     table = get_tabled_targets(targets_list)
     args.console.print(table)
