@@ -93,9 +93,5 @@ PROBELY_API_URL_BASE = os.getenv(
 )
 # URLs
 PROBELY_API_TARGETS_URL = PROBELY_API_URL_BASE + "targets/"
-PROBELY_API_SCANS_URL = PROBELY_API_URL_BASE + "targets/"
-
-
-def get_scan_target_url(target_id):
-    # Check urlparse or something like this for the url creation CLI
-    return PROBELY_API_TARGETS_URL + target_id + "/scan_now/"
+PROBELY_API_TARGETS_RETRIEVE_URL = PROBELY_API_TARGETS_URL + "{id}/"
+PROBELY_API_SCANS_URL = PROBELY_API_TARGETS_URL + "{target_id}/scan_now/"

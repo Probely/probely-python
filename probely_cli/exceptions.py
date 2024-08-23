@@ -3,13 +3,23 @@ class ProbelyException(Exception):
 
 
 class ProbelyRequestFailed(ProbelyException):
-    pass
+    """General exception for non successful api calls"""
+
+    def __init__(self, reason, *args, **kwargs):
+        super().__init__(reason, *args)
+        self.reason = reason
+
+
+class ProbelyObjectNotFound(ProbelyException):
+    def __init__(self, id, *args, **kwargs):
+        super().__init__("object '{id}' not found.".format(id=id), *args)
+        self.not_found_object_id = id
 
 
 class ProbelyBadRequest(ProbelyException):
-    def __init__(self, *args, **kwargs):
-        super().__init__("API Validation Error.", *args)
-        self.response_payload = kwargs.get("response_payload")
+    def __init__(self, response_payload, *args, **kwargs):
+        super().__init__("API validation error.", *args)
+        self.response_payload = response_payload
 
 
 class ProbelyMissConfig(ProbelyException):

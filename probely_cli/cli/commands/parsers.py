@@ -79,20 +79,31 @@ def build_targets_parser(
         formatter_class=RichHelpFormatter,
     )
     targets_parser.set_defaults(
-        func=show_help,
+        command_handler=show_help,
         is_no_action_parser=True,
         parser=targets_parser,
         formatter_class=RichHelpFormatter,
     )
     targets_command_parser = targets_parser.add_subparsers()
 
-    targets_list_parser = targets_command_parser.add_parser(
+    targets_get_parser = targets_command_parser.add_parser(
         "get",
         parents=[configs_parser, target_filters_parser],
         formatter_class=RichHelpFormatter,
     )
 
-    targets_list_parser.set_defaults(func=targets_get_command_handler)
+    targets_get_parser.add_argument(
+        "target_ids",
+        metavar="target_id",
+        nargs="*",
+        help="IDs of targets to list",
+        default=None,
+    )
+
+    targets_get_parser.set_defaults(
+        command_handler=targets_get_command_handler,
+        parser=targets_get_parser,
+    )
 
     targets_create_parser = targets_command_parser.add_parser(
         "add",
@@ -107,7 +118,10 @@ def build_targets_parser(
         "--site-name",
     )
 
-    targets_create_parser.set_defaults(func=add_targets_command_handler)
+    targets_create_parser.set_defaults(
+        command_handler=add_targets_command_handler,
+        parser=targets_create_parser,
+    )
 
 
 def build_file_parser():
@@ -169,7 +183,7 @@ def build_cli_parser():
         formatter_class=RichHelpFormatter,
     )
     probely_parser.set_defaults(
-        func=show_help,
+        command_handler=show_help,
         is_no_action_parser=True,
         parser=probely_parser,
     )
@@ -189,7 +203,7 @@ def build_cli_parser():
     )
 
     scans_parser.set_defaults(
-        func=show_help,
+        command_handler=show_help,
         is_no_action_parser=True,
         parser=scans_parser,
         formatter_class=RichHelpFormatter,
@@ -204,7 +218,10 @@ def build_cli_parser():
     scans_start_parser.add_argument(
         "target_id",
     )
-    scans_start_parser.set_defaults(func=start_scans_command_handler)
+    scans_start_parser.set_defaults(
+        command_handler=start_scans_command_handler,
+        parser=scans_start_parser,
+    )
 
     apply_parser = commands_parser.add_parser(
         "apply",
@@ -213,7 +230,8 @@ def build_cli_parser():
     )
     apply_parser.add_argument("yaml_file")
     apply_parser.set_defaults(
-        func=apply_command_handler,
+        command_handler=apply_command_handler,
+        parser=apply_parser,
     )
 
     return probely_parser

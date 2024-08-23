@@ -1,6 +1,10 @@
 import argparse
+import logging
 
 from probely_cli import settings
+from probely_cli.exceptions import ProbelyException
+
+logger = logging.getLogger(__name__)
 
 
 class CliApp:
@@ -16,8 +20,17 @@ class CliApp:
 
         self.args = args
 
+    def _print_error_message(self, message: str) -> None:
+        message = "{cmd}: error: {message}".format(
+            cmd=self.args.parser.prog, message=message
+        )
+        self.args.err_console.print(message)
+
     def run(self):
         try:
-            return self.args.func(self.args)
+            return self.args.command_handler(self.args)
+        except ProbelyException as e:
+            self._print_error_message(str(e))
         except Exception as e:
-            self.args.err_console.print(e)
+            logger.debug("Unhandled exception:")
+            self._print_error_message(str(e))

@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 import pytest
 import requests
-from requests import Response, PreparedRequest
+from requests import PreparedRequest
 
 from probely_cli.exceptions import ProbelyApiUnavailable
 from probely_cli.sdk.client import Probely, ProbelyAPIClient

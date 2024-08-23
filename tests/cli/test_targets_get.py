@@ -4,6 +4,7 @@ from unittest.mock import patch, Mock
 import pytest
 
 from probely_cli.cli.common import TargetRiskEnum, TargetTypeEnum
+from tests.testable_api_responses import RETRIEVE_TARGET_200_RESPONSE
 
 
 @patch("probely_cli.cli.commands.targets.get.list_targets")
@@ -271,3 +272,50 @@ def test_targets_get__arg_filters_validations(
 
     error_message = stderr_lines[-1]
     assert expected_error_content in error_message
+
+
+@patch("probely_cli.cli.commands.targets.get.retrieve_targets")
+def test_targets_get__retrieve_by_id(retrieve_targets_mock: Mock, probely_cli):
+    target_id1 = "target_id1"
+    target_id2 = "target_id2"
+
+    target_id1_content = RETRIEVE_TARGET_200_RESPONSE.copy()
+    target_id2_content = RETRIEVE_TARGET_200_RESPONSE.copy()
+
+    target_id1_content["id"] = target_id1
+    target_id2_content["id"] = target_id2
+
+    retrieve_targets_mock.return_value = [target_id1_content, target_id2_content]
+
+    stdout_lines, stderr_lines = probely_cli(
+        "targets",
+        "get",
+        target_id1,
+        target_id2,
+        return_list=True,
+    )
+
+    retrieve_targets_mock.assert_called_once_with([target_id1, target_id2])
+    assert len(stderr_lines) == 0
+    assert (
+        len(stdout_lines) == 3
+    ), "Expected to have header and 2 entries for each target"
+    assert target_id1 in stdout_lines[1]
+    assert target_id2 in stdout_lines[2]
+
+
+def test_targets_get__mutually_exclusive_arguments(probely_cli):
+    stdout_lines, stderr_lines = probely_cli(
+        "targets",
+        "get",
+        "target_id1 target_id2",
+        "--f-has-unlimited-scans=True",
+        return_list=True,
+    )
+
+    assert len(stdout_lines) == 0, "Expected no output"
+    assert len(stderr_lines) == 1, "Expected error output"
+
+    assert stderr_lines[0] == (
+        "probely targets get: error: filters and target ids are mutually exclusive."
+    )

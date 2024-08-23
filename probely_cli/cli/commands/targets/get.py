@@ -8,7 +8,7 @@ from rich.table import Table
 from probely_cli.cli.commands.targets.schemas import TargetApiFiltersSchema
 from probely_cli.cli.common import TargetRiskEnum
 from probely_cli.exceptions import ProbelyCLIValidation
-from probely_cli.sdk.targets import list_targets
+from probely_cli.sdk.targets import list_targets, retrieve_targets
 
 TARGET_NEVER_SCANNED_OUTPUT: str = "Never scanned"
 
@@ -93,7 +93,13 @@ def targets_get_command_handler(args):
     """
 
     filters = target_filters_handler(args)
+    if filters and args.target_ids:
+        raise ProbelyCLIValidation("filters and target ids are mutually exclusive.")
 
-    targets_list = list_targets(targets_filters=filters)
+    if args.target_ids:
+        targets_list = retrieve_targets(args.target_ids)
+    else:
+        targets_list = list_targets(targets_filters=filters)
+
     table = get_tabled_targets(targets_list)
     args.console.print(table)

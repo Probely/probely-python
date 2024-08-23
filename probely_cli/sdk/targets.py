@@ -3,12 +3,35 @@ from typing import List, Dict
 
 from mergedeep import merge, Strategy
 
+from probely_cli.exceptions import (
+    ProbelyRequestFailed,
+    ProbelyBadRequest,
+    ProbelyObjectNotFound,
+)
 from .client import ProbelyAPIClient
-from probely_cli.exceptions import ProbelyRequestFailed, ProbelyBadRequest
-from ..settings import PROBELY_API_TARGETS_URL
-
+from ..settings import PROBELY_API_TARGETS_URL, PROBELY_API_TARGETS_RETRIEVE_URL
 
 logger = logging.getLogger(__name__)
+
+
+def retrieve_targets(targets_ids: List[str]) -> List[Dict]:
+    retrieved_targets = []
+    for target_id in targets_ids:
+        retrieved_targets.append(retrieve_target(target_id))
+
+    return retrieved_targets
+
+
+def retrieve_target(target_id) -> dict:
+    url = PROBELY_API_TARGETS_RETRIEVE_URL.format(id=target_id)
+    resp_status_code, resp_content = ProbelyAPIClient().get(url)
+    if resp_status_code == 404:
+        raise ProbelyObjectNotFound(id=target_id)
+
+    if resp_status_code != 200:
+        raise ProbelyRequestFailed(resp_content)
+
+    return resp_content
 
 
 def list_targets(targets_filters: dict = None) -> List[Dict]:
@@ -35,7 +58,7 @@ def list_targets(targets_filters: dict = None) -> List[Dict]:
     )
 
     if resp_status_code != 200:  # TODO: needs testing
-        raise ProbelyRequestFailed(resp_content["detail"])
+        raise ProbelyRequestFailed(resp_content)
 
     return resp_content["results"]
 
@@ -83,7 +106,7 @@ def add_target(  # TODO: needs testing
         raise ex
 
     if resp_status_code != 201:
-        raise ProbelyRequestFailed(resp_content["detail"])
+        raise ProbelyRequestFailed(resp_content)
 
     created_target = resp_content
     return created_target
