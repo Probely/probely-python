@@ -1,7 +1,9 @@
+import json
 import re
 from unittest.mock import patch, Mock
 
 import pytest
+import yaml
 
 from probely_cli.cli.common import TargetRiskEnum, TargetTypeEnum
 from tests.testable_api_responses import RETRIEVE_TARGET_200_RESPONSE
@@ -295,7 +297,7 @@ def test_targets_get__retrieve_by_id(retrieve_targets_mock: Mock, probely_cli):
         return_list=True,
     )
 
-    retrieve_targets_mock.assert_called_once_with([target_id1, target_id2])
+    retrieve_targets_mock.assert_called_once_with(targets_ids=[target_id1, target_id2])
     assert len(stderr_lines) == 0
     assert (
         len(stdout_lines) == 3
@@ -319,3 +321,65 @@ def test_targets_get__mutually_exclusive_arguments(probely_cli):
     assert stderr_lines[0] == (
         "probely targets get: error: filters and target ids are mutually exclusive."
     )
+
+
+@patch("probely_cli.cli.commands.targets.get.retrieve_targets")
+def test_targets_get__output_argument_validation(_: Mock, probely_cli):
+    stdout_lines, stderr_lines = probely_cli(
+        "targets",
+        "get",
+        "-o",
+        "random_text",
+        return_list=True,
+    )
+    assert stdout_lines == []
+    assert (
+        stderr_lines[-1]
+        == "probely targets get: error: argument --output/-o: invalid choice: "
+        "'RANDOM_TEXT' (choose from 'YAML', 'JSON')"
+    )
+
+
+@patch("probely_cli.cli.commands.targets.get.retrieve_targets")
+def test_targets_get__output_argument_output(retrieve_targets_mock, probely_cli):
+    target_id0 = "target_id0"
+    target_id1 = "target_id1"
+
+    target_id1_content = RETRIEVE_TARGET_200_RESPONSE.copy()
+    target_id2_content = RETRIEVE_TARGET_200_RESPONSE.copy()
+
+    target_id1_content["id"] = target_id0
+    target_id2_content["id"] = target_id1
+
+    retrieve_targets_mock.return_value = [target_id1_content, target_id2_content]
+
+    stdout, _ = probely_cli(
+        "targets",
+        "get",
+        target_id0,
+        target_id1,
+    )
+    header = ("ID", "NAME", "URL", "RISK", "LAST_SCAN", "LABELS")
+    assert all(column in stdout for column in header), "Output with table expected"
+    assert target_id0 in stdout, "target_id0 entry expected"
+    assert target_id1 in stdout, "target_id0 entry expected"
+
+    stdout, stderr = probely_cli("targets", "get", target_id0, target_id1, "-o yaml")
+
+    assert stderr == ""
+    yaml_content = yaml.load(stdout, Loader=yaml.FullLoader)
+    assert isinstance(yaml_content, list), "Expected a yaml list"
+    assert len(yaml_content) == 2, "Expected 2 targets"
+    assert yaml_content[0]["id"] == target_id0, "Expected target_id0 in yaml content"
+    assert yaml_content[1]["id"] == target_id1, "Expected target_id1 in yaml content"
+
+    stdout, stderr = probely_cli(
+        "targets", "get", target_id0, target_id1, "--output json"
+    )
+
+    assert stderr == ""
+    json_content = json.loads(stdout)
+    assert isinstance(json_content, list), "Expected a json list"
+    assert len(json_content) == 2, "Expected 2 targets"
+    assert json_content[0]["id"] == target_id0, "Expected target_id0 in json"
+    assert json_content[1]["id"] == target_id1, "Expected target_id1 in json"

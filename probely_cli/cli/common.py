@@ -55,3 +55,8 @@ class TargetRiskEnum(ProbelyCLIEnum):
 class TargetTypeEnum(ProbelyCLIEnum):
     WEB = "single"
     API = "api"
+
+
+class OutputEnum(ProbelyCLIEnum):
+    YAML = "yaml"
+    JSON = "json"

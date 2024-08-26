@@ -1,12 +1,15 @@
+import json
+import sys
 from typing import List, Dict, Union
 
 import marshmallow
+import yaml
 from dateutil import parser
 from marshmallow import Schema
 from rich.table import Table
 
 from probely_cli.cli.commands.targets.schemas import TargetApiFiltersSchema
-from probely_cli.cli.common import TargetRiskEnum
+from probely_cli.cli.common import TargetRiskEnum, OutputEnum
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.targets import list_targets, retrieve_targets
 
@@ -87,6 +90,22 @@ def target_filters_handler(args):
     return api_ready_filters
 
 
+def build_cmd_output(args, targets_list):
+    output_type = OutputEnum[args.output] if args.output else None
+
+    if output_type == OutputEnum.JSON:
+        return json.dumps(targets_list, indent=2)
+
+    if output_type == OutputEnum.YAML:
+        return yaml.dump(
+            targets_list,
+            indent=2,
+            width=sys.maxsize,  # avoids word wrapping
+        )
+
+    return get_tabled_targets(targets_list)
+
+
 def targets_get_command_handler(args):
     """
     Lists all accessible targets of client
@@ -97,9 +116,9 @@ def targets_get_command_handler(args):
         raise ProbelyCLIValidation("filters and target ids are mutually exclusive.")
 
     if args.target_ids:
-        targets_list = retrieve_targets(args.target_ids)
+        targets_list = retrieve_targets(targets_ids=args.target_ids)
     else:
         targets_list = list_targets(targets_filters=filters)
 
-    table = get_tabled_targets(targets_list)
-    args.console.print(table)
+    cmd_output = build_cmd_output(args, targets_list)
+    args.console.print(cmd_output)

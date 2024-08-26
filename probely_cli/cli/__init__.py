@@ -1,4 +1,5 @@
 import logging
+import sys
 from argparse import Namespace
 
 from rich.console import Console
@@ -8,8 +9,13 @@ from .commands.parsers import build_cli_parser
 
 logger = logging.getLogger(__name__)
 
-console = Console()
-err_console = Console(stderr=True)
+console = Console(
+    width=sys.maxsize,  # avoids word wrapping
+)
+err_console = Console(
+    width=sys.maxsize,  # avoids word wrapping
+    stderr=True,
+)
 
 
 def app():

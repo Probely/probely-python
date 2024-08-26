@@ -32,5 +32,9 @@ class CliApp:
         except ProbelyException as e:
             self._print_error_message(str(e))
         except Exception as e:
-            logger.debug("Unhandled exception:")
+            logger.debug(
+                "Unhandled exception: {name}: {msg}".format(
+                    name=type(e).__name__, msg=str(e)
+                )
+            )
             self._print_error_message(str(e))

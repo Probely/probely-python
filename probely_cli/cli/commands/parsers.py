@@ -11,16 +11,12 @@ from probely_cli.cli.common import (
     TargetTypeEnum,
     lowercase_acceptable_parser_type,
     show_help,
+    OutputEnum,
 )
 from probely_cli.settings import TRUTHY_VALUES, FALSY_VALUES
 
 
-def build_targets_parser(
-    commands_parser,
-    configs_parser,
-    file_parser,
-):
-
+def build_targets_filters_parser():
     target_filters_parser = argparse.ArgumentParser(
         description="Filters usable in Targets commands",
         add_help=False,
@@ -73,11 +69,23 @@ def build_targets_parser(
         default=None,
     )
 
+    return target_filters_parser
+
+
+def build_targets_parser(
+    commands_parser,
+    configs_parser,
+    file_parser,
+    output_parser,
+):
+    target_filters_parser = build_targets_filters_parser()
+
     targets_parser = commands_parser.add_parser(
         "targets",
         parents=[configs_parser],
         formatter_class=RichHelpFormatter,
     )
+
     targets_parser.set_defaults(
         command_handler=show_help,
         is_no_action_parser=True,
@@ -88,7 +96,7 @@ def build_targets_parser(
 
     targets_get_parser = targets_command_parser.add_parser(
         "get",
-        parents=[configs_parser, target_filters_parser],
+        parents=[configs_parser, target_filters_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
 
@@ -101,8 +109,8 @@ def build_targets_parser(
     )
 
     targets_get_parser.set_defaults(
-        command_handler=targets_get_command_handler,
         parser=targets_get_parser,
+        command_handler=targets_get_command_handler,
     )
 
     targets_create_parser = targets_command_parser.add_parser(
@@ -160,9 +168,26 @@ def build_configs_parser():
     return configs_parser
 
 
+def build_output_parser():
+    output_parser = argparse.ArgumentParser(
+        description="Controls output format of command",
+        formatter_class=RichHelpFormatter,
+        add_help=False,
+    )
+    output_parser.add_argument(
+        "--output",
+        "-o",
+        type=lowercase_acceptable_parser_type,
+        choices=OutputEnum.cli_input_choices(),
+        help="Presets for output formats",
+    )
+    return output_parser
+
+
 def build_cli_parser():
     file_parser = build_file_parser()
     configs_parser = build_configs_parser()
+    output_parser = build_output_parser()
 
     # TODO: kill in exchange of -o/--output option
     raw_response_parser = argparse.ArgumentParser(
@@ -194,6 +219,7 @@ def build_cli_parser():
         commands_parser,
         configs_parser,
         file_parser,
+        output_parser,
     )
 
     scans_parser = commands_parser.add_parser(
