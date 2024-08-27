@@ -77,7 +77,6 @@ class ProbelyAPIClient:
         try:
             content = json.loads(resp.content)
         except json.JSONDecodeError:  # todo: needs testing
-            print(resp.content)
             logger.debug(
                 "Something wrong with the API. Response content is not valid JSON."
             )

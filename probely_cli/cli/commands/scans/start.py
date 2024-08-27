@@ -17,8 +17,4 @@ def start_scans_command_handler(args):
         extra_payload = validate_and_retrieve_yaml_content(yaml_file_path)
     scan = start_scan(target_id, extra_payload)
 
-    if args.raw:
-        args.console.print(scan)
-        return
-
     args.console.print(scan["id"])

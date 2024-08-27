@@ -11,6 +11,7 @@ from probely_cli.cli import CliApp, build_cli_parser
 from tests.testable_api_responses import (
     START_SCAN_200_RESPONSE,
     GET_TARGETS_200_RESPONSE,
+    GET_FINDINGS_200_RESPONSE,
 )
 
 
@@ -120,3 +121,8 @@ def valid_scans_start_api_response() -> dict:
 @pytest.fixture()
 def valid_get_targets_api_response() -> dict:
     return GET_TARGETS_200_RESPONSE
+
+
+@pytest.fixture()
+def valid_get_findings_api_response() -> dict:
+    return GET_FINDINGS_200_RESPONSE

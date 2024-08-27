@@ -18,7 +18,6 @@ class ProbelyCLIEnumField(marshmallow.fields.Enum):
         raise NotImplementedError()
 
     def _deserialize(self, value, attr, data, **kwargs):
-        print(self.enum_class[value].api_filter_value)
         try:
             return self.enum_class[value].api_filter_value
         except:

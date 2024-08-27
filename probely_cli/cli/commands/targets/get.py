@@ -4,16 +4,20 @@ from typing import List, Dict, Union
 
 import marshmallow
 import yaml
-from dateutil import parser
 from marshmallow import Schema
 from rich.table import Table
 
 from probely_cli.cli.commands.targets.schemas import TargetApiFiltersSchema
-from probely_cli.cli.common import TargetRiskEnum, OutputEnum
+from probely_cli.cli.common import OutputEnum
+from probely_cli.cli.common import (
+    get_printable_risk,
+    get_printable_labels,
+    get_printable_date,
+)
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.targets import list_targets, retrieve_targets
 
-TARGET_NEVER_SCANNED_OUTPUT: str = "Never scanned"
+TARGET_NEVER_SCANNED_OUTPUT: str = "Never_scanned"
 
 
 def _get_printable_last_scan_date(target: Dict) -> str:
@@ -24,35 +28,7 @@ def _get_printable_last_scan_date(target: Dict) -> str:
 
     last_scan_start_date_str: Union[str, None] = last_scan_obj.get("started", None)
 
-    if last_scan_start_date_str is None:
-        return TARGET_NEVER_SCANNED_OUTPUT
-
-    last_start_date = parser.isoparse(last_scan_start_date_str)
-    return last_start_date.strftime("%Y-%m-%d %H:%m")
-
-
-def _get_printable_risk(target: Dict) -> str:
-    target_risk_value = target.get("risk", None)
-    try:
-        risk_name: str = TargetRiskEnum.get_by_api_response_value(
-            target_risk_value
-        ).name
-        return risk_name
-    except ValueError:
-        return "Unknown"  # TODO: scenario that risk enum updated but CLI is forgotten
-
-
-def _get_printable_labels(target: Dict) -> str:
-    labels: List[Dict] = target.get("labels", [])
-    labels_name = []
-    try:
-        [labels_name.append(label["name"]) for label in labels]
-    except:
-        return "Unknown labels"
-
-    printable_labels = ", ".join(labels_name)
-
-    return printable_labels
+    return get_printable_date(last_scan_start_date_str, TARGET_NEVER_SCANNED_OUTPUT)
 
 
 def get_tabled_targets(targets_list: List[Dict]):
@@ -71,9 +47,9 @@ def get_tabled_targets(targets_list: List[Dict]):
             target.get("id"),
             asset.get("name", "N/D"),
             asset.get("url"),
-            _get_printable_risk(target),
-            _get_printable_last_scan_date(target),
-            _get_printable_labels(target),
+            get_printable_risk(target["risk"]),
+            _get_printable_last_scan_date(target),  # last_scan
+            get_printable_labels(target["labels"]),
         )
 
     return table

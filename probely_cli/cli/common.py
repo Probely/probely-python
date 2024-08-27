@@ -1,6 +1,8 @@
 from pathlib import Path
+from typing import Dict, List, Union
 
 import yaml
+from dateutil import parser
 
 import probely_cli.settings as settings
 from probely_cli.exceptions import ProbelyCLIValidation
@@ -60,3 +62,40 @@ class TargetTypeEnum(ProbelyCLIEnum):
 class OutputEnum(ProbelyCLIEnum):
     YAML = "yaml"
     JSON = "json"
+
+
+def get_printable_risk(api_risk_value) -> str:
+    try:
+        risk_name: str = TargetRiskEnum.get_by_api_response_value(api_risk_value).name
+        return risk_name
+    except ValueError:
+        return "Unknown"  # TODO: scenario that risk enum updated but CLI is forgotten
+
+
+def get_printable_labels(labels: List[Dict] = None) -> str:
+    if labels is None:
+        return "Unknown_labels"
+
+    labels_name = []
+    try:
+        [labels_name.append(label["name"]) for label in labels]
+    except:
+        return "Unknown_labels"
+
+    printable_labels = ", ".join(labels_name)
+
+    return printable_labels
+
+
+def get_printable_date(
+    date_string: Union[str, None],
+    default_string: Union[str, None] = None,
+) -> str:
+    if date_string:
+        datetime = parser.isoparse(date_string)
+        return datetime.strftime("%Y-%m-%d %H:%M")
+
+    if default_string:
+        return default_string
+
+    return ""

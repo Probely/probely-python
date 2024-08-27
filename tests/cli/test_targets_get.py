@@ -33,10 +33,10 @@ def test_targets_get__table_headers_output(
 @pytest.mark.parametrize(
     "testing_value,expected_output",
     [
-        (None, "Never scanned"),
-        ({}, "Never scanned"),
-        ({"started": None}, "Never scanned"),
-        ({"started": "2024-07-15T15:47:52.608557Z"}, "2024-07-15 15:07"),
+        (None, "Never_scanned"),
+        ({}, "Never_scanned"),
+        ({"started": None}, "Never_scanned"),
+        ({"started": "2024-07-15T15:47:52.608557Z"}, "2024-07-15 15:47"),
     ],
 )
 @patch("probely_cli.cli.commands.targets.get.list_targets")
@@ -114,8 +114,8 @@ def test_targets_get__table_risk_output(
     [
         ([{"name": "one"}], "one"),
         ([{"name": "one"}, {"name": "two"}], "one, two"),
-        (None, "Unknown labels"),
-        ([{"no_name_key": "no"}], "Unknown labels"),
+        (None, "Unknown_labels"),
+        ([{"no_name_key": "no"}], "Unknown_labels"),
     ],
 )
 @patch("probely_cli.cli.commands.targets.get.list_targets")
@@ -268,7 +268,6 @@ def test_targets_get__arg_filters_validations(
         "targets", "get", filter_arg, return_list=True
     )
 
-    print("in tests", stderr_lines)
     assert len(stdout_lines) == 0, "Expected no output"
     assert len(stderr_lines) >= 1, "Expected error output"
 
@@ -383,3 +382,20 @@ def test_targets_get__output_argument_output(retrieve_targets_mock, probely_cli)
     assert len(json_content) == 2, "Expected 2 targets"
     assert json_content[0]["id"] == target_id0, "Expected target_id0 in json"
     assert json_content[1]["id"] == target_id1, "Expected target_id1 in json"
+
+
+def test_targets_get__mutually_exclusive_arguments(probely_cli):
+    stdout_lines, stderr_lines = probely_cli(
+        "targets",
+        "get",
+        "target_id1 target_id2",
+        "--f-has-unlimited-scans=True",
+        return_list=True,
+    )
+
+    assert len(stdout_lines) == 0, "Expected no output"
+    assert len(stderr_lines) == 1, "Expected error output"
+
+    assert stderr_lines[0] == (
+        "probely targets get: error: filters and target ids are mutually exclusive."
+    )
