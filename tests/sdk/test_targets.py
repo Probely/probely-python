@@ -3,8 +3,16 @@ from unittest.mock import Mock, patch
 import pytest
 
 from probely_cli.exceptions import ProbelyRequestFailed, ProbelyObjectNotFound
-from probely_cli.sdk.targets import list_targets, retrieve_target, retrieve_targets
-from probely_cli.settings import PROBELY_API_TARGETS_RETRIEVE_URL
+from probely_cli.sdk.targets import (
+    delete_targets,
+    list_targets,
+    retrieve_target,
+    retrieve_targets,
+)
+from probely_cli.settings import (
+    PROBELY_API_TARGETS_BULK_DELETE_URL,
+    PROBELY_API_TARGETS_RETRIEVE_URL,
+)
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.get")
@@ -63,6 +71,39 @@ def test_retrieve_target__success_api_call(api_client_mock: Mock):
 
     expected_call_url = PROBELY_API_TARGETS_RETRIEVE_URL.format(id=testable_id)
     api_client_mock.assert_called_with(expected_call_url)
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+def test_delete_target__success_api_call(api_client_mock: Mock):
+    resp_code = 200
+    testable_id = "2DZkoZH8WMEM"
+    resp_content = {"id": testable_id}
+
+    api_client_mock.return_value = (resp_code, resp_content)
+
+    delete_targets([testable_id])
+
+    expected_call_url = PROBELY_API_TARGETS_BULK_DELETE_URL
+    api_client_mock.assert_called_with(
+        url=expected_call_url, payload={"ids": [testable_id]}
+    )
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+def test_delete_target__unsuccessful_api_call(api_client_mock: Mock):
+    resp_code = 400
+    testable_id = "2DZkoZH8WMEM"
+
+    api_client_mock.return_value = (resp_code, {})
+    with pytest.raises(BaseException) as exc_info:
+        delete_targets([testable_id])
+
+    expected_call_url = PROBELY_API_TARGETS_BULK_DELETE_URL
+    api_client_mock.assert_called_with(
+        url=expected_call_url, payload={"ids": [testable_id]}
+    )
+    raised_exception = exc_info.value
+    assert isinstance(raised_exception, ProbelyRequestFailed)
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.get")

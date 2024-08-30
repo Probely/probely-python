@@ -3,6 +3,7 @@ import argparse
 from rich_argparse import RichHelpFormatter
 
 from probely_cli.cli.commands.targets.add import add_targets_command_handler
+from probely_cli.cli.commands.targets.delete import targets_delete_command_handler
 from probely_cli.cli.commands.targets.get import targets_get_command_handler
 from probely_cli.cli.common import (
     show_help,
@@ -70,6 +71,8 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
     return target_filters_parser
 
 
+
+
 def build_targets_parser(commands_parser, configs_parser, file_parser, output_parser):
 
     target_filters_parser = build_targets_filters_parser()
@@ -105,6 +108,25 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
     targets_get_parser.set_defaults(
         command_handler=targets_get_command_handler,
         parser=targets_get_parser,
+    )
+
+    targets_delete_parser = targets_command_parser.add_parser(
+        "delete",
+        parents=[configs_parser, target_filters_parser, output_parser],
+        formatter_class=RichHelpFormatter,
+    )
+
+    targets_delete_parser.add_argument(
+        "target_ids",
+        metavar="target_id",
+        nargs="*",
+        help="IDs of targets to delete",
+        default=None,
+    )
+
+    targets_delete_parser.set_defaults(
+        command_handler=targets_delete_command_handler,
+        parser=targets_delete_parser,
     )
 
     targets_add_parser = targets_command_parser.add_parser(

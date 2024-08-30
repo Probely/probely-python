@@ -9,7 +9,11 @@ from probely_cli.exceptions import (
     ProbelyObjectNotFound,
 )
 from .client import ProbelyAPIClient
-from ..settings import PROBELY_API_TARGETS_URL, PROBELY_API_TARGETS_RETRIEVE_URL
+from ..settings import (
+    PROBELY_API_TARGETS_BULK_DELETE_URL,
+    PROBELY_API_TARGETS_URL,
+    PROBELY_API_TARGETS_RETRIEVE_URL,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +35,25 @@ def retrieve_target(target_id) -> dict:
     if resp_status_code != 200:
         raise ProbelyRequestFailed(resp_content)
 
+    return resp_content
+
+
+def delete_targets(targets_ids: List[str]):
+    """Delete targets
+
+    :param target_ids: targets to be deleted.
+    :type target_ids: List[str].
+
+    """
+    url = PROBELY_API_TARGETS_BULK_DELETE_URL
+
+    logger.debug("Delete targets : %s", targets_ids)
+    resp_status_code, resp_content = ProbelyAPIClient().post(
+        url=url, payload={"ids": targets_ids}
+    )
+    if resp_status_code != 200:
+        raise ProbelyRequestFailed(resp_content)
+    logger.debug("Targets : %s deleted successfully", targets_ids)
     return resp_content
 
 
