@@ -5,12 +5,15 @@ from probely_cli.sdk.client import ProbelyAPIClient
 from probely_cli.settings import PROBELY_API_FINDINGS_URL
 
 
-def list_findings() -> List[Dict]:
+def list_findings(findings_filters: dict = None) -> List[Dict]:
+
+    filters = findings_filters or {}
 
     query_params = {
         "length": 100,
         "ordering": "-last_found",
         "page": 1,
+        **filters,
     }
 
     # TODO: go through pagination?

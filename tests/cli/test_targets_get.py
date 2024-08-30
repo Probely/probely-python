@@ -76,9 +76,9 @@ def test_targets_get__table_last_scan_date_output(
         (20, TargetRiskEnum.NORMAL.name),
         (30, TargetRiskEnum.HIGH.name),
         (None, TargetRiskEnum.NA.name),
-        (323232320, "Unknown"),
-        ("323232320", "Unknown"),
-        ("10", "Unknown"),
+        (323232320, "UNKNOWN"),
+        ("323232320", "UNKNOWN"),
+        ("10", "UNKNOWN"),
     ],
 )
 @patch("probely_cli.cli.commands.targets.get.list_targets")
@@ -114,8 +114,8 @@ def test_targets_get__table_risk_output(
     [
         ([{"name": "one"}], "one"),
         ([{"name": "one"}, {"name": "two"}], "one, two"),
-        (None, "Unknown_labels"),
-        ([{"no_name_key": "no"}], "Unknown_labels"),
+        (None, "UNKNOWN_LABELS"),
+        ([{"no_name_key": "no"}], "UNKNOWN_LABELS"),
     ],
 )
 @patch("probely_cli.cli.commands.targets.get.list_targets")

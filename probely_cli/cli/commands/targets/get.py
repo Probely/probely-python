@@ -8,12 +8,9 @@ from marshmallow import Schema
 from rich.table import Table
 
 from probely_cli.cli.commands.targets.schemas import TargetApiFiltersSchema
-from probely_cli.cli.common import OutputEnum
-from probely_cli.cli.common import (
-    get_printable_risk,
-    get_printable_labels,
-    get_printable_date,
-)
+from probely_cli.cli.common import OutputEnum, TargetRiskEnum
+from probely_cli.cli.formatters import get_printable_date, get_printable_enum_value, \
+    get_printable_labels
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.targets import list_targets, retrieve_targets
 
@@ -47,7 +44,7 @@ def get_tabled_targets(targets_list: List[Dict]):
             target.get("id"),
             asset.get("name", "N/D"),
             asset.get("url"),
-            get_printable_risk(target["risk"]),
+            get_printable_enum_value(TargetRiskEnum, target["risk"]),
             _get_printable_last_scan_date(target),  # last_scan
             get_printable_labels(target["labels"]),
         )

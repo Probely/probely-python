@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from probely_cli.cli.common import TargetRiskEnum
+from probely_cli.cli.common import FindingSeverityEnum, FindingStateEnum
 
 
 @patch("probely_cli.cli.commands.findings.get.list_findings")
@@ -68,14 +68,14 @@ def test_findings_get__table_last_found_date_output(
 @pytest.mark.parametrize(
     "testing_value,expected_output",
     [
-        (0, TargetRiskEnum.NO_RISK.name),
-        (10, TargetRiskEnum.LOW.name),
-        (20, TargetRiskEnum.NORMAL.name),
-        (30, TargetRiskEnum.HIGH.name),
-        (None, TargetRiskEnum.NA.name),
-        (323232320, "Unknown"),
-        ("323232320", "Unknown"),
-        ("10", "Unknown"),
+        (0, "UNKNOWN"),
+        (10, FindingSeverityEnum.LOW.name),
+        (20, FindingSeverityEnum.NORMAL.name),
+        (30, FindingSeverityEnum.HIGH.name),
+        (None, "UNKNOWN"),
+        (323232320, "UNKNOWN"),
+        ("323232320", "UNKNOWN"),
+        ("10", "UNKNOWN"),
     ],
 )
 @patch("probely_cli.cli.commands.findings.get.list_findings")
@@ -116,8 +116,8 @@ def test_findings_get__table_severity_output(
     [
         ([{"name": "one"}], "one"),
         ([{"name": "one"}, {"name": "two"}], "one, two"),
-        (None, "Unknown_labels"),
-        ([{"no_name_key": "no"}], "Unknown_labels"),
+        (None, "UNKNOWN_LABELS"),
+        ([{"no_name_key": "no"}], "UNKNOWN_LABELS"),
     ],
 )
 @patch("probely_cli.cli.commands.findings.get.list_findings")
@@ -152,3 +152,146 @@ def test_findings_get__table_labels_output(
 
     finding_columns = finding_line_without_extra_spaces.split(column_separator)
     assert finding_columns[6] == expected_output
+
+
+@pytest.mark.parametrize(
+    "filter_arg, expected_filter_request",
+    [
+        ("--f-scans id1", {"scan": ["id1"]}),
+        ("--f-scans=id1", {"scan": ["id1"]}),
+        ("--f-scans id1 id2", {"scan": ["id1", "id2"]}),
+        (
+            f"--f-severity {FindingSeverityEnum.LOW.name}",
+            {"severity": [FindingSeverityEnum.LOW.api_filter_value]},
+        ),
+        (
+            f"--f-severity={FindingSeverityEnum.NORMAL.name}",
+            {"severity": [FindingSeverityEnum.NORMAL.api_filter_value]},
+        ),
+        (
+            f"--f-severity {FindingSeverityEnum.LOW.name} {FindingSeverityEnum.HIGH.name}",
+            {
+                "severity": [
+                    FindingSeverityEnum.LOW.api_filter_value,
+                    FindingSeverityEnum.HIGH.api_filter_value,
+                ]
+            },
+        ),
+        (
+            f"--f-severity {FindingSeverityEnum.LOW.name.lower()}",
+            {"severity": [FindingSeverityEnum.LOW.api_filter_value]},
+        ),
+        (
+            f"--f-state {FindingStateEnum.FIXED.name}",
+            {"state": [FindingStateEnum.FIXED.api_filter_value]},
+        ),
+        (
+            f"--f-state={FindingStateEnum.NOT_FIXED.name}",
+            {"state": [FindingStateEnum.NOT_FIXED.api_filter_value]},
+        ),
+        (
+            f"--f-state {FindingStateEnum.ACCEPTED.name} {FindingStateEnum.FIXED.name}",
+            {
+                "state": [
+                    FindingStateEnum.ACCEPTED.api_filter_value,
+                    FindingStateEnum.FIXED.api_filter_value,
+                ]
+            },
+        ),
+        (
+            f"--f-state {FindingStateEnum.FIXED.name.lower()}",
+            {"state": [FindingStateEnum.FIXED.api_filter_value]},
+        ),
+        (
+            "--f-targets xxx ",
+            {"target": ["xxx"]},
+        ),
+        (
+            "--f-targets id1 id2",
+            {"target": ["id1", "id2"]},
+        ),
+        ("--f-search hello", {"search": "hello"}),
+        ("--f-is-new true", {"new": True}),
+        ("--f-is-new false", {"new": False}),
+    ],
+)
+@patch("probely_cli.cli.commands.findings.get.list_findings")
+def test_findings_get__arg_filters_success(
+    sdk_list_findings_mock: Mock,
+    filter_arg,
+    expected_filter_request,
+    probely_cli,
+):
+    stdout, stderr = probely_cli("findings", "get", filter_arg, return_list=True)
+
+    assert len(stderr) == 0, "Expected no errors"
+    sdk_list_findings_mock.assert_called_once_with(
+        findings_filters=expected_filter_request
+    )
+
+
+@pytest.mark.parametrize(
+    "filter_arg, expected_error_content",
+    [
+        (
+            "--f-scans",
+            "error: argument --f-scans: expected at least one argument",
+        ),
+        (
+            "--f-severity",
+            "error: argument --f-severity: expected at least one argument",
+        ),
+        (
+            "--f-severity=invalid_value",
+            "error: argument --f-severity: invalid choice: 'INVALID_VALUE' (choose from 'LOW', 'NORMAL', 'HIGH')",
+        ),
+        (
+            "--f-severity invalid_value",
+            "error: argument --f-severity: invalid choice: 'INVALID_VALUE' (choose from 'LOW', 'NORMAL', 'HIGH')",
+        ),
+        (
+            "--f-state",
+            "error: argument --f-state: expected at least one argument",
+        ),
+        (
+            "--f-state=invalid_value",
+            "error: argument --f-state: invalid choice: 'INVALID_VALUE' (choose from 'FIXED', 'NOT_FIXED', 'ACCEPTED', 'RETESTING')",
+        ),
+        (
+            "--f-state invalid_value",
+            "error: argument --f-state: invalid choice: 'INVALID_VALUE' (choose from 'FIXED', 'NOT_FIXED', 'ACCEPTED', 'RETESTING')",
+        ),
+        (
+            "--f-targets",
+            "error: argument --f-targets: expected at least one argument",
+        ),
+        (
+            "--f-search",
+            "error: argument --f-search: expected one argument",
+        ),
+        (
+            "--f-is-new",
+            "error: argument --f-is-new: expected one argument",
+        ),
+        (
+            "--f-is-new xxx",
+            "error: argument --f-is-new: invalid choice: 'XXX' (choose from 'TRUE', 'FALSE')",
+        ),
+    ],
+)
+@patch("probely_cli.cli.commands.findings.get.list_findings")
+def test_findings_get__arg_filters_validations(
+    _: Mock,
+    filter_arg,
+    expected_error_content,
+    probely_cli,
+):
+    stdout_lines, stderr_lines = probely_cli(
+        "findings", "get", filter_arg, return_list=True
+    )
+
+    assert len(stdout_lines) == 0, "Expected no output"
+    assert len(stderr_lines) >= 1, "Expected error output"
+
+    error_message = stderr_lines[-1]
+    assert expected_error_content in error_message

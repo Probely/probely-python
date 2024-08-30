@@ -22,15 +22,11 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
         formatter_class=RichHelpFormatter,
     )
 
-    multiple_values_help_text = (
-        "You can chose multiple options separated by space. eg: '--f Value1 Value2'"
-    )
-
     target_filters_parser.add_argument(
         "--f-has-unlimited-scans",
         type=lowercase_acceptable_parser_type,
         choices=TRUTHY_VALUES + FALSY_VALUES,
-        help="Filter if target has unlimited scans. ",
+        help="Filter if target has unlimited scans",
         action="store",
     )
 
@@ -38,16 +34,15 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
         "--f-is-url-verified",
         type=lowercase_acceptable_parser_type,
         choices=TRUTHY_VALUES + FALSY_VALUES,
-        help="Filter if target URL is verified. ",
+        help="Filter if target URL is verified",
         action="store",
-        default=None,
     )
 
     target_filters_parser.add_argument(
         "--f-risk",
         type=lowercase_acceptable_parser_type,
         choices=TargetRiskEnum.cli_input_choices(),
-        help="Filter targets by risk. " + multiple_values_help_text,
+        help="Filter targets by list of risk",
         nargs="+",
         action="store",
     )
@@ -56,7 +51,7 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
         "--f-type",
         type=lowercase_acceptable_parser_type,
         choices=TargetTypeEnum.cli_input_choices(),
-        help="Filter targets by type. " + multiple_values_help_text,
+        help="Filter targets by list of type",
         nargs="+",
         action="store",
     )

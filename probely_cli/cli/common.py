@@ -1,8 +1,9 @@
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Type
 
+import marshmallow
 import yaml
-from dateutil import parser
+from marshmallow import post_load
 
 import probely_cli.settings as settings
 from probely_cli.exceptions import ProbelyCLIValidation
@@ -59,43 +60,53 @@ class TargetTypeEnum(ProbelyCLIEnum):
     API = "api"
 
 
+class FindingSeverityEnum(ProbelyCLIEnum):
+    LOW = (TargetRiskEnum.LOW.value, TargetRiskEnum.LOW.api_filter_value)
+    NORMAL = (TargetRiskEnum.NORMAL.value, TargetRiskEnum.NORMAL.api_filter_value)
+    HIGH = (TargetRiskEnum.HIGH.value, TargetRiskEnum.HIGH.api_filter_value)
+
+
+class FindingStateEnum(ProbelyCLIEnum):
+    FIXED = "fixed"
+    NOT_FIXED = "notfixed"
+    ACCEPTED = "accepted"
+    RETESTING = "retesting"
+
+
 class OutputEnum(ProbelyCLIEnum):
     YAML = "yaml"
     JSON = "json"
 
 
-def get_printable_risk(api_risk_value) -> str:
-    try:
-        risk_name: str = TargetRiskEnum.get_by_api_response_value(api_risk_value).name
-        return risk_name
-    except ValueError:
-        return "Unknown"  # TODO: scenario that risk enum updated but CLI is forgotten
+class ProbelyCLIBaseFiltersSchema(marshmallow.Schema):
+    @post_load
+    def ignore_unused_filters(self, data, **kwargs):
+        """
+        All argparse arguments default to None, which means they must be removed.
+        This avoids errors when calling the API.
+        """
+        command_filters = {f: v for f, v in data.items() if v is not None}
+        return command_filters
+
+    class Meta:
+        # ignores other args that are not filters
+        unknown = marshmallow.EXCLUDE
 
 
-def get_printable_labels(labels: List[Dict] = None) -> str:
-    if labels is None:
-        return "Unknown_labels"
+class ProbelyCLIEnumField(marshmallow.fields.Enum):
+    enum_class: Type[ProbelyCLIEnum]
 
-    labels_name = []
-    try:
-        [labels_name.append(label["name"]) for label in labels]
-    except:
-        return "Unknown_labels"
+    def __init__(self, enum_class: Type[ProbelyCLIEnum], *args, **kwargs):
+        self.enum_class = enum_class
+        super().__init__(enum=enum_class, *args, **kwargs)
 
-    printable_labels = ", ".join(labels_name)
+    def _serialize(self, value, attr, obj, **kwargs):
+        raise NotImplementedError()
 
-    return printable_labels
+    def _deserialize(self, value, attr, data, **kwargs):
+        try:
+            return self.enum_class[value].api_filter_value
+        except:
+            raise marshmallow.ValidationError("Values not within the accepted values.")
 
 
-def get_printable_date(
-    date_string: Union[str, None],
-    default_string: Union[str, None] = None,
-) -> str:
-    if date_string:
-        datetime = parser.isoparse(date_string)
-        return datetime.strftime("%Y-%m-%d %H:%M")
-
-    if default_string:
-        return default_string
-
-    return ""
