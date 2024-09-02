@@ -84,7 +84,7 @@ def build_cli_parser():
     commands_parser = probely_parser.add_subparsers()
 
     build_targets_parser(commands_parser, configs_parser, file_parser, output_parser)
-    build_scans_parser(commands_parser, configs_parser, file_parser)
+    build_scans_parser(commands_parser, configs_parser, file_parser, output_parser)
     build_findings_parser(commands_parser, configs_parser)
 
     apply_parser = commands_parser.add_parser(

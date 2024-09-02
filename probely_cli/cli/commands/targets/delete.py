@@ -11,6 +11,11 @@ def targets_delete_command_handler(args):
     """
 
     filters = target_filters_handler(args)
+
+    if not filters and not args.target_ids:
+        args.parser.print_help()
+        return
+
     if filters and args.target_ids:
         raise ProbelyCLIValidation("filters and target ids are mutually exclusive.")
 

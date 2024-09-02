@@ -1843,6 +1843,8 @@ START_SCAN_200_RESPONSE = {
     "user_data": None,
 }
 
+CANCEL_SCAN_200_RESPONSE = {**START_SCAN_200_RESPONSE, "status": "canceling"}
+
 GET_FINDINGS_200_RESPONSE = {
     "count": 110,
     "page_total": 28,
