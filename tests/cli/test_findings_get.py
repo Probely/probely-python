@@ -1,7 +1,9 @@
+import json
 import re
 from unittest.mock import Mock, patch
 
 import pytest
+import yaml
 
 from probely_cli.cli.common import FindingSeverityEnum, FindingStateEnum
 from tests.testable_api_responses import RETRIEVE_FINDING_200_RESPONSE
@@ -345,3 +347,54 @@ def test_findings_get__mutually_exclusive_arguments(probely_cli):
     assert stderr_lines[0] == (
         "probely findings get: error: filters and finding ids are mutually exclusive."
     )
+
+
+@patch("probely_cli.cli.commands.findings.get.retrieve_findings")
+def test_targets_get__output_argument_output(retrieve_findings_mock, probely_cli):
+    findings_id0 = "findings_id0 "
+    findings_id1 = "findings_id1"
+
+    findings_id1_content = RETRIEVE_FINDING_200_RESPONSE.copy()
+    findings_id2_content = RETRIEVE_FINDING_200_RESPONSE.copy()
+
+    findings_id1_content["id"] = findings_id0
+    findings_id2_content["id"] = findings_id1
+
+    retrieve_findings_mock.return_value = [findings_id1_content, findings_id2_content]
+
+    stdout, _ = probely_cli(
+        "findings",
+        "get",
+        findings_id0,
+        findings_id1,
+    )
+    header = ("ID", "TARGET_ID", "SEVERITY", "TITLE", "LAST_FOUND", "STATE", "LABELS")
+    assert all(column in stdout for column in header), "Output with table expected"
+    assert findings_id0 in stdout, "findings_id0 entry expected"
+    assert findings_id1 in stdout, "findings_id0 entry expected"
+
+    stdout, stderr = probely_cli(
+        "findings", "get", findings_id0, findings_id1, "-o yaml"
+    )
+
+    assert stderr == ""
+    yaml_content = yaml.load(stdout, Loader=yaml.FullLoader)
+    assert isinstance(yaml_content, list), "Expected a yaml list"
+    assert len(yaml_content) == 2, "Expected 2 targets"
+    assert (
+        yaml_content[0]["id"] == findings_id0
+    ), "Expected findings_id0  in yaml content"
+    assert (
+        yaml_content[1]["id"] == findings_id1
+    ), "Expected findings_id1 in yaml content"
+
+    stdout, stderr = probely_cli(
+        "findings", "get", findings_id0, findings_id1, "--output json"
+    )
+
+    assert stderr == ""
+    json_content = json.loads(stdout)
+    assert isinstance(json_content, list), "Expected a json list"
+    assert len(json_content) == 2, "Expected 2 targets"
+    assert json_content[0]["id"] == findings_id0, "Expected findings_id0  in json"
+    assert json_content[1]["id"] == findings_id1, "Expected findings_id1 in json"

@@ -73,7 +73,7 @@ class ProbelyAPIClient:
         logger.debug("Requesting probely API in {}".format(prepared_request.url))
         resp = session.send(prepared_request)
 
-        logger.debug("Probely API response content: {}".format(resp.content))
+        logger.debug(f"Probely API response content: {resp.content}")
 
         status_code = resp.status_code
         try:
@@ -83,6 +83,7 @@ class ProbelyAPIClient:
                 "Something wrong with the API. Response content is not valid JSON."
             )
             raise ProbelyApiUnavailable
+
 
         return status_code, content
 

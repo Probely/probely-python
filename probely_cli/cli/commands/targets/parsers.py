@@ -66,8 +66,6 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
     return target_filters_parser
 
 
-
-
 def build_targets_parser(commands_parser, configs_parser, file_parser, output_parser):
 
     target_filters_parser = build_targets_filters_parser()

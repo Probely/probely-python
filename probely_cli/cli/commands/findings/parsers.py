@@ -68,7 +68,7 @@ def build_findings_filters_parser() -> argparse.ArgumentParser:
     return findings_filters_parser
 
 
-def build_findings_parser(commands_parser, configs_parser):
+def build_findings_parser(commands_parser, configs_parser, output_parser):
     findings_filter_parser = build_findings_filters_parser()
 
     findings_parser = commands_parser.add_parser(
@@ -88,7 +88,7 @@ def build_findings_parser(commands_parser, configs_parser):
     findings_get_parser = findings_command_parser.add_parser(
         "get",
         help="Lists all findings",
-        parents=[configs_parser, findings_filter_parser],
+        parents=[configs_parser, findings_filter_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
 

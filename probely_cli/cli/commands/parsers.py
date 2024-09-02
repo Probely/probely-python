@@ -85,7 +85,7 @@ def build_cli_parser():
 
     build_targets_parser(commands_parser, configs_parser, file_parser, output_parser)
     build_scans_parser(commands_parser, configs_parser, file_parser, output_parser)
-    build_findings_parser(commands_parser, configs_parser)
+    build_findings_parser(commands_parser, configs_parser, output_parser)
 
     apply_parser = commands_parser.add_parser(
         "apply",

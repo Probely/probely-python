@@ -1,12 +1,16 @@
+import json
+import sys
 from typing import Dict, List
 
 import marshmallow
+import yaml
 from marshmallow import Schema
 from rich.table import Table
 
 from probely_cli.cli.commands.findings.schemas import FindingsApiFiltersSchema
 from probely_cli.cli.common import (
     FindingSeverityEnum,
+    OutputEnum,
 )
 from probely_cli.cli.formatters import (
     get_printable_enum_value,
@@ -61,8 +65,23 @@ def finding_filters_handler(args):
     return api_ready_filters
 
 
-def findings_get_command_handler(args):
+def build_cmd_output(args, targets_list):
+    output_type = OutputEnum[args.output] if args.output else None
 
+    if output_type == OutputEnum.JSON:
+        return json.dumps(targets_list, indent=2)
+
+    if output_type == OutputEnum.YAML:
+        return yaml.dump(
+            targets_list,
+            indent=2,
+            width=sys.maxsize,  # avoids word wrapping
+        )
+
+    return get_tabled_findings(targets_list)
+
+
+def findings_get_command_handler(args):
     api_filters = finding_filters_handler(args)
     if api_filters and args.findings_ids:
         raise ProbelyCLIValidation("filters and finding ids are mutually exclusive.")
@@ -72,5 +91,5 @@ def findings_get_command_handler(args):
     else:
         findings_list = list_findings(findings_filters=api_filters)
 
-    findings_output = get_tabled_findings(findings_list)
+    findings_output = build_cmd_output(args, findings_list)
     args.console.print(findings_output)
