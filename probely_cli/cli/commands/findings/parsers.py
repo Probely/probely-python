@@ -92,6 +92,13 @@ def build_findings_parser(commands_parser, configs_parser):
         formatter_class=RichHelpFormatter,
     )
 
+    findings_get_parser.add_argument(
+        "findings_ids",
+        metavar="FINDING_ID",
+        nargs="*",
+        help="IDs of findings to list",
+    )
+
     findings_get_parser.set_defaults(
         command_handler=findings_get_command_handler,
         parser=findings_get_parser,

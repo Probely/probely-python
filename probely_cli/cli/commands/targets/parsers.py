@@ -94,7 +94,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
 
     targets_get_parser.add_argument(
         "target_ids",
-        metavar="target_id",
+        metavar="TARGET_ID",
         nargs="*",
         help="IDs of targets to list",
         default=None,
@@ -113,7 +113,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
 
     targets_delete_parser.add_argument(
         "target_ids",
-        metavar="target_id",
+        metavar="TARGET_ID",
         nargs="*",
         help="IDs of targets to delete",
         default=None,

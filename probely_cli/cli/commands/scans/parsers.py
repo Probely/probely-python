@@ -27,6 +27,7 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
     )
     scans_start_parser.add_argument(
         "target_id",
+        metavar="TARGET_ID",
     )
     scans_start_parser.set_defaults(
         command_handler=start_scans_command_handler,

@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from probely_cli.cli.common import FindingSeverityEnum, FindingStateEnum
+from tests.testable_api_responses import RETRIEVE_FINDING_200_RESPONSE
 
 
 @patch("probely_cli.cli.commands.findings.get.list_findings")
@@ -295,3 +296,52 @@ def test_findings_get__arg_filters_validations(
 
     error_message = stderr_lines[-1]
     assert expected_error_content in error_message
+
+
+@patch("probely_cli.cli.commands.findings.get.retrieve_findings")
+def test_findings_get__retrieve_by_ids(retrieve_findings_mock: Mock, probely_cli):
+    finding_id1 = "finding_id1"
+    finding_id2 = "finding_id2"
+
+    finding_id1_content = RETRIEVE_FINDING_200_RESPONSE.copy()
+    finding_id2_content = RETRIEVE_FINDING_200_RESPONSE.copy()
+
+    finding_id1_content["id"] = finding_id1
+    finding_id2_content["id"] = finding_id2
+
+    retrieve_findings_mock.return_value = [finding_id1_content, finding_id2_content]
+
+    stdout_lines, stderr_lines = probely_cli(
+        "findings",
+        "get",
+        finding_id1,
+        finding_id2,
+        return_list=True,
+    )
+
+    retrieve_findings_mock.assert_called_once_with(
+        findings_ids=[finding_id1, finding_id2]
+    )
+    assert len(stderr_lines) == 0
+    assert (
+        len(stdout_lines) == 3
+    ), "Expected to have header and 2 entries for each target"
+    assert finding_id1 in stdout_lines[1]
+    assert finding_id2 in stdout_lines[2]
+
+
+def test_findings_get__mutually_exclusive_arguments(probely_cli):
+    stdout_lines, stderr_lines = probely_cli(
+        "findings",
+        "get",
+        "id1 id2",
+        "--f-severity low",
+        return_list=True,
+    )
+
+    assert len(stdout_lines) == 0, "Expected no output"
+    assert len(stderr_lines) == 1, "Expected error output"
+
+    assert stderr_lines[0] == (
+        "probely findings get: error: filters and finding ids are mutually exclusive."
+    )

@@ -1,11 +1,8 @@
 import logging
 
-from rich.console import Console
-
+from probely_cli.cli.common import validate_and_retrieve_yaml_content
 from probely_cli.exceptions import ProbelyException, ProbelyBadRequest
 from probely_cli.sdk.targets import add_target
-from probely_cli.cli.common import validate_and_retrieve_yaml_content
-
 
 logger = logging.getLogger(__name__)
 
@@ -31,10 +28,6 @@ def add_targets_command_handler(args):
         args.err_console.print(str(probely_ex))
         if isinstance(probely_ex, ProbelyBadRequest):
             args.err_console.print(probely_ex.response_payload)
-        return
-
-    if args.raw:
-        args.console.print(target)
         return
 
     args.console.print(target["id"])

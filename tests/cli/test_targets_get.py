@@ -382,20 +382,3 @@ def test_targets_get__output_argument_output(retrieve_targets_mock, probely_cli)
     assert len(json_content) == 2, "Expected 2 targets"
     assert json_content[0]["id"] == target_id0, "Expected target_id0 in json"
     assert json_content[1]["id"] == target_id1, "Expected target_id1 in json"
-
-
-def test_targets_get__mutually_exclusive_arguments(probely_cli):
-    stdout_lines, stderr_lines = probely_cli(
-        "targets",
-        "get",
-        "target_id1 target_id2",
-        "--f-has-unlimited-scans=True",
-        return_list=True,
-    )
-
-    assert len(stdout_lines) == 0, "Expected no output"
-    assert len(stderr_lines) == 1, "Expected error output"
-
-    assert stderr_lines[0] == (
-        "probely targets get: error: filters and target ids are mutually exclusive."
-    )

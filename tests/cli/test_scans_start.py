@@ -19,9 +19,6 @@ def test_start_scans__command_handler(
     assert stderr == ""
 
 
-# todo: test raw response
-
-
 @patch("probely_cli.cli.commands.scans.start.start_scan")
 def test_scans_start_yaml_file_argument(
     sdk_start_scan_mock: Mock,

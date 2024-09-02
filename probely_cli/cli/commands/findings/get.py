@@ -8,10 +8,14 @@ from probely_cli.cli.commands.findings.schemas import FindingsApiFiltersSchema
 from probely_cli.cli.common import (
     FindingSeverityEnum,
 )
-from probely_cli.cli.formatters import get_printable_enum_value, get_printable_date, \
-    get_printable_labels
+from probely_cli.cli.formatters import (
+    get_printable_enum_value,
+    get_printable_date,
+    get_printable_labels,
+)
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.findings import list_findings
+from probely_cli.sdk.findings import retrieve_findings
 
 DEFAULT_LAST_FOUND_DATE_VALUE = "NO_DATE"
 
@@ -30,8 +34,10 @@ def get_tabled_findings(findings_list: List[Dict]):
         target = finding.get("target")
 
         table.add_row(
-            str(finding["id"]),  # id
-            target["id"],  # target_id
+            "{target_id}-{finding_id}".format(
+                target_id=str(target["id"]), finding_id=str(finding["id"])
+            ),  # id
+            target["id"],
             get_printable_enum_value(FindingSeverityEnum, finding["severity"]),
             finding["definition"]["name"],  # title
             get_printable_date(
@@ -58,8 +64,13 @@ def finding_filters_handler(args):
 def findings_get_command_handler(args):
 
     api_filters = finding_filters_handler(args)
+    if api_filters and args.findings_ids:
+        raise ProbelyCLIValidation("filters and finding ids are mutually exclusive.")
 
-    findings_list = list_findings(findings_filters=api_filters)
+    if args.findings_ids:
+        findings_list = retrieve_findings(findings_ids=args.findings_ids)
+    else:
+        findings_list = list_findings(findings_filters=api_filters)
 
     findings_output = get_tabled_findings(findings_list)
     args.console.print(findings_output)
