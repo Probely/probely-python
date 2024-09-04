@@ -7,7 +7,6 @@ from probely_cli.cli.commands.findings.parsers import build_findings_parser
 from probely_cli.cli.commands.scans.parsers import build_scans_parser
 from probely_cli.cli.commands.targets.parsers import build_targets_parser
 from probely_cli.cli.common import (
-    lowercase_acceptable_parser_type,
     OutputEnum,
     show_help,
 )
@@ -37,12 +36,12 @@ def build_configs_parser():
     )
     configs_parser.add_argument(
         "--api-key",
-        help="Override API KEY used for requests",
+        help="Set API KEY used for requests",
         default=None,
     )
     configs_parser.add_argument(
         "--debug",
-        help="Override DEBUG MODE setting",
+        help="Enable DEBUG mode setting",
         action="store_true",
         default=False,
     )
@@ -58,7 +57,7 @@ def build_output_parser():
     output_parser.add_argument(
         "--output",
         "-o",
-        type=lowercase_acceptable_parser_type,
+        type=str.upper,
         choices=OutputEnum.cli_input_choices(),
         help="Presets for output formats",
     )

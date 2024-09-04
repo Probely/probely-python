@@ -9,8 +9,11 @@ from rich.table import Table
 
 from probely_cli.cli.commands.targets.schemas import TargetApiFiltersSchema
 from probely_cli.cli.common import OutputEnum, TargetRiskEnum
-from probely_cli.cli.formatters import get_printable_date, get_printable_enum_value, \
-    get_printable_labels
+from probely_cli.cli.formatters import (
+    get_printable_date,
+    get_printable_enum_value,
+    get_printable_labels,
+)
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.targets import list_targets, retrieve_targets
 
@@ -28,7 +31,7 @@ def _get_printable_last_scan_date(target: Dict) -> str:
     return get_printable_date(last_scan_start_date_str, TARGET_NEVER_SCANNED_OUTPUT)
 
 
-def get_tabled_targets(targets_list: List[Dict]):
+def get_tabled_targets(targets_list: List[Dict]) -> Table:
     table = Table(box=None)
     table.add_column("ID")
     table.add_column("NAME")
@@ -52,7 +55,7 @@ def get_tabled_targets(targets_list: List[Dict]):
     return table
 
 
-def target_filters_handler(args):
+def target_filters_handler(args) -> dict:
     filters_schema: Schema = TargetApiFiltersSchema()
     try:
         api_ready_filters = filters_schema.load(vars(args))

@@ -1,8 +1,50 @@
+import argparse
 from rich_argparse import RichHelpFormatter
 
 from probely_cli.cli.commands.scans.cancel import scans_cancel_command_handler
+from probely_cli.cli.commands.scans.get import scans_get_command_handler
 from probely_cli.cli.commands.scans.start import start_scans_command_handler
-from probely_cli.cli.common import show_help
+from probely_cli.cli.common import ScanStatusEnum, show_help
+
+
+def build_scan_filters_parser() -> argparse.ArgumentParser:
+    scan_filters_parser = argparse.ArgumentParser(
+        description="Filters usable in Scan commands",
+        add_help=False,
+        formatter_class=RichHelpFormatter,
+    )
+    scan_filters_parser.add_argument(
+        "--f-search",
+        action="store",
+        default=None,
+        metavar="SEARCH TERM",
+        help="Keyword to match with Scan URL, Target name, URL or labels",
+    )
+
+    scan_filters_parser.add_argument(
+        "--f-status",
+        action="store",
+        nargs="+",
+        type=str.upper,
+        choices=ScanStatusEnum.cli_input_choices(),
+        help="Filter by Scan status",
+    )
+
+    for date_field in ["completed", "started"]:
+        for filter_lookup in ["gt", "gte", "lt", "lte"]:
+            scan_filters_parser.add_argument(
+                f"--f-{date_field}-{filter_lookup}",
+                action="store",
+                default=None,
+                metavar="DATETIME",
+                help=(
+                    f"Filter Scans `{date_field}` datetime `{filter_lookup.upper()}` "
+                    f"the specified date or datetime in ISO 8601 format. "
+                    f"For example, `2020-07-05` for a date or `2020-07-05T12:45:30` for a datetime."
+                ),
+            )
+
+    return scan_filters_parser
 
 
 def build_scans_parser(commands_parser, configs_parser, file_parser, output_parser):
@@ -11,13 +53,13 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
         parents=[configs_parser],
         formatter_class=RichHelpFormatter,
     )
-
     scans_parser.set_defaults(
         command_handler=show_help,
         is_no_action_parser=True,
         parser=scans_parser,
         formatter_class=RichHelpFormatter,
     )
+
     scans_command_parser = scans_parser.add_subparsers()
 
     scans_start_parser = scans_command_parser.add_parser(
@@ -41,7 +83,7 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
     )
     scans_cancel_parser.add_argument(
         "scan_ids",
-        metavar="scan_id",
+        metavar="SCAN_ID",
         nargs="*",
         help="IDs of scans to cancel",
         default=None,
@@ -49,4 +91,23 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
     scans_cancel_parser.set_defaults(
         command_handler=scans_cancel_command_handler,
         parser=scans_cancel_parser,
+    )
+
+    scan_filters_parser = build_scan_filters_parser()
+
+    scans_get_parser = scans_command_parser.add_parser(
+        "get",
+        parents=[configs_parser, scan_filters_parser, output_parser],
+        formatter_class=RichHelpFormatter,
+    )
+    scans_get_parser.add_argument(
+        "scan_ids",
+        metavar="SCAN_ID",
+        nargs="*",
+        help="IDs of Scans to list",
+        default=None,
+    )
+    scans_get_parser.set_defaults(
+        command_handler=scans_get_command_handler,
+        parser=scans_get_parser,
     )

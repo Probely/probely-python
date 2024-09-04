@@ -1,3 +1,5 @@
+import argparse
+import textwrap
 from typing import Type, Dict, List, Union
 
 from dateutil import parser
@@ -19,13 +21,17 @@ def get_printable_labels(labels: List[Dict] = None) -> str:
     if labels is None:
         return "UNKNOWN_LABELS"
 
-    labels_name = []
+    labels_names = []
     try:
-        [labels_name.append(label["name"]) for label in labels]
+        for label in labels:
+            truncated_label = textwrap.shorten(
+                label["name"], width=16, placeholder="..."
+            )
+            labels_names.append(truncated_label)
     except:
         return "UNKNOWN_LABELS"
 
-    printable_labels = ", ".join(labels_name)
+    printable_labels = ", ".join(labels_names)
 
     return printable_labels
 

@@ -7,7 +7,6 @@ from probely_cli.cli.commands.targets.delete import targets_delete_command_handl
 from probely_cli.cli.commands.targets.get import targets_get_command_handler
 from probely_cli.cli.common import (
     show_help,
-    lowercase_acceptable_parser_type,
     TargetRiskEnum,
     TargetTypeEnum,
 )
@@ -24,7 +23,7 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
 
     target_filters_parser.add_argument(
         "--f-has-unlimited-scans",
-        type=lowercase_acceptable_parser_type,
+        type=str.upper,
         choices=TRUTHY_VALUES + FALSY_VALUES,
         help="Filter if target has unlimited scans",
         action="store",
@@ -32,7 +31,7 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
 
     target_filters_parser.add_argument(
         "--f-is-url-verified",
-        type=lowercase_acceptable_parser_type,
+        type=str.upper,
         choices=TRUTHY_VALUES + FALSY_VALUES,
         help="Filter if target URL is verified",
         action="store",
@@ -40,7 +39,7 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
 
     target_filters_parser.add_argument(
         "--f-risk",
-        type=lowercase_acceptable_parser_type,
+        type=str.upper,
         choices=TargetRiskEnum.cli_input_choices(),
         help="Filter targets by list of risk",
         nargs="+",
@@ -49,7 +48,7 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
 
     target_filters_parser.add_argument(
         "--f-type",
-        type=lowercase_acceptable_parser_type,
+        type=str.upper,
         choices=TargetTypeEnum.cli_input_choices(),
         help="Filter targets by list of type",
         nargs="+",
@@ -89,7 +88,6 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         parents=[configs_parser, target_filters_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
-
     targets_get_parser.add_argument(
         "target_ids",
         metavar="TARGET_ID",
@@ -97,7 +95,6 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         help="IDs of targets to list",
         default=None,
     )
-
     targets_get_parser.set_defaults(
         command_handler=targets_get_command_handler,
         parser=targets_get_parser,
@@ -108,7 +105,6 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         parents=[configs_parser, target_filters_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
-
     targets_delete_parser.add_argument(
         "target_ids",
         metavar="TARGET_ID",
@@ -116,7 +112,6 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         help="IDs of targets to delete",
         default=None,
     )
-
     targets_delete_parser.set_defaults(
         command_handler=targets_delete_command_handler,
         parser=targets_delete_parser,
@@ -127,14 +122,12 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         parents=[configs_parser, file_parser],
         formatter_class=RichHelpFormatter,
     )
-
     targets_add_parser.add_argument(
         "site_url",
     )
     targets_add_parser.add_argument(
         "--site-name",
     )
-
     targets_add_parser.set_defaults(
         command_handler=add_targets_command_handler,
         parser=targets_add_parser,

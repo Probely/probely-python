@@ -1,3 +1,4 @@
+import dateutil.parser
 from pathlib import Path
 from typing import Type
 
@@ -10,13 +11,9 @@ from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.utils import ProbelyCLIEnum
 
 
-def lowercase_acceptable_parser_type(value: str):
-    return value.upper()
-
-
 def show_help(args):
     if args.is_no_action_parser:
-        args.cli_parser.print_help()
+        args.parser.print_help()
 
 
 def validate_and_retrieve_yaml_content(yaml_file_path):
@@ -78,6 +75,20 @@ class OutputEnum(ProbelyCLIEnum):
     JSON = "json"
 
 
+class ScanStatusEnum(ProbelyCLIEnum):
+    CANCELED = "canceled"
+    CANCELING = "canceling"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    PAUSED = "paused"
+    PAUSING = "pausing"
+    QUEUED = "queued"
+    RESUMING = "resuming"
+    STARTED = "started"
+    UNDER_REVIEW = "under_review"
+    FINISHING_UP = "finishing_up"
+
+
 class ProbelyCLIBaseFiltersSchema(marshmallow.Schema):
     @post_load
     def ignore_unused_filters(self, data, **kwargs):
@@ -110,3 +121,35 @@ class ProbelyCLIEnumField(marshmallow.fields.Enum):
             raise marshmallow.ValidationError("Values not within the accepted values.")
 
 
+class ISO8601DateTimeField(marshmallow.fields.Field):
+    """
+    Field for parsing ISO 8601 datetime strings into datetime objects and serializing them back.
+
+    An ISO-8601 datetime string consists of a date portion, followed optionally by a time
+    portion - the date and time portions are separated by a single character separator,
+    which is ``T`` in the official standard.
+
+    Supported common date formats are:
+    - ``YYYY``
+    - ``YYYY-MM``
+    - ``YYYY-MM-DD`` or ``YYYYMMDD``
+
+    Supported common time formats are:
+    - ``hh``
+    - ``hh:mm`` or ``hhmm``
+    - ``hh:mm:ss`` or ``hhmmss``
+    - ``hh:mm:ss.ssssss`` (Up to 6 sub-second digits)
+    """
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        try:
+            return dateutil.parser.isoparse(value)
+        except (ValueError, TypeError, OverflowError):
+            raise marshmallow.ValidationError(
+                "Invalid datetime format. Please provide a valid datetime in ISO 8601 format."
+            )
+
+    def _serialize(self, value, attr, obj, **kwargs):
+        if value is None:
+            return None
+        return value.isoformat()

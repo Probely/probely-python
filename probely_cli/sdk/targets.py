@@ -26,7 +26,7 @@ def retrieve_targets(targets_ids: List[str]) -> List[Dict]:
     return retrieved_targets
 
 
-def retrieve_target(target_id) -> dict:
+def retrieve_target(target_id: str) -> dict:
     url = PROBELY_API_TARGETS_RETRIEVE_URL.format(id=target_id)
     resp_status_code, resp_content = ProbelyAPIClient().get(url)
     if resp_status_code == 404:

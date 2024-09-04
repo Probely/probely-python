@@ -29,8 +29,11 @@ def app():
 
     from .. import settings
 
-    logging_level = logging.DEBUG if settings.IS_DEBUG_MODE else logging.WARNING
-    logging.basicConfig(level=logging_level)
-    logger.debug("DEBUG MODE IS ON")
+    if settings.IS_DEBUG_MODE:
+        logging_level = logging.DEBUG
+        logging.basicConfig(level=logging_level)
+        logger.debug("DEBUG MODE IS ON")
+    else:
+        logging.disabled = True
 
     return cli_app.run()

@@ -4,7 +4,7 @@ from unittest.mock import patch, Mock
 import pytest
 
 from probely_cli.exceptions import ProbelyRequestFailed
-from probely_cli.sdk.scans import start_scan, cancel_scans
+from probely_cli.sdk.scans import list_scans, start_scan, cancel_scans
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.post")
@@ -88,3 +88,28 @@ def test_cancel_scan_failed(mock_client):
         assert exc_info == response_error_content
 
     mock_client.assert_called_once()
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+def test_list_scans__ok(api_client_mock: Mock):
+    expected_content = [{"id": "scan1"}, {"id": "scan2"}]
+    response_content = {"results": expected_content}
+
+    api_client_mock.return_value = (200, response_content)
+
+    r = list_scans()
+    assert r == expected_content
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+def test_list_scans__notok(api_client_mock: Mock):
+    invalid_status_code = 400
+    error_message = "request invalid"
+    error_response_content = {"detail": error_message}
+
+    api_client_mock.return_value = (invalid_status_code, error_response_content)
+
+    with pytest.raises(ProbelyRequestFailed) as exc:
+        list_scans()
+        raised_exception = exc.value
+        assert str(raised_exception) == error_message
