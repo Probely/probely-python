@@ -2,7 +2,7 @@ import argparse
 import logging
 
 from probely_cli import settings
-from probely_cli.exceptions import ProbelyException
+from probely_cli.exceptions import ProbelyException, ProbelyCLIValidation
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +29,9 @@ class CliApp:
     def run(self):
         try:
             return self.args.command_handler(self.args)
+        except ProbelyCLIValidation as e:
+            self.args.parser.print_usage()
+            self._print_error_message(str(e))
         except ProbelyException as e:
             self._print_error_message(str(e))
         except Exception as e:
