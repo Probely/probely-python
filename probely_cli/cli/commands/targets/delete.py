@@ -9,22 +9,19 @@ def targets_delete_command_handler(args):
     """
     Delete targets
     """
-
     filters = target_filters_handler(args)
+    targets_ids = args.target_ids
 
-    if not filters and not args.target_ids:
-        args.parser.print_help()
-        return
+    if not filters and not targets_ids:
+        raise ProbelyCLIValidation("either filters or Target IDs must be provided.")
 
-    if filters and args.target_ids:
-        raise ProbelyCLIValidation("filters and target ids are mutually exclusive.")
+    if filters and targets_ids:
+        raise ProbelyCLIValidation("filters and Target IDs are mutually exclusive.")
 
-    targets_list_ids = args.target_ids
-
-    if not args.target_ids:
+    if not targets_ids:
         targets_list = list_targets(targets_filters=filters)
-        targets_list_ids = [target.get("id") for target in targets_list]
+        targets_ids = [target.get("id") for target in targets_list]
 
-    targets = delete_targets(targets_ids=targets_list_ids)
+    targets = delete_targets(targets_ids=targets_ids)
     for ids in targets.get("ids"):
         args.console.print(ids)

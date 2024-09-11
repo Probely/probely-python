@@ -73,11 +73,13 @@ def build_cmd_output(args, scans: List[Dict]) -> Table:
 
 def scans_get_command_handler(args: argparse.Namespace):
     filters = prepare_scan_filters_for_api(args)
-    if filters and args.scan_ids:
-        raise ProbelyCLIValidation("Filters and Scan IDs are mutually exclusive")
+    scan_ids = args.scan_ids
 
-    if args.scan_ids:
-        scans_list = retrieve_scans(args.scan_ids)
+    if filters and scan_ids:
+        raise ProbelyCLIValidation("filters and Scan IDs are mutually exclusive")
+
+    if scan_ids:
+        scans_list = retrieve_scans(scan_ids)
     else:
         scans_list = list_scans(scans_filters=filters)
 

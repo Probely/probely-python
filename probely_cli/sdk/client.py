@@ -47,21 +47,29 @@ class Probely:
 
 
 class ProbelyAPIClient:
-
     def get(self, url, query_params=None):
+        return self._send_request("get", url, query_params=query_params)
+
+    def post(self, url, payload: dict = None):
+        return self._send_request("post", url, payload=payload)
+
+    def patch(self, url, payload: dict = None):
+        return self._send_request("patch", url, payload=payload)
+
+    def _send_request(
+        self, method: str, url: str, payload: dict = None, query_params: dict = None
+    ):
         if query_params:
             url = f"{url}?{urlencode(query_params, True)}"
 
-        request = Request("get", url=url)
-
-        return self._call_probely_api(request)
-
-    def post(self, url, payload: dict = None):
         if payload is None:
             payload = {}
 
-        logger.debug("Requesting probely API. Payload: {}".format(payload))
-        request = Request("post", url=url, json=payload)
+        logger.debug(
+            "Requesting probely API. Method: %s, URL: %s, payload: %s"
+            % (method.upper(), url, payload)
+        )
+        request = Request(method, url=url, json=payload)
 
         return self._call_probely_api(request)
 
@@ -73,7 +81,11 @@ class ProbelyAPIClient:
         logger.debug("Requesting probely API in {}".format(prepared_request.url))
         resp = session.send(prepared_request)
 
-        logger.debug(f"Probely API response content: {resp.content}")
+        logger.debug(
+            "Probely API response status: %s, content: %s",
+            resp.status_code,
+            resp.content,
+        )
 
         status_code = resp.status_code
         try:
@@ -83,7 +95,6 @@ class ProbelyAPIClient:
                 "Something wrong with the API. Response content is not valid JSON."
             )
             raise ProbelyApiUnavailable
-
 
         return status_code, content
 

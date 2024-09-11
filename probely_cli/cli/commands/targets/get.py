@@ -86,13 +86,14 @@ def targets_get_command_handler(args):
     """
     Lists all accessible targets of client
     """
-
     filters = target_filters_handler(args)
-    if filters and args.target_ids:
-        raise ProbelyCLIValidation("filters and target ids are mutually exclusive.")
+    targets_ids = args.target_ids
 
-    if args.target_ids:
-        targets_list = retrieve_targets(targets_ids=args.target_ids)
+    if filters and targets_ids:
+        raise ProbelyCLIValidation("filters and Target IDs are mutually exclusive.")
+
+    if targets_ids:
+        targets_list = retrieve_targets(targets_ids=targets_ids)
     else:
         targets_list = list_targets(targets_filters=filters)
 

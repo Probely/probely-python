@@ -5,6 +5,7 @@ from rich_argparse import RichHelpFormatter
 from probely_cli.cli.commands.targets.add import add_targets_command_handler
 from probely_cli.cli.commands.targets.delete import targets_delete_command_handler
 from probely_cli.cli.commands.targets.get import targets_get_command_handler
+from probely_cli.cli.commands.targets.update import update_targets_command_handler
 from probely_cli.cli.common import (
     show_help,
     TargetRiskEnum,
@@ -14,13 +15,11 @@ from probely_cli.settings import TRUTHY_VALUES, FALSY_VALUES
 
 
 def build_targets_filters_parser() -> argparse.ArgumentParser:
-
     target_filters_parser = argparse.ArgumentParser(
         description="Filters usable in Targets commands",
         add_help=False,
         formatter_class=RichHelpFormatter,
     )
-
     target_filters_parser.add_argument(
         "--f-has-unlimited-scans",
         type=str.upper,
@@ -28,7 +27,6 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
         help="Filter if target has unlimited scans",
         action="store",
     )
-
     target_filters_parser.add_argument(
         "--f-is-url-verified",
         type=str.upper,
@@ -36,7 +34,6 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
         help="Filter if target URL is verified",
         action="store",
     )
-
     target_filters_parser.add_argument(
         "--f-risk",
         type=str.upper,
@@ -45,7 +42,6 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
         nargs="+",
         action="store",
     )
-
     target_filters_parser.add_argument(
         "--f-type",
         type=str.upper,
@@ -54,7 +50,6 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
         nargs="+",
         action="store",
     )
-
     target_filters_parser.add_argument(
         "--f-search",
         help="Keyword to match with name, url and labels",
@@ -131,4 +126,21 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
     targets_add_parser.set_defaults(
         command_handler=add_targets_command_handler,
         parser=targets_add_parser,
+    )
+
+    targets_update_parser = targets_command_parser.add_parser(
+        "update",
+        parents=[configs_parser, target_filters_parser, file_parser, output_parser],
+        formatter_class=RichHelpFormatter,
+    )
+    targets_update_parser.add_argument(
+        "target_ids",
+        metavar="TARGET_ID",
+        nargs="*",
+        help="IDs of targets to update",
+        default=None,
+    )
+    targets_update_parser.set_defaults(
+        command_handler=update_targets_command_handler,
+        parser=targets_update_parser,
     )

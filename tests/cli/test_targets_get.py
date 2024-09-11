@@ -318,7 +318,7 @@ def test_targets_get__mutually_exclusive_arguments(probely_cli):
     assert len(stderr_lines) == 1, "Expected error output"
 
     assert stderr_lines[0] == (
-        "probely targets get: error: filters and target ids are mutually exclusive."
+        "probely targets get: error: filters and Target IDs are mutually exclusive."
     )
 
 

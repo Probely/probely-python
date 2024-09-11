@@ -38,6 +38,8 @@ def validate_and_retrieve_yaml_content(yaml_file_path):
         try:
             # TODO: supported yaml versions?
             yaml_content = yaml.safe_load(yaml_file)
+            if yaml_content is None:
+                raise ProbelyCLIValidation("YAML file {} is empty.".format(file_path))
         except yaml.scanner.ScannerError as ex:
             raise ProbelyCLIValidation("Invalid yaml content in file: {}".format(ex))
 

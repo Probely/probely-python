@@ -3,6 +3,7 @@ from typing import List, Dict
 
 from mergedeep import merge, Strategy
 
+from probely_cli.sdk.common import validate_resource_ids
 from probely_cli.exceptions import (
     ProbelyRequestFailed,
     ProbelyBadRequest,
@@ -11,6 +12,7 @@ from probely_cli.exceptions import (
 from .client import ProbelyAPIClient
 from ..settings import (
     PROBELY_API_TARGETS_BULK_DELETE_URL,
+    PROBELY_API_TARGETS_BULK_UPDATE_URL,
     PROBELY_API_TARGETS_URL,
     PROBELY_API_TARGETS_RETRIEVE_URL,
 )
@@ -123,7 +125,6 @@ def add_target(  # TODO: needs testing
         url=create_target_url, payload=body_data
     )
 
-    logger.debug("Add target request response code: %s", resp_status_code)
     if resp_status_code == 400:
         ex = ProbelyBadRequest(response_payload=resp_content)
         raise ex
@@ -133,3 +134,37 @@ def add_target(  # TODO: needs testing
 
     created_target = resp_content
     return created_target
+
+
+def update_target(target_id: str, payload: dict) -> dict:
+    url = PROBELY_API_TARGETS_RETRIEVE_URL.format(id=target_id)
+
+    resp_status_code, resp_content = ProbelyAPIClient().patch(url, payload)
+
+    if resp_status_code != 200:
+        if resp_status_code == 400:
+            raise ProbelyBadRequest(resp_content)
+        if resp_status_code == 404:
+            raise ProbelyObjectNotFound(id=target_id)
+        raise ProbelyRequestFailed(resp_content)
+
+    return resp_content
+
+
+def update_targets(target_ids: List[str], payload: dict) -> List[Dict]:
+    validate_resource_ids(PROBELY_API_TARGETS_URL, target_ids)
+
+    url = PROBELY_API_TARGETS_BULK_UPDATE_URL
+    update_payload = {"ids": target_ids, **payload}
+
+    resp_status_code, resp_content = ProbelyAPIClient().post(url, update_payload)
+
+    if resp_status_code != 200:
+        if resp_status_code == 400:
+            raise ProbelyBadRequest(resp_content)
+        raise ProbelyRequestFailed(resp_content)
+
+    # Bulk update returns only the IDs of the updated targets, so they need to be retrieved again
+    targets_ids = resp_content.get("ids", [])
+    targets = retrieve_targets(targets_ids)
+    return targets

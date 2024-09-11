@@ -3,7 +3,9 @@ from unittest.mock import patch, Mock
 
 @patch("probely_cli.cli.commands.targets.delete.delete_targets")
 @patch("probely_cli.cli.commands.targets.delete.list_targets")
-def test_targets_delete_target(list_targets_mock: Mock,delete_targets_mock: Mock, probely_cli):
+def test_targets_delete_target(
+    list_targets_mock: Mock, delete_targets_mock: Mock, probely_cli
+):
     target_id1 = "target_id1"
     target_id2 = "target_id2"
 
@@ -60,5 +62,5 @@ def test_targets_delete__mutually_exclusive_arguments(probely_cli):
     assert len(stderr_lines) == 1, "Expected error output"
 
     assert stderr_lines[0] == (
-        "probely targets delete: error: filters and target ids are mutually exclusive."
+        "probely targets delete: error: filters and Target IDs are mutually exclusive."
     )

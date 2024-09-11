@@ -22,11 +22,6 @@ def start_scan(target_id: str, extra_payload: dict = None) -> dict:
     )
 
     if resp_status_code != 200:
-        logging.debug(
-            "Request unsuccessful. Status code: {}, body: {}".format(
-                resp_status_code, resp_content
-            )
-        )
         raise ProbelyRequestFailed(resp_content)
 
     scan = resp_content
@@ -41,12 +36,7 @@ def cancel_scans(scan_ids: List[str]) -> List[dict]:
     )
 
     if resp_status_code != 200:
-        logging.debug(
-            "Request unsuccessful. Status code: {}, body: {}".format(
-                resp_status_code, resp_content
-            )
-        )
-        raise ProbelyRequestFailed(resp_content, resp_status_code)
+        raise ProbelyRequestFailed(resp_content)
 
     scans = resp_content
     return scans

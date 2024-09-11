@@ -18,7 +18,7 @@ class ProbelyObjectNotFound(ProbelyException):
 
 class ProbelyBadRequest(ProbelyException):
     def __init__(self, response_payload, *args, **kwargs):
-        super().__init__("API validation error.", *args)
+        super().__init__("API validation error: {}".format(response_payload), *args)
         self.response_payload = response_payload
 
 
