@@ -78,9 +78,11 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
         parser=scans_start_parser,
     )
 
+    scan_filters_parser = build_scan_filters_parser()
+
     scans_cancel_parser = scans_command_parser.add_parser(
         "cancel",
-        parents=[configs_parser, output_parser],
+        parents=[configs_parser, scan_filters_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
     scans_cancel_parser.add_argument(
@@ -94,8 +96,6 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
         command_handler=scans_cancel_command_handler,
         parser=scans_cancel_parser,
     )
-
-    scan_filters_parser = build_scan_filters_parser()
 
     scans_get_parser = scans_command_parser.add_parser(
         "get",
