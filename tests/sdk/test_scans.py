@@ -3,8 +3,13 @@ from unittest.mock import patch, Mock
 
 import pytest
 
-from probely_cli.exceptions import ProbelyRequestFailed
-from probely_cli.sdk.scans import list_scans, start_scan, cancel_scans
+from probely_cli.exceptions import ProbelyObjectNotFound, ProbelyRequestFailed
+from probely_cli.sdk.scans import (
+    list_scans,
+    resume_scans,
+    start_scan,
+    cancel_scans,
+)
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.post")
@@ -113,3 +118,63 @@ def test_list_scans__notok(api_client_mock: Mock):
         list_scans()
         raised_exception = exc.value
         assert str(raised_exception) == error_message
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely_cli.sdk.scans.retrieve_scan")
+def test_resume_scan(
+    sdk_retrieve_scan_mock: Mock,
+    mock_client: Mock,
+    valid_scans_resume_api_response: Dict,
+):
+    response_content = valid_scans_resume_api_response
+    valid_status_code = 200
+
+    sdk_retrieve_scan_mock.return_value = valid_scans_resume_api_response
+
+    scan_id_to_resume = valid_scans_resume_api_response["id"]
+
+    mock_client.return_value = (valid_status_code, response_content)
+    scan = resume_scans([scan_id_to_resume])
+
+    mock_client.assert_called_once()
+    scans_to_resume = mock_client.call_args[0][1]
+
+    assert scans_to_resume is not None
+    assert scans_to_resume["scans"][0]["id"] == scan_id_to_resume
+    assert scan == [response_content]
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely_cli.sdk.scans.retrieve_scan")
+def test_resume_scan_failed(
+    sdk_retrieve_scan_mock: Mock, mock_client, valid_scans_resume_api_response
+):
+    response_error_content = {"error": "random error message"}
+    invalid_status_code = 400
+    sdk_retrieve_scan_mock.return_value = valid_scans_resume_api_response
+    mock_client.return_value = (invalid_status_code, response_error_content)
+
+    with pytest.raises(ProbelyRequestFailed) as exc_info:
+        resume_scans(["random_id"])
+
+        assert exc_info == response_error_content
+
+    mock_client.assert_called_once()
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely_cli.sdk.scans.retrieve_scan")
+def test_resume_scan_failed_invalid_ids(
+    sdk_retrieve_scan_mock: Mock, mock_client: Mock
+):
+
+    scan_id = "random_scan_id"
+    exception_message = f"probely scans resume: error: objects '{scan_id}' not found.\n"
+    sdk_retrieve_scan_mock.side_effect = ProbelyObjectNotFound(exception_message)
+    with pytest.raises(ProbelyObjectNotFound) as exc_info:
+        resume_scans([scan_id])
+
+        assert exc_info == exception_message
+
+    mock_client.assert_not_called()

@@ -12,7 +12,7 @@ class ProbelyRequestFailed(ProbelyException):
 
 class ProbelyObjectNotFound(ProbelyException):
     def __init__(self, id, *args, **kwargs):
-        super().__init__("object '{id}' not found.".format(id=id), *args)
+        super().__init__("object '{}' not found.".format(id), *args)
         self.not_found_object_id = id
 
 

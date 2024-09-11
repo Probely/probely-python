@@ -6,6 +6,7 @@ from probely_cli.exceptions import ProbelyObjectNotFound, ProbelyRequestFailed
 from probely_cli.sdk.client import ProbelyAPIClient
 from probely_cli.settings import (
     PROBELY_API_SCANS_BULK_CANCEL_URL,
+    PROBELY_API_SCANS_BULK_RESUME_URL,
     PROBELY_API_SCANS_URL,
     PROBELY_API_START_SCAN_URL,
 )
@@ -91,3 +92,29 @@ def retrieve_scan(scan_id: str) -> dict:
 
 def retrieve_scans(scan_ids: List[str]) -> List[Dict]:
     return [retrieve_scan(scan_id) for scan_id in scan_ids]
+
+
+def resume_scans(scan_ids: List[str], ignore_blackout_period=False) -> List[Dict]:
+    scan_resume_url = PROBELY_API_SCANS_BULK_RESUME_URL
+
+    scans = []
+    for scan_id in scan_ids:
+        scan = retrieve_scan(scan_id)
+        scans.append(scan)
+
+    payload = {
+        "scans": [{"id": scan_id} for scan_id in scan_ids],
+        "overrides": {"ignore_blackout_period": ignore_blackout_period},
+    }
+
+    resp_status_code, resp_content = ProbelyAPIClient().post(scan_resume_url, payload)
+
+    if resp_status_code != 200:
+        raise ProbelyRequestFailed(resp_content, resp_status_code)
+
+    return scans
+
+
+def resume_scan(scan_id: str, ignore_blackout_period=False) -> dict:
+    scan = resume_scans([scan_id], ignore_blackout_period)[0]
+    return scan

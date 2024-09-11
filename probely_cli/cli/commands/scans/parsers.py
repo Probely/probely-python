@@ -3,8 +3,10 @@ from rich_argparse import RichHelpFormatter
 
 from probely_cli.cli.commands.scans.cancel import scans_cancel_command_handler
 from probely_cli.cli.commands.scans.get import scans_get_command_handler
+from probely_cli.cli.commands.scans.resume import scans_resume_command_handler
 from probely_cli.cli.commands.scans.start import start_scans_command_handler
 from probely_cli.cli.common import ScanStatusEnum, show_help
+from probely_cli.settings import FALSY_VALUES, TRUTHY_VALUES
 
 
 def build_scan_filters_parser() -> argparse.ArgumentParser:
@@ -110,4 +112,28 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
     scans_get_parser.set_defaults(
         command_handler=scans_get_command_handler,
         parser=scans_get_parser,
+    )
+
+    scans_resume_parser = scans_command_parser.add_parser(
+        "resume",
+        parents=[configs_parser, scan_filters_parser, output_parser],
+        formatter_class=RichHelpFormatter,
+    )
+    scans_resume_parser.add_argument(
+        "scan_ids",
+        metavar="SCAN_ID",
+        nargs="*",
+        help="IDs of scans to resume",
+        default=None,
+    )
+
+    scans_resume_parser.add_argument(
+        "--ignore-blackout-period",
+        help="Ignore blackout period settings",
+        action="store_true",
+    )
+
+    scans_resume_parser.set_defaults(
+        command_handler=scans_resume_command_handler,
+        parser=scans_resume_parser,
     )

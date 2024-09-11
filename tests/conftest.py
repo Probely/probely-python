@@ -10,6 +10,7 @@ from rich.console import Console
 from probely_cli.cli import CliApp, build_cli_parser
 from tests.testable_api_responses import (
     CANCEL_SCAN_200_RESPONSE,
+    RESUME_SCAN_200_RESPONSE,
     START_SCAN_200_RESPONSE,
     GET_TARGETS_200_RESPONSE,
     GET_FINDINGS_200_RESPONSE,
@@ -122,6 +123,11 @@ def valid_scans_start_api_response() -> dict:
 @pytest.fixture()
 def valid_scans_cancel_api_response() -> dict:
     return CANCEL_SCAN_200_RESPONSE
+
+
+@pytest.fixture()
+def valid_scans_resume_api_response() -> dict:
+    return RESUME_SCAN_200_RESPONSE
 
 
 @pytest.fixture()
