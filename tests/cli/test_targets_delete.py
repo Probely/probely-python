@@ -64,3 +64,20 @@ def test_targets_delete__mutually_exclusive_arguments(probely_cli):
     assert stderr_lines[0] == (
         "probely targets delete: error: filters and Target IDs are mutually exclusive."
     )
+
+
+@patch("probely_cli.cli.commands.targets.delete.delete_targets")
+def test_targets_delete__without_any_argument(delete_targets_mock: Mock, probely_cli):
+    stdout_lines, stderr_lines = probely_cli(
+        "targets",
+        "delete",
+        return_list=True,
+    )
+    assert len(stdout_lines) == 0, "Expected no output"
+    assert len(stderr_lines) == 1, "Expected error output"
+
+    assert stderr_lines[-1] == (
+        "probely targets delete: error: Expected target_ids or filters"
+    )
+
+    delete_targets_mock.assert_not_called()

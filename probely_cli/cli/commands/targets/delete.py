@@ -13,7 +13,7 @@ def targets_delete_command_handler(args):
     targets_ids = args.target_ids
 
     if not filters and not targets_ids:
-        raise ProbelyCLIValidation("either filters or Target IDs must be provided.")
+        raise ProbelyCLIValidation("Expected target_ids or filters")
 
     if filters and targets_ids:
         raise ProbelyCLIValidation("filters and Target IDs are mutually exclusive.")
