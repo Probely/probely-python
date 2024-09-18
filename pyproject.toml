@@ -1,61 +1,54 @@
 [project]
 name = "probely_cli"
 version = "0.0.1"
-description = "Add your description here"
+description = "CLI and SDK wrappers for Probely's API"
 authors = [
-    { name = "João Silva", email = "joao.silva@probely.com" }
+    { name = "João Silva", email = "joao.silva@probely.com" },
+    { name = "Vladimir Kontic", email = "vladimir@probely.com" },
+    { name = "Temidire Adams", email = "temidire@probely.com" }
 ]
-# TODO
-#license = {file = "LICENSE.txt"}
-## https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#keywords
-#keywords = ["egg", "bacon", "sausage", "tomatoes", "Lobster Thermidor"]
-## https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#classifiers
-#classifiers = [
-#  # How mature is this project? Common values are
-#  #   3 - Alpha
-#  #   4 - Beta
-#  #   5 - Production/Stable
-#  "Development Status :: 4 - Beta",
-#
-#  # Indicate who your project is intended for
-#  "Intended Audience :: Developers",
-#  "Topic :: Software Development :: Build Tools",
-#
-#  # Pick your license as you wish (see also "license" above)
-#  "License :: OSI Approved :: MIT License",
-#
-#  # Specify the Python versions you support here.
-#  "Programming Language :: Python :: 3",
-#  "Programming Language :: Python :: 3.6",
-#  "Programming Language :: Python :: 3.7",
-#  "Programming Language :: Python :: 3.8",
-#  "Programming Language :: Python :: 3.9",
-#  "Programming Language :: Python :: 3.10",
-#  "Programming Language :: Python :: 3.11",
-#  "Programming Language :: Python :: 3.12",
-#]
+license = { file = "LICENSE" }
+keywords = ["probely", "cli", "sdk", "api", "client", "wrapper"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Other Audience",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: BSD License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development",
+]
 
 readme = "README.md"
 requires-python = ">= 3.8"
 
 dependencies = [
     "requests",
-    "rich", # TODO: is this still required?
-    "rich-argparse", #TODO: is this still required?
+    "rich",
+    "rich-argparse",
     "environs",
     "marshmallow",
     "pyyaml",
     "mergedeep",
-    "python-dateutil", # 3.8's datetime dont recognize probely API's iso date format
+    "python-dateutil", # Python <= 3.10's fromisoformat is not a full ISO-8601 format parser
 ]
 
 [project.optional-dependencies]
 test = [
     "pytest",
-#    "pytest-cov",
+    #    "pytest-cov",
     "tox",
 ]
-docs = [  # TODO: not decided yet
+docs = [
     "sphinx",
     "sphinx-argparse-cli",
     "sphinx-markdown-builder",
@@ -66,13 +59,13 @@ line-length = 88
 
 [project.scripts]
 probely = "probely_cli.cli:app"
-# TODO
-#[project.urls]
-#Homepage = "https://example.com"
-#Documentation = "https://readthedocs.org"
-#Repository = "https://github.com/me/spam.git"
-#"Bug Tracker" = "https://github.com/me/spam/issues"
-#Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
+
+[project.urls]
+Homepage = "https://probely.com"
+Documentation = "https://developers.probely.com"
+Repository = "https://github.com/probely/probely_cli.git"
+"Bug Tracker" = "https://github.com/probely/probely_cli/issues"
+#Changelog = "https://github.com/probely/probely_cli/blob/master/CHANGELOG.md"
 
 
 
