@@ -334,7 +334,7 @@ def test_targets_get__output_argument_validation(_: Mock, probely_cli):
     assert stdout_lines == []
     assert (
         stderr_lines[-1]
-        == "probely targets get: error: argument --output/-o: invalid choice: "
+        == "probely targets get: error: argument -o/--output: invalid choice: "
         "'RANDOM_TEXT' (choose from 'YAML', 'JSON')"
     )
 

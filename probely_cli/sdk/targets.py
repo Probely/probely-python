@@ -1,15 +1,16 @@
 import logging
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from mergedeep import merge, Strategy
 
-from probely_cli.sdk.common import validate_resource_ids
 from probely_cli.exceptions import (
     ProbelyRequestFailed,
     ProbelyBadRequest,
     ProbelyObjectNotFound,
 )
+from probely_cli.sdk.common import validate_resource_ids
 from .client import ProbelyAPIClient
+from ..cli.common import TargetTypeEnum, APISchemaTypeEnum
 from ..settings import (
     PROBELY_API_TARGETS_BULK_DELETE_URL,
     PROBELY_API_TARGETS_BULK_UPDATE_URL,
@@ -89,45 +90,68 @@ def list_targets(targets_filters: dict = None) -> List[Dict]:
 
 
 def add_target(  # TODO: needs testing
-    site_url: str,
-    site_name: str = None,
-    extra_payload: dict = None,
+    target_url: str,
+    target_name: Union[str, None] = None,
+    target_type: TargetTypeEnum = TargetTypeEnum.WEB,
+    api_schema_file_url: Union[str, None] = None,
+    api_schema_type: Union[APISchemaTypeEnum, None] = None,
+    extra_payload: Union[dict, None] = None,
 ) -> Dict:
     """Creates new target
 
-    :param site_url: url to be scanned.
-    :type site_url: str.
-    :param site_name: name of target.
-    :type site_name: str, optional.
+    :param api_schema_type:
+    :type api_schema_type: APISchemaTypeEnum, optional.
+    :param api_schema_file_url:
+    :type api_schema_file_url: str, optional.
+    :param target_type:
+    :type target_type: TargetTypeEnum, optional.
+    :param target_url: url to be scanned.
+    :type target_url: str.
+    :param target_name: name of target.
+    :type target_name: str, optional.
     :param extra_payload: allows customization of request. Content should follow api request body
     :type extra_payload: Optional[dict].
     :raise: ProbelyBadRequest.
     :return: Created target content.
 
     """
+    create_target_url = PROBELY_API_TARGETS_URL
 
-    create_target_url = (
-        PROBELY_API_TARGETS_URL  # + "?duplicate_check=true&check_fullpath=true"
-    )
+    query_params = {
+        "duplicate_check": False,
+        "skip_reachability_check": True,
+    }
 
     body_data = {}
     if extra_payload:
         body_data = extra_payload
 
-    arguments_settings = {"site": {"url": site_url}}
-    if site_name:
-        arguments_settings["site"]["name"] = site_name
+    arguments_settings = {
+        "site": {"url": target_url},
+        "type": target_type.api_request_value,
+    }
+    if target_name:
+        arguments_settings["site"]["name"] = target_name
+
+    if target_type == TargetTypeEnum.API:
+        api_scan_settings = {}
+
+        if api_schema_file_url:
+            api_scan_settings["api_schema_url"] = api_schema_file_url
+
+        if api_schema_type:
+            api_scan_settings["api_schema_type"] = api_schema_type.api_request_value
+
+        arguments_settings["site"]["api_scan_settings"] = api_scan_settings
 
     merge(body_data, arguments_settings, strategy=Strategy.REPLACE)
 
-    logger.debug("Add target request content: %s", body_data)
     resp_status_code, resp_content = ProbelyAPIClient().post(
-        url=create_target_url, payload=body_data
+        url=create_target_url, query_params=query_params, payload=body_data
     )
 
     if resp_status_code == 400:
-        ex = ProbelyBadRequest(response_payload=resp_content)
-        raise ex
+        raise ProbelyBadRequest(response_payload=resp_content)
 
     if resp_status_code != 201:
         raise ProbelyRequestFailed(resp_content)

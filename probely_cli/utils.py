@@ -14,6 +14,10 @@ class ProbelyCLIEnum(Enum):
     def api_response_value(self):
         return self.value
 
+    @property
+    def api_request_value(self):
+        return self.value
+
     @classmethod
     def get_by_api_response_value(cls, value):
         for enum_element in cls:

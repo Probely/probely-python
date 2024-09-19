@@ -40,4 +40,7 @@ class CliApp:
                     name=type(e).__name__, msg=str(e)
                 )
             )
-            self._print_error_message(str(e))
+            if settings.IS_DEBUG_MODE:
+                self.args.err_console.print_exception(show_locals=True)
+            else:
+                self._print_error_message(str(e))

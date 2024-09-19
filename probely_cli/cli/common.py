@@ -1,9 +1,9 @@
 import json
 import sys
-import dateutil.parser
 from pathlib import Path
-from typing import Type
+from typing import Type, Union
 
+import dateutil.parser
 import marshmallow
 import yaml
 from marshmallow import post_load
@@ -18,7 +18,10 @@ def show_help(args):
         args.parser.print_help()
 
 
-def validate_and_retrieve_yaml_content(yaml_file_path):
+def validate_and_retrieve_yaml_content(yaml_file_path: Union[str, None]):
+    if not yaml_file_path:
+        return dict()
+
     file_path = Path(yaml_file_path)
 
     if not file_path.exists():
@@ -42,7 +45,7 @@ def validate_and_retrieve_yaml_content(yaml_file_path):
             yaml_content = yaml.safe_load(yaml_file)
             if yaml_content is None:
                 raise ProbelyCLIValidation("YAML file {} is empty.".format(file_path))
-        except yaml.scanner.ScannerError as ex:
+        except yaml.error.YAMLError as ex:
             raise ProbelyCLIValidation("Invalid yaml content in file: {}".format(ex))
 
     return yaml_content
@@ -72,6 +75,11 @@ class FindingStateEnum(ProbelyCLIEnum):
     NOT_FIXED = "notfixed"
     ACCEPTED = "accepted"
     RETESTING = "retesting"
+
+
+class APISchemaTypeEnum(ProbelyCLIEnum):
+    OPENAPI = "openapi"
+    POSTMAN = "postman"
 
 
 class OutputEnum(ProbelyCLIEnum):

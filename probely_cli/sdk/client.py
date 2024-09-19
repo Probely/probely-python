@@ -50,8 +50,10 @@ class ProbelyAPIClient:
     def get(self, url, query_params=None):
         return self._send_request("get", url, query_params=query_params)
 
-    def post(self, url, payload: dict = None):
-        return self._send_request("post", url, payload=payload)
+    def post(self, url, query_params: dict = None, payload: dict = None):
+        return self._send_request(
+            "post", url, query_params=query_params, payload=payload
+        )
 
     def patch(self, url, payload: dict = None):
         return self._send_request("patch", url, payload=payload)

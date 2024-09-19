@@ -15,6 +15,7 @@ from tests.testable_api_responses import (
     START_SCAN_200_RESPONSE,
     GET_TARGETS_200_RESPONSE,
     GET_FINDINGS_200_RESPONSE,
+    RETRIEVE_TARGET_200_RESPONSE,
 )
 
 
@@ -38,6 +39,9 @@ def prepare_cmd_command_for_parsing(cmd_command: Union[str, Tuple[str]]) -> List
 
     prepared_cmd_command = []
     for item in cmd_command:
+        if item == "":
+            continue
+
         if " " in item:
             prepared_cmd_command.extend(item.split())
             continue
@@ -105,7 +109,10 @@ def create_testable_yaml_file(tmp_path: Path) -> Callable:
     to test file parameter of CLI commands.
     """
 
-    def _create_testable_yaml_file(file_name: str, file_content: Dict) -> str:
+    def _create_testable_yaml_file(file_content: Dict, file_name: str = None) -> str:
+        if file_name is None:
+            file_name = "testable_file.yaml"
+
         yaml_content = yaml.dump(file_content)
 
         testable_yaml_file: Path = tmp_path / file_name
@@ -137,13 +144,13 @@ def valid_scans_pause_api_response() -> dict:
 
 
 @pytest.fixture()
-def valid_scans_pause_api_response() -> dict:
-    return PAUSE_SCAN_200_RESPONSE
+def valid_get_targets_api_response() -> dict:
+    return GET_TARGETS_200_RESPONSE
 
 
 @pytest.fixture()
-def valid_get_targets_api_response() -> dict:
-    return GET_TARGETS_200_RESPONSE
+def valid_add_targets_api_response() -> dict:
+    return RETRIEVE_TARGET_200_RESPONSE
 
 
 @pytest.fixture()

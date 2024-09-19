@@ -1,7 +1,9 @@
-from unittest.mock import Mock, patch
+from copy import deepcopy
+from unittest.mock import Mock, patch, MagicMock
 
 import pytest
 
+from probely_cli.cli.common import TargetTypeEnum, APISchemaTypeEnum
 from probely_cli.exceptions import (
     ProbelyBadRequest,
     ProbelyRequestFailed,
@@ -14,6 +16,7 @@ from probely_cli.sdk.targets import (
     retrieve_target,
     retrieve_targets,
     update_target,
+    add_target,
 )
 from probely_cli.settings import (
     PROBELY_API_TARGETS_BULK_DELETE_URL,
@@ -155,6 +158,184 @@ def test_retrieve_targets__success_api_calls(api_client_mock: Mock):
 
     results_ids = set([r["id"] for r in results])
     assert results_ids == set(ids_list), "Expected one result for each target ID"
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+def test_add_target__success_api_call(
+    api_client_mock: MagicMock,
+    valid_add_targets_api_response,
+):
+    expected_content = valid_add_targets_api_response
+    response_content = valid_add_targets_api_response
+
+    api_client_mock.return_value = (201, response_content)
+
+    r = add_target("https://www.example.com")
+    assert r == expected_content, "Expected object output from API"
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+def test_add_target__unsuccessful_api_call(
+    api_client_mock: MagicMock,
+):
+    invalid_status_code = (401,)
+    error_message = ("request invalid",)
+    error_response_content = {"detail": error_message}
+
+    api_client_mock.return_value = (invalid_status_code, error_response_content)
+
+    with pytest.raises(ProbelyRequestFailed) as exc:
+        add_target("https://www.example.com")
+
+        raised_exception = exc.value
+        assert str(raised_exception) == error_message
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+def test_add_target__api_call_with_default_query_params(
+    api_client_mock: MagicMock,
+):
+    base_query_params = {
+        "duplicate_check": False,
+        "skip_reachability_check": True,
+    }
+
+    with pytest.raises(BaseException) as _:
+        add_target("https://www.example.com")
+
+    assert api_client_mock.call_count == 1, "Expected call"
+    _, kwargs = api_client_mock.call_args
+    assert kwargs["query_params"] == base_query_params
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+def test_add_target__api_call_with_payload(
+    api_client_mock: MagicMock,
+):
+    expected_url = "https://www.example.com"
+
+    valid_file_input = {
+        "type": "single",
+        "site": {
+            "name": "testable_target_name_from_file",
+            "url": "https://testable_url_from_file.com",
+            "api_scan_settings": {
+                "api_schema_type": "postman",
+                "api_schema_url": "https://target_from_file.com/api_schema.json",
+            },
+        },
+        "other_api_property": "control_value",
+    }
+
+    expected_payload = deepcopy(valid_file_input)
+    expected_payload["site"]["url"] = expected_url
+
+    with pytest.raises(BaseException) as _:  # not testing the api output
+        add_target(expected_url, extra_payload=valid_file_input)
+
+    assert api_client_mock.call_count == 1, "Expected call"
+
+    _, kwargs = api_client_mock.call_args
+    assert kwargs["payload"] == expected_payload, "Expected payload to be sent"
+    assert id(kwargs["payload"]) != id(
+        expected_payload
+    ), "Watch out for ids of test data"
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+def test_add_target__arguments_are_api_call_arguments(
+    api_client_mock: MagicMock,
+):
+    target_url = "https://www.name_overwrite.com"
+    target_name = "name_overwrite"
+    target_type = TargetTypeEnum.API
+    api_schema_file_url = "https://api_schema_file_url_overwrite.com/sh.yaml"
+    api_schema_type = APISchemaTypeEnum.OPENAPI
+
+    other_api_properties = {"random_api_property": "random_value"}
+
+    with pytest.raises(BaseException) as _:  # not testing the api output
+        add_target(
+            target_url,
+            target_name=target_name,
+            target_type=target_type,
+            api_schema_file_url=api_schema_file_url,
+            api_schema_type=api_schema_type,
+            extra_payload=other_api_properties,
+        )
+
+    expected_payload = {
+        "type": target_type.api_request_value,
+        "site": {
+            "name": target_name,
+            "url": target_url,
+            "api_scan_settings": {
+                "api_schema_type": api_schema_type.api_request_value,
+                "api_schema_url": api_schema_file_url,
+            },
+        },
+        **other_api_properties,
+    }
+
+    assert api_client_mock.call_count == 1, "Expected call"
+    _, kwargs = api_client_mock.call_args
+
+    assert (
+        kwargs["payload"] == expected_payload
+    ), "Expected arguments to be sent as pyload"
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+def test_add_target__api_call_with_payload_overrides(
+    api_client_mock: MagicMock,
+):
+    valid_file_input = {
+        "type": "single",
+        "site": {
+            "name": "testable_target_name_from_file",
+            "url": "https://testable_url_from_file.com",
+            "api_scan_settings": {
+                "api_schema_type": "postman",
+                "api_schema_url": "https://target_from_file.com/api_schema.json",
+            },
+        },
+        "other_api_property": "control_value",
+    }
+
+    target_url_overwrite = "https://www.name_overwrite.com"
+    target_name_overwrite = "name_overwrite"
+    target_type_overwrite = TargetTypeEnum.API
+    api_schema_type_overwrite = APISchemaTypeEnum.OPENAPI
+    api_schema_file_url_overwrite = "https://api_schema_file_url_overwrite.com/sh.yaml"
+
+    expected_payload = deepcopy(valid_file_input)
+    expected_payload["type"] = target_type_overwrite.api_request_value
+    expected_payload["site"]["name"] = target_name_overwrite
+    expected_payload["site"]["url"] = target_url_overwrite
+    expected_payload["site"]["api_scan_settings"][
+        "api_schema_type"
+    ] = api_schema_type_overwrite.api_request_value
+    expected_payload["site"]["api_scan_settings"][
+        "api_schema_url"
+    ] = api_schema_file_url_overwrite
+
+    with pytest.raises(BaseException) as _:  # not testing the api output
+        add_target(
+            target_url_overwrite,
+            target_name=target_name_overwrite,
+            target_type=target_type_overwrite,
+            api_schema_file_url=api_schema_file_url_overwrite,
+            api_schema_type=api_schema_type_overwrite,
+            extra_payload=valid_file_input,
+        )
+
+    assert api_client_mock.call_count == 1, "Expected call"
+    _, kwargs = api_client_mock.call_args
+
+    assert kwargs["payload"] == expected_payload, "Expected overrides to take effect"
+    assert id(kwargs["payload"]) != id(
+        expected_payload
+    ), "Watch out for ids of test data"
 
 
 @patch("probely_cli.sdk.targets.ProbelyAPIClient.patch")

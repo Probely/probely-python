@@ -2,7 +2,7 @@ import argparse
 
 from rich_argparse import RichHelpFormatter
 
-from probely_cli.cli.commands.targets.add import add_targets_command_handler
+from probely_cli.cli.commands.targets.add import targets_add_command_handler
 from probely_cli.cli.commands.targets.delete import targets_delete_command_handler
 from probely_cli.cli.commands.targets.get import targets_get_command_handler
 from probely_cli.cli.commands.targets.start_scan import start_scans_command_handler
@@ -11,6 +11,7 @@ from probely_cli.cli.common import (
     show_help,
     TargetRiskEnum,
     TargetTypeEnum,
+    APISchemaTypeEnum,
 )
 from probely_cli.settings import TRUTHY_VALUES, FALSY_VALUES
 
@@ -115,17 +116,37 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
 
     targets_add_parser = targets_command_parser.add_parser(
         "add",
-        parents=[configs_parser, file_parser],
+        parents=[configs_parser, file_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
     targets_add_parser.add_argument(
-        "site_url",
+        "target_url",
+        metavar="TARGET_URL",
+        nargs="?",
+        help="Url of target",
     )
     targets_add_parser.add_argument(
-        "--site-name",
+        "--target-name",
+        help="Display name of target",
+    )
+    targets_add_parser.add_argument(
+        "--target-type",
+        type=str.upper,
+        choices=TargetTypeEnum.cli_input_choices(),
+        help="Type of target",
+    )
+    targets_add_parser.add_argument(
+        "--api-schema-type",
+        type=str.upper,
+        choices=APISchemaTypeEnum.cli_input_choices(),
+        help="Type of schema for API Targets",
+    )
+    targets_add_parser.add_argument(
+        "--api-schema-file-url",
+        help="Url for download of API schema of target",
     )
     targets_add_parser.set_defaults(
-        command_handler=add_targets_command_handler,
+        command_handler=targets_add_command_handler,
         parser=targets_add_parser,
     )
 

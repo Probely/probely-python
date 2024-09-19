@@ -1,0 +1,9 @@
+type: "api"
+site:
+  name: "test_invicti_cli_from_file"
+  url: "https://rest.testinvicti.com/"
+  api_scan_settings:
+    api_schema_type: "postman"
+    api_schema_url: "https://rest.testinvicti.com/files/postman_basicauthentication.json"
+other_api_property: "control_value"
+unlimited: "true"

@@ -25,6 +25,7 @@ def build_file_parser():
         default=None,
         help="Path to yaml file. Accepts same payload as listed in API docs",
     )
+
     return file_parser
 
 
@@ -55,8 +56,8 @@ def build_output_parser():
         add_help=False,
     )
     output_parser.add_argument(
-        "--output",
         "-o",
+        "--output",
         type=str.upper,
         choices=OutputEnum.cli_input_choices(),
         help="Presets for output formats",
