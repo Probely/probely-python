@@ -49,6 +49,9 @@ def test_scans_cancel_request_with_exception(
 
     sdk_cancel_scan_mock.assert_called_once()
 
+    assert stdout == "", f"Expected no output, but got: {stdout}"
+    assert stderr == f"probely scans cancel: error: {exception_message}\n"
+
 
 def test_scans_cancel__mutually_exclusive_arguments(probely_cli):
     stdout_lines, stderr_lines = probely_cli(

@@ -5,6 +5,7 @@ from rich_argparse import RichHelpFormatter
 from probely_cli.cli.commands.targets.add import add_targets_command_handler
 from probely_cli.cli.commands.targets.delete import targets_delete_command_handler
 from probely_cli.cli.commands.targets.get import targets_get_command_handler
+from probely_cli.cli.commands.targets.start_scan import start_scans_command_handler
 from probely_cli.cli.commands.targets.update import update_targets_command_handler
 from probely_cli.cli.common import (
     show_help,
@@ -87,7 +88,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         "target_ids",
         metavar="TARGET_ID",
         nargs="*",
-        help="IDs of targets to list",
+        help="IDs of Targets to list",
         default=None,
     )
     targets_get_parser.set_defaults(
@@ -143,4 +144,21 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
     targets_update_parser.set_defaults(
         command_handler=update_targets_command_handler,
         parser=targets_update_parser,
+    )
+
+    start_scan_parser = targets_command_parser.add_parser(
+        "start-scan",
+        parents=[configs_parser, target_filters_parser, file_parser, output_parser],
+        formatter_class=RichHelpFormatter,
+    )
+    start_scan_parser.add_argument(
+        "target_ids",
+        metavar="TARGET_ID",
+        nargs="*",
+        help="IDs of Targets that will be scanned",
+        default=None,
+    )
+    start_scan_parser.set_defaults(
+        command_handler=start_scans_command_handler,
+        parser=start_scan_parser,
     )

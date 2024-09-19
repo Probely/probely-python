@@ -34,7 +34,7 @@ from unittest.mock import patch
     ],
 )
 @patch("probely_cli.cli.commands.targets.update.validate_and_retrieve_yaml_content")
-def test_targets_update_validation(
+def test_targets_update__validation(
     get_yaml_file_content_mock, probely_cli, args, expected_error
 ):
     """
@@ -115,18 +115,64 @@ def test_target_update__output_format(
     assert stdout == f"{target_id}\n", stdout
 
 
-@patch("probely_cli.cli.commands.targets.update.list_targets")
+@patch("probely_cli.cli.commands.targets.update.update_target")
 @patch("probely_cli.cli.commands.targets.update.update_targets")
 @patch("probely_cli.cli.commands.targets.update.validate_and_retrieve_yaml_content")
-def test_targets_update_with_filters(
+def test_targets_update__calls_correct_sdk_function(
+    get_yaml_file_content_mock,
+    sdk_update_targets_mock,
+    sdk_update_target_mock,
+    probely_cli,
+):
+    """
+    Ensure that correct SDK function is called based on the number of Target IDs provided.
+
+    - If a single target ID is provided, `update_target()` should be called.
+    - If multiple target IDs are provided, `update_targets()` should be called.
+    """
+    update_payload = {"name": "Updated name"}
+    get_yaml_file_content_mock.return_value = update_payload
+
+    # Test case 1: Single target ID
+    probely_cli("targets", "update", "target_id1", "-f update_payload.yaml")
+    sdk_update_target_mock.assert_called_once_with("target_id1", update_payload)
+    sdk_update_targets_mock.assert_not_called()
+
+    sdk_update_target_mock.reset_mock()
+    sdk_update_targets_mock.reset_mock()
+
+    # Test case 2: Multiple Target IDs
+    probely_cli(
+        "targets", "update", "target_id1", "target_id2", "-f update_payload.yaml"
+    )
+    sdk_update_targets_mock.assert_called_once_with(
+        ["target_id1", "target_id2"], update_payload
+    )
+    sdk_update_target_mock.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "filtered_targets",
+    [
+        ([{"id": "target_id1"}]),
+        ([{"id": "target_id1"}, {"id": "target_id2"}]),
+    ],
+)
+@patch("probely_cli.cli.commands.targets.update.list_targets")
+@patch("probely_cli.cli.commands.targets.update.update_target")
+@patch("probely_cli.cli.commands.targets.update.update_targets")
+@patch("probely_cli.cli.commands.targets.update.validate_and_retrieve_yaml_content")
+def test_targets_update__with_filters(
     get_yaml_file_content_mock,
     update_targets_mock,
+    update_target_mock,
     list_targets_mock,
     probely_cli,
+    filtered_targets,
 ):
     update_payload = {"name": "Updated name"}
     get_yaml_file_content_mock.return_value = update_payload
-    list_targets_mock.return_value = [{"id": "target_id1"}, {"id": "target_id2"}]
+    list_targets_mock.return_value = filtered_targets
 
     _, stderr = probely_cli(
         "targets",
@@ -142,6 +188,9 @@ def test_targets_update_with_filters(
         targets_filters={"unlimited": True, "verified": False}
     )
 
-    update_targets_mock.assert_called_once_with(
-        ["target_id1", "target_id2"], update_payload
-    )
+    target_ids = [target["id"] for target in filtered_targets]
+
+    if len(target_ids) == 1:
+        update_target_mock.assert_called_once_with(target_ids[0], update_payload)
+    else:
+        update_targets_mock.assert_called_once_with(target_ids, update_payload)

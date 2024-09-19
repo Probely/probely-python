@@ -3,7 +3,11 @@ from unittest.mock import patch, Mock
 
 import pytest
 
-from probely_cli.exceptions import ProbelyObjectNotFound, ProbelyRequestFailed
+from probely_cli.exceptions import (
+    ProbelyBadRequest,
+    ProbelyObjectNotFound,
+    ProbelyRequestFailed,
+)
 from probely_cli.sdk.scans import (
     list_scans,
     pause_scan,
@@ -11,57 +15,125 @@ from probely_cli.sdk.scans import (
     resume_scans,
     start_scan,
     cancel_scans,
+    start_scans,
+)
+from probely_cli.settings import (
+    PROBELY_API_BULK_START_SCANS_URL,
+    PROBELY_API_START_SCAN_URL,
 )
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-def test_start_scan(mock_client: Mock, valid_scans_start_api_response: Dict):
-    response_content = valid_scans_start_api_response
-    valid_status_code = 200
-
-    target_id_to_be_scanned = valid_scans_start_api_response["target"]["id"]
-
-    mock_client.return_value = (valid_status_code, response_content)
-    scan = start_scan(target_id_to_be_scanned)
-
-    mock_client.assert_called_once()
-    url_arg = mock_client.call_args[0][0]
-    extra_payload_arg = mock_client.call_args[0][1]
-
-    assert target_id_to_be_scanned in url_arg
-    assert extra_payload_arg is None
-    assert scan == response_content
-
-
-@patch(
-    "probely_cli.sdk.client.ProbelyAPIClient.post",
-    return_value=(200, {"content": "not relevant"}),
+@pytest.mark.parametrize(
+    "payload",
+    [
+        None,
+        {"key": "value"},
+    ],
 )
-def test_start_scan_with_extra_payload(mock_client: Mock):
-    random_id = "sdkfjsfhskfjhs"
-    extra_payload = {"some_example": "example value"}
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+def test_start_scan(
+    api_client_mock: Mock, valid_scans_start_api_response: Dict, payload
+):
+    """
+    Test that start_scan successfully starts a scan and returns the scan details,
+    both with and without an extra payload.
+    """
+    target_id = valid_scans_start_api_response["target"]["id"]
+    expected_response = valid_scans_start_api_response
+    expected_endpoint_url = PROBELY_API_START_SCAN_URL.format(target_id=target_id)
 
-    start_scan(random_id, extra_payload)
+    api_client_mock.return_value = (200, expected_response)
 
-    mock_client.assert_called_once()
+    result = start_scan(target_id, payload) if payload else start_scan(target_id)
 
-    request_body = mock_client.call_args[0][1]
-    assert request_body == extra_payload
+    assert result == expected_response
+    api_client_mock.assert_called_once_with(expected_endpoint_url, payload)
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-def test_start_scan_failed(mock_client):
-    response_error_content = {"error": "random error message"}
-    invalid_status_code = 400
+def test_start_scan_failed(api_client_mock: Mock):
+    # Ensure ProbelyBadRequest is raised if API returns status code 400
+    api_validation_error = {"error": "A scan is already in progress for this target."}
+    api_client_mock.return_value = (400, api_validation_error)
 
-    mock_client.return_value = (invalid_status_code, response_error_content)
+    with pytest.raises(ProbelyBadRequest) as exc_info:
+        start_scan("random_id")
+        assert exc_info == api_validation_error
 
+    # Ensure ProbelyObjectNotFound is raised if API returns status code 404
+    api_client_mock.return_value = (404, {})
+    with pytest.raises(ProbelyObjectNotFound) as exc_info:
+        start_scan("invalid_target_id")
+        assert exc_info.value.not_found_object_id == "invalid_target_id"
+
+    # Ensure ProbelyRequestFailed is raised if API returns some another notok status code
+    api_error = {"detail": "Incorrect authentication credentials."}
+    api_client_mock.return_value = (401, api_error)
     with pytest.raises(ProbelyRequestFailed) as exc_info:
         start_scan("random_id")
+        assert exc_info.value.reason == api_error
 
-        assert exc_info == response_error_content
 
-    mock_client.assert_called_once()
+@patch("probely_cli.sdk.scans.ProbelyAPIClient.post")
+@patch("probely_cli.sdk.scans.validate_resource_ids")
+def test_start_scans__successful_api_call(
+    validate_resource_ids_mock: Mock,
+    api_client_mock: Mock,
+    valid_scans_start_api_response: Dict,
+):
+    validate_resource_ids_mock.return_value = None  # target IDs are valid
+    expected_endpoint_url = PROBELY_API_BULK_START_SCANS_URL
+    payload = {"overrides": {"scan_profile": "lightning"}}
+    target_ids = ["target_id1", "target_id2"]
+    expected_payload_on_api_call = {
+        "targets": [{"id": target_id} for target_id in target_ids],
+        **payload,
+    }
+    expected_response = [valid_scans_start_api_response for _ in target_ids]
+
+    api_client_mock.return_value = (200, expected_response)
+    result = start_scans(target_ids, payload)
+
+    assert result == expected_response
+    api_client_mock.assert_called_once_with(
+        expected_endpoint_url, expected_payload_on_api_call
+    )
+
+
+@patch("probely_cli.sdk.scans.ProbelyAPIClient.post")
+@patch("probely_cli.sdk.scans.validate_resource_ids")
+def test_start_scans__unsuccessful_api_call(
+    validate_resource_ids_mock: Mock, api_client_mock: Mock
+):
+    # Ensure ProbelyObjectNotFound is raised if invalid target IDs are provided:
+    scanned_target_ids = ["invalid_id1"]
+    validate_resource_ids_mock.side_effect = ProbelyObjectNotFound(
+        id=scanned_target_ids[0]
+    )
+
+    with pytest.raises(ProbelyObjectNotFound) as exc_info:
+        start_scans(scanned_target_ids)
+        assert exc_info.value.not_found_object_id == scanned_target_ids[0]
+
+    # Ensure ProbelyBadRequest is raised if API returns status code 400
+    validate_resource_ids_mock.side_effect = None
+    validate_resource_ids_mock.returne_value = (
+        None  # Target IDs are valid for this scenario
+    )
+
+    api_validation_error = {"error": "Invalid scan profile"}
+    api_client_mock.return_value = (400, api_validation_error)
+
+    with pytest.raises(ProbelyBadRequest) as exc_info:
+        start_scans(["target_id1", "target_id2"])
+        assert exc_info == api_validation_error
+
+    # Ensure ProbelyRequestFailed is raised if API returns some another notok status code
+    api_error = {"detail": "Incorrect authentication credentials."}
+    api_client_mock.return_value = (401, api_error)
+    with pytest.raises(ProbelyRequestFailed) as exc_info:
+        start_scans(["random_id", "another_random_id"])
+        assert exc_info.value.reason == api_error
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.post")

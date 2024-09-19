@@ -37,16 +37,16 @@ def test_scans_resume_request_with_exception(
 
     sdk_resume_scan_mock.side_effect = Exception(exception_message)
 
-    with pytest.raises(Exception):
-        stdout, stderr = probely_cli(
-            "scans",
-            "resume",
-            "random_scan_id",
-        )
-        assert stdout == ""
-        assert stderr == exception_message
+    stdout, stderr = probely_cli(
+        "scans",
+        "resume",
+        "random_scan_id",
+    )
 
     sdk_resume_scan_mock.assert_called_once()
+
+    assert stdout == "", f"Expected no output, but got: {stdout}"
+    assert stderr == f"probely scans resume: error: {exception_message}\n"
 
 
 @patch("probely_cli.cli.commands.scans.resume.resume_scans")

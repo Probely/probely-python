@@ -158,7 +158,7 @@ def test_retrieve_targets__success_api_calls(api_client_mock: Mock):
 
 
 @patch("probely_cli.sdk.targets.ProbelyAPIClient.patch")
-def test_update_target__succesful_api_call(api_client_mock: Mock):
+def test_update_target__successful_api_call(api_client_mock: Mock):
     target_id = "sample_target_id"
     payload = {"description": "Updated description"}
 
@@ -176,7 +176,7 @@ def test_update_target__succesful_api_call(api_client_mock: Mock):
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.patch")
-def test_update_target__unsuccesful_api_call(api_client_mock: Mock):
+def test_update_target__unsuccessful_api_call(api_client_mock: Mock):
     target_id = "sample_target_id"
     payload = {"type": "apiX"}
 
@@ -205,9 +205,9 @@ def test_update_target__unsuccesful_api_call(api_client_mock: Mock):
 @patch("probely_cli.sdk.targets.ProbelyAPIClient.post")
 @patch("probely_cli.sdk.targets.validate_resource_ids")
 @patch("probely_cli.sdk.targets.retrieve_targets")
-def test_update_targets__succesful_api_call(
+def test_update_targets__successful_api_call(
     retrieve_targets_mock: Mock,
-    validate_resource_ids_mock,
+    validate_resource_ids_mock: Mock,
     api_client_mock: Mock,
 ):
     validate_resource_ids_mock.return_value = None  # target IDs are valid
@@ -238,8 +238,8 @@ def test_update_targets__succesful_api_call(
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.post")
 @patch("probely_cli.sdk.targets.validate_resource_ids")
-def test_update_targets__unsuccesful_api_call(
-    validate_resource_ids_mock,
+def test_update_targets__unsuccessful_api_call(
+    validate_resource_ids_mock: Mock,
     api_client_mock: Mock,
 ):
     payload = {"key": "value", "name": "new_name"}
@@ -267,7 +267,6 @@ def test_update_targets__unsuccesful_api_call(
         assert exc_info.value.response_payload == api_validation_error
 
     # Ensure ProbelyRequestFailed is raised if API returns some another notok status code
-    # api_error should be some generic for 401
     api_error = {"detail": "Authentication credentials were not provided."}
     api_client_mock.return_value = (401, api_error)
     with pytest.raises(ProbelyRequestFailed) as exc_info:
