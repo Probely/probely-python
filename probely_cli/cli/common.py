@@ -1,3 +1,5 @@
+import json
+import sys
 import dateutil.parser
 from pathlib import Path
 from typing import Type
@@ -155,3 +157,23 @@ class ISO8601DateTimeField(marshmallow.fields.Field):
         if value is None:
             return None
         return value.isoformat()
+
+
+def cmd_output_format(args, data):
+    """
+    If the --output arg is provided, display data in the specified format (JSON/YAML).
+    Otherwise, display only the IDs line by line.
+    """
+    output_type = OutputEnum[args.output] if args.output else None
+
+    if not output_type:
+        for item in data:
+            args.console.print(item["id"])
+        return
+
+    if output_type == OutputEnum.JSON:
+        output = json.dumps(data, indent=2)
+    else:
+        output = yaml.dump(data, indent=2, width=sys.maxsize)
+
+    args.console.print(output)

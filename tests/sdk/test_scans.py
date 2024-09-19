@@ -6,6 +6,8 @@ import pytest
 from probely_cli.exceptions import ProbelyObjectNotFound, ProbelyRequestFailed
 from probely_cli.sdk.scans import (
     list_scans,
+    pause_scan,
+    pause_scans,
     resume_scans,
     start_scan,
     cancel_scans,
@@ -157,7 +159,6 @@ def test_resume_scan_failed(
 
     with pytest.raises(ProbelyRequestFailed) as exc_info:
         resume_scans(["random_id"])
-
         assert exc_info == response_error_content
 
     mock_client.assert_called_once()
@@ -178,3 +179,105 @@ def test_resume_scan_failed_invalid_ids(
         assert exc_info == exception_message
 
     mock_client.assert_not_called()
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely_cli.sdk.scans.retrieve_scan")
+def test_pause_scans(
+    sdk_retrieve_scan_mock: Mock,
+    mock_client: Mock,
+    valid_scans_pause_api_response: Dict,
+):
+    sdk_retrieve_scan_mock.return_value = valid_scans_pause_api_response
+
+    response_content = valid_scans_pause_api_response
+    valid_status_code = 200
+
+    scan_id_to_pause = valid_scans_pause_api_response["id"]
+
+    mock_client.return_value = (valid_status_code, response_content)
+    scan = pause_scans([scan_id_to_pause])
+
+    mock_client.assert_called_once()
+    scans_to_pause = mock_client.call_args[0][1]
+
+    assert scans_to_pause is not None
+    assert scans_to_pause["scans"][0]["id"] == scan_id_to_pause
+    assert scan == [response_content]
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely_cli.sdk.scans.retrieve_scan")
+def test_pause_scans_failed(
+    sdk_retrieve_scan_mock: Mock, mock_client, valid_scans_pause_api_response
+):
+    response_error_content = {"error": "random error message"}
+    invalid_status_code = 400
+
+    sdk_retrieve_scan_mock.return_value = valid_scans_pause_api_response
+
+    mock_client.return_value = (invalid_status_code, response_error_content)
+
+    with pytest.raises(ProbelyRequestFailed) as exc_info:
+        pause_scans(["random_id"])
+
+        assert exc_info == response_error_content
+
+    mock_client.assert_called_once()
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely_cli.sdk.scans.retrieve_scan")
+def test_pause_scans_failed_invalid_ids(
+    sdk_retrieve_scan_mock: Mock, mock_client: Mock
+):
+    scan_id = "random_scan_id"
+    exception_message = f"probely scans cancel: error: objects '{scan_id}' not found.\n"
+    sdk_retrieve_scan_mock.side_effect = ProbelyObjectNotFound(exception_message)
+    with pytest.raises(ProbelyObjectNotFound) as exc_info:
+        pause_scans([scan_id])
+
+        assert exc_info == exception_message
+
+    mock_client.assert_not_called()
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely_cli.sdk.scans.retrieve_scan")
+def test_pause_scan(
+    sdk_retrieve_scan_mock: Mock,
+    mock_client: Mock,
+    valid_scans_pause_api_response: Dict,
+):
+    sdk_retrieve_scan_mock.return_value = valid_scans_pause_api_response
+
+    response_content = valid_scans_pause_api_response
+    valid_status_code = 200
+
+    scan_id_to_pause = valid_scans_pause_api_response["id"]
+
+    mock_client.return_value = (valid_status_code, response_content)
+    scan = pause_scan(scan_id_to_pause)
+
+    mock_client.assert_called_once()
+    assert scan == response_content
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely_cli.sdk.scans.retrieve_scan")
+def test_pause_scans_failed(
+    sdk_retrieve_scan_mock: Mock, mock_client, valid_scans_pause_api_response
+):
+    response_error_content = {"error": "random error message"}
+    invalid_status_code = 400
+
+    sdk_retrieve_scan_mock.return_value = valid_scans_pause_api_response
+
+    mock_client.return_value = (invalid_status_code, response_error_content)
+
+    with pytest.raises(ProbelyRequestFailed) as exc_info:
+        pause_scan(["random_id"])
+
+        assert exc_info == response_error_content
+
+    mock_client.assert_called_once()

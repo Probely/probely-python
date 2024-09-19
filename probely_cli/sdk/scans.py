@@ -5,8 +5,10 @@ from urllib.parse import urljoin
 from probely_cli.exceptions import ProbelyObjectNotFound, ProbelyRequestFailed
 from probely_cli.sdk.client import ProbelyAPIClient
 from probely_cli.settings import (
+    PROBELY_API_SCAN_PAUSE_URL,
     PROBELY_API_SCANS_BULK_CANCEL_URL,
     PROBELY_API_SCANS_BULK_RESUME_URL,
+    PROBELY_API_SCANS_BULK_PAUSE_URL,
     PROBELY_API_SCANS_URL,
     PROBELY_API_START_SCAN_URL,
 )
@@ -108,3 +110,51 @@ def resume_scans(scan_ids: List[str], ignore_blackout_period=False) -> List[Dict
 def resume_scan(scan_id: str, ignore_blackout_period=False) -> dict:
     scan = resume_scans([scan_id], ignore_blackout_period)[0]
     return scan
+
+
+def pause_scans(scan_ids: List[str]) -> List[dict]:
+    scan_pause_url = PROBELY_API_SCANS_BULK_PAUSE_URL
+
+    for scan_id in scan_ids:
+        scan = retrieve_scan(scan_id)
+
+    resp_status_code, resp_content = ProbelyAPIClient().post(
+        scan_pause_url, {"scans": [{"id": scan_id} for scan_id in scan_ids]}
+    )
+
+    if resp_status_code != 200:
+        raise ProbelyRequestFailed(resp_content, resp_status_code)
+
+    scans = []
+    for scan_id in scan_ids:
+        scan = retrieve_scan(scan_id)
+        scans.append(scan)
+
+    return scans
+
+
+def pause_scan(scan_id: str) -> dict:
+
+    scan = retrieve_scan(scan_id)
+    target = scan.get("target", {})
+
+    scan_pause_url = PROBELY_API_SCAN_PAUSE_URL.format(
+        target_id=target.get("id"), scan_id=scan_id
+    )
+
+    resp_status_code, resp_content = ProbelyAPIClient().post(
+        scan_pause_url,
+        {
+            "target_options": {
+                "site": target.get("site"),
+                "scanning_agent": target.get("scanning_agent"),
+            },
+            "has_sequence_navigation": scan.get("has_sequence_navigation"),
+            "user_data": scan.get("user_data"),
+        },
+    )
+
+    if resp_status_code != 200:
+        raise ProbelyRequestFailed(resp_content, resp_status_code)
+
+    return resp_content
