@@ -1,7 +1,7 @@
 import logging
 
 from probely_cli.cli.commands.scans.get import prepare_scan_filters_for_api
-from probely_cli.cli.common import cmd_output_format
+from probely_cli.cli.common import display_scans_response_output
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.scans import list_scans, pause_scan, pause_scans
 
@@ -29,4 +29,4 @@ def scans_pause_command_handler(args):
         scans.append(scan)
     else:
         scans = pause_scans(scan_ids)
-    cmd_output_format(args, scans)
+    display_scans_response_output(args, scans)

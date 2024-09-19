@@ -1,6 +1,9 @@
 import logging
-from probely_cli.cli.commands.scans.get import prepare_scan_filters_for_api
-from probely_cli.exceptions import ProbelyCLIValidation, ProbelyObjectNotFound
+from probely_cli.cli.commands.scans.get import (
+    prepare_scan_filters_for_api,
+)
+from probely_cli.cli.common import display_scans_response_output
+from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.scans import cancel_scans, list_scans
 
 logger = logging.getLogger(__name__)
@@ -22,5 +25,4 @@ def scans_cancel_command_handler(args):
 
     logger.debug("Cancelling scan for scan ids: {}".format(scan_ids))
     scans = cancel_scans(scan_ids)
-    for scan in scans:
-        args.console.print(scan.get("id"))
+    display_scans_response_output(args, scans)

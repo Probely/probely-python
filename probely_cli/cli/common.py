@@ -159,21 +159,27 @@ class ISO8601DateTimeField(marshmallow.fields.Field):
         return value.isoformat()
 
 
-def cmd_output_format(args, data):
+def display_scans_response_output(args, scans):
     """
-    If the --output arg is provided, display data in the specified format (JSON/YAML).
-    Otherwise, display only the IDs line by line.
+    Args:
+        args: Command-line arguments that include output format (optional) and console for printing.
+              It is expected to have an 'output' attribute indicating the desired format and a 'console' attribute for printing.
+        scans: The list of scans to be formatted and displayed.
+
+    Output:
+        The formatted scans is printed to the console in the specified format (JSON, YAML), or in a default format.
     """
+
     output_type = OutputEnum[args.output] if args.output else None
 
     if not output_type:
-        for item in data:
-            args.console.print(item["id"])
+        for scan in scans:
+            args.console.print(scan["id"])
         return
 
     if output_type == OutputEnum.JSON:
-        output = json.dumps(data, indent=2)
+        output = json.dumps(scans, indent=2)
     else:
-        output = yaml.dump(data, indent=2, width=sys.maxsize)
+        output = yaml.dump(scans, indent=2, width=sys.maxsize)
 
     args.console.print(output)

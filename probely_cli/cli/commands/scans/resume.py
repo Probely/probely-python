@@ -1,13 +1,11 @@
-import argparse
 import logging
-
-import marshmallow
 
 from probely_cli.cli.commands.scans.get import (
     prepare_scan_filters_for_api,
 )
-from probely_cli.exceptions import ProbelyCLIValidation, ProbelyObjectNotFound
-from probely_cli.sdk.scans import list_scans, resume_scans, retrieve_scan
+from probely_cli.cli.common import display_scans_response_output
+from probely_cli.exceptions import ProbelyCLIValidation
+from probely_cli.sdk.scans import list_scans, resume_scans
 
 logger = logging.getLogger(__name__)
 
@@ -30,5 +28,5 @@ def scans_resume_command_handler(args):
 
     logger.debug("Resuming scan for scan ids: {}".format(scan_ids))
     scans = resume_scans(scan_ids, ignore_blackout_period=ignore_blackout_period)
-    for scan in scans:
-        args.console.print(scan.get("id"))
+
+    display_scans_response_output(args, scans)

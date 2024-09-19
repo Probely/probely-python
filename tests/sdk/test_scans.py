@@ -65,8 +65,15 @@ def test_start_scan_failed(mock_client):
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-def test_cancel_scan(mock_client: Mock, valid_scans_cancel_api_response: Dict):
+@patch("probely_cli.sdk.scans.retrieve_scan")
+def test_cancel_scan(
+    sdk_retrieve_scan_mock: Mock,
+    mock_client: Mock,
+    valid_scans_cancel_api_response: Dict,
+):
     response_content = valid_scans_cancel_api_response
+    sdk_retrieve_scan_mock.return_value = valid_scans_cancel_api_response
+
     valid_status_code = 200
 
     scan_id_to_cancel = valid_scans_cancel_api_response["id"]
@@ -79,13 +86,17 @@ def test_cancel_scan(mock_client: Mock, valid_scans_cancel_api_response: Dict):
 
     assert scans_to_cancel is not None
     assert scans_to_cancel["scans"][0]["id"] == scan_id_to_cancel
-    assert scan == response_content
+    assert scan == [response_content]
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-def test_cancel_scan_failed(mock_client):
+@patch("probely_cli.sdk.scans.retrieve_scan")
+def test_cancel_scan_failed(
+    sdk_retrieve_scan_mock: Mock, mock_client, valid_scans_cancel_api_response
+):
     response_error_content = {"error": "random error message"}
     invalid_status_code = 400
+    sdk_retrieve_scan_mock.return_value = valid_scans_cancel_api_response
 
     mock_client.return_value = (invalid_status_code, response_error_content)
 
