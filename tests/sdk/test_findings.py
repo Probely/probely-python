@@ -9,11 +9,11 @@ from probely_cli.sdk.findings import list_findings
 @patch("probely_cli.sdk.client.ProbelyAPIClient.get")
 def test_list_findings__ok(api_client_mock: Mock):
     expected_content = [{"list": "of objects1"}, {"list": "of objects2"}]
-    response_content = {"results": expected_content}
+    response_content = {"results": expected_content, "page_total": 1}
 
     api_client_mock.return_value = (200, response_content)
 
-    r = list_findings()
+    r = list(list_findings())
     assert r == expected_content
 
 
@@ -26,7 +26,7 @@ def test_list_findings__unsuccessful(api_client_mock: Mock):
     api_client_mock.return_value = (invalid_status_code, error_response_content)
 
     with pytest.raises(ProbelyRequestFailed) as exc:
-        list_findings()
+        list(list_findings())
 
         raised_exception = exc.value
         assert str(raised_exception) == error_message

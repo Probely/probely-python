@@ -148,4 +148,5 @@ def test_probely_api_client__filters_added_as_query_params(session_send_mock: Mo
 
     prepared_request_used = session_send_mock.call_args[0][0]
     expected_url_called = "https://url.com/?k1=v1&k2=v2&f1=s1&f_l1=e1&f_l1=e2&f_l2=e3"
+
     assert prepared_request_used.url == expected_url_called

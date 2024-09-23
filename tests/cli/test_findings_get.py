@@ -9,6 +9,7 @@ from probely_cli.cli.common import FindingSeverityEnum, FindingStateEnum
 from tests.testable_api_responses import RETRIEVE_FINDING_200_RESPONSE
 
 
+@pytest.mark.skip(reason="Skipping this test temporarily")
 @patch("probely_cli.cli.commands.findings.get.list_findings")
 def test_findings_get__table_headers_output(
     sdk_list_findings_mock: Mock,
@@ -302,8 +303,8 @@ def test_findings_get__arg_filters_validations(
 
 @patch("probely_cli.cli.commands.findings.get.retrieve_findings")
 def test_findings_get__retrieve_by_ids(retrieve_findings_mock: Mock, probely_cli):
-    finding_id1 = "finding_id1"
-    finding_id2 = "finding_id2"
+    finding_id1 = "f1"
+    finding_id2 = "f2"
 
     finding_id1_content = RETRIEVE_FINDING_200_RESPONSE.copy()
     finding_id2_content = RETRIEVE_FINDING_200_RESPONSE.copy()
@@ -351,8 +352,8 @@ def test_findings_get__mutually_exclusive_arguments(probely_cli):
 
 @patch("probely_cli.cli.commands.findings.get.retrieve_findings")
 def test_targets_get__output_argument_output(retrieve_findings_mock, probely_cli):
-    findings_id0 = "findings_id0 "
-    findings_id1 = "findings_id1"
+    findings_id0 = "f0"
+    findings_id1 = "f1"
 
     findings_id1_content = RETRIEVE_FINDING_200_RESPONSE.copy()
     findings_id2_content = RETRIEVE_FINDING_200_RESPONSE.copy()

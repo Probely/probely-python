@@ -70,9 +70,7 @@ def list_targets(targets_filters: dict = None) -> List[Dict]:
     filters = targets_filters or {}
 
     query_params = {
-        "length": 50,
         "ordering": "-changed",
-        "page": 1,
         **filters,
     }
 

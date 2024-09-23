@@ -122,9 +122,7 @@ def list_scans(scans_filters: Dict = None) -> List[Dict]:
     filters = scans_filters or {}
 
     query_params = {
-        "length": 50,
         "ordering": "-changed",
-        "page": 1,
         **filters,
     }
 

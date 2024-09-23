@@ -1,19 +1,20 @@
-from typing import List, Dict
+from typing import Generator, List, Dict
 
 from probely_cli.exceptions import ProbelyRequestFailed, ProbelyObjectNotFound
 from probely_cli.sdk.client import ProbelyAPIClient
 from probely_cli.settings import (
     PROBELY_API_FINDINGS_URL,
     PROBELY_API_FINDINGS_RETRIEVE_URL,
+    PROBELY_API_PAGE_SIZE,
 )
 
 
 def retrieve_findings(findings_ids: List[str]) -> List[Dict]:
-    retrieved_findings = []
+    findings = []
     for target_id in findings_ids:
-        retrieved_findings.append(retrieve_finding(target_id))
-
-    return retrieved_findings
+        finding = retrieve_finding(target_id)
+        findings.append(finding)
+    return findings
 
 
 def retrieve_finding(finding_id) -> dict:
@@ -29,24 +30,33 @@ def retrieve_finding(finding_id) -> dict:
     return resp_content
 
 
-def list_findings(findings_filters: dict = None) -> List[Dict]:
+def list_findings(findings_filters: Dict = None) -> Generator[Dict, None, None]:
     filters = findings_filters or {}
+    page = 1
 
-    query_params = {
-        "length": 100,
-        "ordering": "-last_found",
-        "page": 1,
-        **filters,
-    }
+    while True:
+        query_params = {
+            "ordering": "-last_found",
+            "length": PROBELY_API_PAGE_SIZE,
+            "page": page,
+            **filters,
+        }
 
-    # TODO: go through pagination?
-    # or maybe the option to return a generator for the sdk??
-    resp_status_code, resp_content = ProbelyAPIClient().get(
-        PROBELY_API_FINDINGS_URL,
-        query_params=query_params,
-    )
+        resp_status_code, resp_content = ProbelyAPIClient().get(
+            PROBELY_API_FINDINGS_URL,
+            query_params=query_params,
+        )
 
-    if resp_status_code != 200:
-        raise ProbelyRequestFailed(resp_content)
+        if resp_status_code != 200:
+            raise ProbelyRequestFailed(resp_content)
 
-    return resp_content["results"]
+        results = resp_content["results"]
+        total_pages_count = resp_content.get("page_total")
+
+        for result in results:
+            yield result
+
+        if total_pages_count >= page:
+            break
+
+        page += 1
