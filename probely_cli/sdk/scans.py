@@ -15,6 +15,8 @@ from probely_cli.settings import (
     PROBELY_API_SCANS_BULK_CANCEL_URL,
     PROBELY_API_SCANS_BULK_RESUME_URL,
     PROBELY_API_SCANS_BULK_PAUSE_URL,
+    PROBELY_API_SCAN_CANCEL_URL,
+    PROBELY_API_SCAN_RESUME_URL,
     PROBELY_API_SCANS_URL,
     PROBELY_API_START_SCAN_URL,
     PROBELY_API_TARGETS_URL,
@@ -82,6 +84,33 @@ def cancel_scans(scan_ids: List[str]) -> List[dict]:
         scans.append(scan)
 
     return scans
+
+
+def cancel_scan(scan_id: str) -> dict:
+
+    scan = retrieve_scan(scan_id)
+    target = scan.get("target", {})
+
+    scan_cancel_url = PROBELY_API_SCAN_CANCEL_URL.format(
+        target_id=target.get("id"), scan_id=scan_id
+    )
+
+    resp_status_code, resp_content = ProbelyAPIClient().post(
+        scan_cancel_url,
+        {
+            "target_options": {
+                "site": target.get("site"),
+                "scanning_agent": target.get("scanning_agent"),
+            },
+            "has_sequence_navigation": scan.get("has_sequence_navigation"),
+            "user_data": scan.get("user_data"),
+        },
+    )
+
+    if resp_status_code != 200:
+        raise ProbelyRequestFailed(resp_content, resp_status_code)
+
+    return resp_content
 
 
 def list_scans(scans_filters: Dict = None) -> List[Dict]:
@@ -187,6 +216,33 @@ def pause_scan(scan_id: str) -> dict:
 
     resp_status_code, resp_content = ProbelyAPIClient().post(
         scan_pause_url,
+        {
+            "target_options": {
+                "site": target.get("site"),
+                "scanning_agent": target.get("scanning_agent"),
+            },
+            "has_sequence_navigation": scan.get("has_sequence_navigation"),
+            "user_data": scan.get("user_data"),
+        },
+    )
+
+    if resp_status_code != 200:
+        raise ProbelyRequestFailed(resp_content, resp_status_code)
+
+    return resp_content
+
+
+def resume_scan(scan_id: str) -> dict:
+
+    scan = retrieve_scan(scan_id)
+    target = scan.get("target", {})
+
+    scan_resume_url = PROBELY_API_SCAN_RESUME_URL.format(
+        target_id=target.get("id"), scan_id=scan_id
+    )
+
+    resp_status_code, resp_content = ProbelyAPIClient().post(
+        scan_resume_url,
         {
             "target_options": {
                 "site": target.get("site"),

@@ -29,7 +29,7 @@ def test_cancel_scans__command_handler(
     assert resp2["id"] in stdout_lines
 
 
-@patch("probely_cli.cli.commands.scans.cancel.cancel_scans")
+@patch("probely_cli.cli.commands.scans.cancel.cancel_scan")
 def test_scans_cancel_request_with_exception(
     sdk_cancel_scan_mock: Mock,
     probely_cli,
@@ -151,3 +151,25 @@ def test_scans_cancel__output_argument_output(
     assert len(json_content) == 2, "Expected 2 scans"
     assert json_content[0]["id"] == scan_id0, "Expected scan_id0 in json"
     assert json_content[1]["id"] == scan_id1, "Expected scan_id1 in json"
+
+
+@patch("probely_cli.cli.commands.scans.cancel.cancel_scans")
+@patch("probely_cli.cli.commands.scans.cancel.cancel_scan")
+def test_cancel_single_scan__command_handler(
+    sdk_cancel_scan_mock: Mock,
+    sdk_cancel_scans_mock: Mock,
+    valid_scans_cancel_api_response: Dict,
+    probely_cli,
+):
+    sdk_cancel_scan_mock.return_value = valid_scans_cancel_api_response
+    stdout_lines, stderr_lines = probely_cli(
+        "scans",
+        "cancel",
+        valid_scans_cancel_api_response["id"],
+        return_list=True,
+    )
+    sdk_cancel_scan_mock.assert_called()
+    sdk_cancel_scans_mock.assert_not_called()
+
+    assert len(stderr_lines) == 0
+    assert valid_scans_cancel_api_response["id"] == stdout_lines[0]

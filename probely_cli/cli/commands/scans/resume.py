@@ -5,7 +5,7 @@ from probely_cli.cli.commands.scans.get import (
 )
 from probely_cli.cli.common import display_scans_response_output
 from probely_cli.exceptions import ProbelyCLIValidation
-from probely_cli.sdk.scans import list_scans, resume_scans
+from probely_cli.sdk.scans import list_scans, resume_scan, resume_scans
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +27,11 @@ def scans_resume_command_handler(args):
         scan_ids = [scan.get("id") for scan in scan_list]
 
     logger.debug("Resuming scan for scan ids: {}".format(scan_ids))
-    scans = resume_scans(scan_ids, ignore_blackout_period=ignore_blackout_period)
+    scans = []
+    if len(scan_ids) == 1:
+        scan = resume_scan(scan_ids[0])
+        scans.append(scan)
+    else:
+        scans = resume_scans(scan_ids, ignore_blackout_period=ignore_blackout_period)
 
     display_scans_response_output(args, scans)

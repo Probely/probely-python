@@ -106,6 +106,12 @@ PROBELY_API_SCAN_PAUSE_URL = (
     PROBELY_API_TARGETS_URL + "{target_id}/scans/{scan_id}/pause/"
 )
 PROBELY_API_BULK_START_SCANS_URL = PROBELY_API_SCANS_URL + "bulk/start/"
+PROBELY_API_SCAN_CANCEL_URL = (
+    PROBELY_API_TARGETS_URL + "{target_id}/scans/{scan_id}/cancel/"
+)
+PROBELY_API_SCAN_RESUME_URL = (
+    PROBELY_API_TARGETS_URL + "{target_id}/scans/{scan_id}/resume/"
+)
 
 PROBELY_API_FINDINGS_URL = PROBELY_API_URL_BASE + "findings/"
 PROBELY_API_FINDINGS_RETRIEVE_URL = PROBELY_API_FINDINGS_URL + "{id}/"
