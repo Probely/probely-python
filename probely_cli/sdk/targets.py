@@ -8,9 +8,12 @@ from probely_cli.exceptions import (
     ProbelyBadRequest,
     ProbelyObjectNotFound,
 )
-from probely_cli.sdk.common import validate_resource_ids
+from probely_cli.sdk.common import (
+    validate_resource_ids,
+    TargetTypeEnum,
+    APISchemaTypeEnum,
+)
 from .client import ProbelyAPIClient
-from ..cli.common import TargetTypeEnum, APISchemaTypeEnum
 from ..settings import (
     PROBELY_API_TARGETS_BULK_DELETE_URL,
     PROBELY_API_TARGETS_BULK_UPDATE_URL,
@@ -31,7 +34,7 @@ def retrieve_targets(targets_ids: List[str]) -> List[Dict]:
 
 def retrieve_target(target_id: str) -> dict:
     url = PROBELY_API_TARGETS_RETRIEVE_URL.format(id=target_id)
-    resp_status_code, resp_content = ProbelyAPIClient().get(url)
+    resp_status_code, resp_content = ProbelyAPIClient.get(url)
     if resp_status_code == 404:
         raise ProbelyObjectNotFound(id=target_id)
 
@@ -44,14 +47,14 @@ def retrieve_target(target_id: str) -> dict:
 def delete_targets(targets_ids: List[str]):
     """Delete targets
 
-    :param target_ids: targets to be deleted.
-    :type target_ids: List[str].
+    :param targets_ids: targets to be deleted.
+    :type targets_ids: List[str].
 
     """
     url = PROBELY_API_TARGETS_BULK_DELETE_URL
 
     logger.debug("Delete targets : %s", targets_ids)
-    resp_status_code, resp_content = ProbelyAPIClient().post(
+    resp_status_code, resp_content = ProbelyAPIClient.post(
         url=url, payload={"ids": targets_ids}
     )
     if resp_status_code != 200:
@@ -76,7 +79,7 @@ def list_targets(targets_filters: dict = None) -> List[Dict]:
 
     # TODO: go through pagination?
     # or maybe the option to return a generator for the sdk??
-    resp_status_code, resp_content = ProbelyAPIClient().get(
+    resp_status_code, resp_content = ProbelyAPIClient.get(
         PROBELY_API_TARGETS_URL,
         query_params=query_params,
     )
@@ -161,7 +164,7 @@ def add_target(  # TODO: needs testing
 def update_target(target_id: str, payload: dict) -> dict:
     url = PROBELY_API_TARGETS_RETRIEVE_URL.format(id=target_id)
 
-    resp_status_code, resp_content = ProbelyAPIClient().patch(url, payload)
+    resp_status_code, resp_content = ProbelyAPIClient.patch(url, payload)
 
     if resp_status_code != 200:
         if resp_status_code == 400:
@@ -179,7 +182,7 @@ def update_targets(target_ids: List[str], payload: dict) -> List[Dict]:
     url = PROBELY_API_TARGETS_BULK_UPDATE_URL
     update_payload = {"ids": target_ids, **payload}
 
-    resp_status_code, resp_content = ProbelyAPIClient().post(url, update_payload)
+    resp_status_code, resp_content = ProbelyAPIClient.post(url, update_payload)
 
     if resp_status_code != 200:
         if resp_status_code == 400:

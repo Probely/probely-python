@@ -7,7 +7,7 @@ import pytest
 import yaml
 from rich.console import Console
 
-from probely_cli.cli import CliApp, build_cli_parser
+from probely_cli.cli import CLIApp, build_cli_parser
 from tests.testable_api_responses import (
     CANCEL_SCAN_200_RESPONSE,
     RESUME_SCAN_200_RESPONSE,
@@ -78,7 +78,7 @@ def probely_cli(cli_parser, capsys):
             args = cli_parser.parse_args(cmd_as_list)
             args.console = testable_console
             args.err_console = testable_err_console
-            cli_app = CliApp(args)
+            cli_app = CLIApp(args)
             cli_app.run()
 
             # noinspection PyUnresolvedReferences

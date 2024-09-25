@@ -9,10 +9,8 @@ from probely_cli.cli.commands.targets.start_scan import start_scans_command_hand
 from probely_cli.cli.commands.targets.update import update_targets_command_handler
 from probely_cli.cli.common import (
     show_help,
-    TargetRiskEnum,
-    TargetTypeEnum,
-    APISchemaTypeEnum,
 )
+from probely_cli.sdk.common import TargetRiskEnum, TargetTypeEnum, APISchemaTypeEnum
 from probely_cli.settings import TRUTHY_VALUES, FALSY_VALUES
 
 

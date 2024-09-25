@@ -18,6 +18,11 @@ def show_help(args):
         args.parser.print_help()
 
 
+class OutputEnum(ProbelyCLIEnum):
+    YAML = "yaml"
+    JSON = "json"
+
+
 def validate_and_retrieve_yaml_content(yaml_file_path: Union[str, None]):
     if not yaml_file_path:
         return dict()
@@ -49,56 +54,6 @@ def validate_and_retrieve_yaml_content(yaml_file_path: Union[str, None]):
             raise ProbelyCLIValidation("Invalid yaml content in file: {}".format(ex))
 
     return yaml_content
-
-
-class TargetRiskEnum(ProbelyCLIEnum):
-    NA = (None, "null")
-    NO_RISK = (0, "0")
-    LOW = (10, "10")
-    NORMAL = (20, "20")
-    HIGH = (30, "30")
-
-
-class TargetTypeEnum(ProbelyCLIEnum):
-    WEB = "single"
-    API = "api"
-
-
-class FindingSeverityEnum(ProbelyCLIEnum):
-    LOW = (TargetRiskEnum.LOW.value, TargetRiskEnum.LOW.api_filter_value)
-    NORMAL = (TargetRiskEnum.NORMAL.value, TargetRiskEnum.NORMAL.api_filter_value)
-    HIGH = (TargetRiskEnum.HIGH.value, TargetRiskEnum.HIGH.api_filter_value)
-
-
-class FindingStateEnum(ProbelyCLIEnum):
-    FIXED = "fixed"
-    NOT_FIXED = "notfixed"
-    ACCEPTED = "accepted"
-    RETESTING = "retesting"
-
-
-class APISchemaTypeEnum(ProbelyCLIEnum):
-    OPENAPI = "openapi"
-    POSTMAN = "postman"
-
-
-class OutputEnum(ProbelyCLIEnum):
-    YAML = "yaml"
-    JSON = "json"
-
-
-class ScanStatusEnum(ProbelyCLIEnum):
-    CANCELED = "canceled"
-    CANCELING = "canceling"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    PAUSED = "paused"
-    PAUSING = "pausing"
-    QUEUED = "queued"
-    RESUMING = "resuming"
-    STARTED = "started"
-    UNDER_REVIEW = "under_review"
-    FINISHING_UP = "finishing_up"
 
 
 class ProbelyCLIBaseFiltersSchema(marshmallow.Schema):

@@ -1,15 +1,12 @@
 import logging
-from pathlib import Path
 
-from rich.console import Console
-from probely_cli.sdk.targets import add_target
+from probely_cli.cli.commands.apply.schemas import ApplyFileSchema
+from probely_cli.cli.common import validate_and_retrieve_yaml_content
 from probely_cli.exceptions import (
     ProbelyException,
     ProbelyBadRequest,
 )
-from probely_cli.cli.commands.apply.schemas import ApplyFileSchema
-from probely_cli.cli.common import validate_and_retrieve_yaml_content
-
+from probely_cli.sdk.targets import add_target
 
 logger = logging.getLogger(__name__)
 

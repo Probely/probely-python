@@ -1,5 +1,8 @@
 import json
 import logging
+import platform
+from enum import Enum
+from typing import Union
 from urllib.parse import urlencode
 
 import requests
@@ -7,21 +10,23 @@ from requests import Request, Session
 
 from probely_cli import settings
 from probely_cli.exceptions import ProbelyMissConfig, ProbelyApiUnavailable
+from probely_cli.version import __version__
 
 logger = logging.getLogger(__name__)
 
 
+class ProbelyUserAgentEnum(Enum):
+    CLI = "ProbelyCLI"
+    SDK = "ProbelySDK"
+
+
 class Probely:
     _instance = None
-    APP_CONFIG: dict = dict()
 
-    def __init__(self, api_key=None, *args, **kwargs):
-        if self.APP_CONFIG.get("is_app_configured", None):
-            return
-
+    def __init__(self, api_key=None):
         self.APP_CONFIG = {
-            "is_app_configured": True,
             "api_key": settings.PROBELY_API_KEY,
+            "is_cli": settings.IS_CLI,
         }
 
         if api_key:
@@ -30,36 +35,50 @@ class Probely:
         self._validate_config()
 
     def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            instance = super().__new__(cls, *args, **kwargs)
-            cls._instance = instance
-        return cls._instance
+        raise NotImplementedError("Use Probely.init() to configure")
 
     def _validate_config(self):
-        if self.APP_CONFIG["api_key"] is None:
-            raise ProbelyMissConfig("Missing fundamental config: api_key")
+        if self.APP_CONFIG.get("api_key") is None:
+            raise ProbelyMissConfig("Missing API_KEY config")
 
     @classmethod
-    def init(cls, *args, **kwargs):
-        instance = cls()
-        instance.APP_CONFIG["is_app_configured"] = False
-        instance.__init__(*args, **kwargs)
+    def get_config(cls):
+        if cls._instance is None:
+            cls.init()
+        return cls._instance.APP_CONFIG
+
+    @classmethod
+    def init(cls, api_key=None):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+
+        cls._instance.__init__(api_key)
+
+    @classmethod
+    def reset_config(cls):
+        cls._instance = None
 
 
 class ProbelyAPIClient:
-    def get(self, url, query_params=None):
-        return self._send_request("get", url, query_params=query_params)
+    _session_cache: Union[Session, None] = None
 
-    def post(self, url, query_params: dict = None, payload: dict = None):
-        return self._send_request(
+    @classmethod
+    def get(cls, url, query_params=None):
+        return cls._send_request("get", url, query_params=query_params)
+
+    @classmethod
+    def post(cls, url, query_params: dict = None, payload: dict = None):
+        return cls._send_request(
             "post", url, query_params=query_params, payload=payload
         )
 
-    def patch(self, url, payload: dict = None):
-        return self._send_request("patch", url, payload=payload)
+    @classmethod
+    def patch(cls, url, payload: dict = None):
+        return cls._send_request("patch", url, payload=payload)
 
+    @classmethod
     def _send_request(
-        self, method: str, url: str, payload: dict = None, query_params: dict = None
+        cls, method: str, url: str, payload: dict = None, query_params: dict = None
     ):
         if query_params:
             url = f"{url}?{urlencode(query_params, True)}"
@@ -73,14 +92,15 @@ class ProbelyAPIClient:
         )
         request = Request(method, url=url, json=payload)
 
-        return self._call_probely_api(request)
+        return cls._call_probely_api(request)
 
-    # noinspection PyMethodMayBeStatic
-    def _call_probely_api(self, request):
-        session: Session = self._build_session()
+    @classmethod
+    def _call_probely_api(cls, request):
+        session: Session = cls._build_session()
         prepared_request = session.prepare_request(request)
 
         logger.debug("Requesting probely API in {}".format(prepared_request.url))
+
         resp = session.send(prepared_request)
 
         logger.debug(
@@ -100,10 +120,12 @@ class ProbelyAPIClient:
 
         return status_code, content
 
-    # noinspection PyMethodMayBeStatic
-    def _build_session(self) -> requests.Session:
+    @classmethod
+    def _build_session(cls) -> requests.Session:
+        if cls._session_cache:
+            return cls._session_cache
         session = requests.Session()
-        api_key = Probely().APP_CONFIG["api_key"]
+        api_key = Probely.get_config()["api_key"]
 
         debug_message = (
             "Session setup with api_key ************{}".format(api_key[-4:])
@@ -113,4 +135,28 @@ class ProbelyAPIClient:
         logger.debug(debug_message)
 
         session.headers.update({"Authorization": "JWT " + api_key})
+        session.headers.update({"User-Agent": cls._build_user_agent()})
+
+        logger.debug(session.headers)
+        cls._session_cache = session
         return session
+
+    @classmethod
+    def flush_session_cache(cls):
+        if cls._session_cache is None:
+            return
+
+        cls._session_cache.close()
+        cls._session_cache = None
+
+    @classmethod
+    def _build_user_agent(cls) -> str:
+        user_agent = ProbelyUserAgentEnum.SDK.value
+
+        if Probely.get_config()["is_cli"]:
+            user_agent = ProbelyUserAgentEnum.CLI.value
+
+        app_details = f"{user_agent}/{__version__}"
+        python_details = f"Python/{platform.python_version()}"
+        system_details = f"{platform.system()}/{platform.release()}"
+        return "{} ({}; {})".format(app_details, python_details, system_details)

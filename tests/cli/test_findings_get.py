@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 import pytest
 import yaml
 
-from probely_cli.cli.common import FindingSeverityEnum, FindingStateEnum
+from probely_cli.sdk.common import FindingSeverityEnum, FindingStateEnum
 from tests.testable_api_responses import RETRIEVE_FINDING_200_RESPONSE
 
 

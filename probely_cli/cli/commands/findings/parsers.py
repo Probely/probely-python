@@ -5,9 +5,8 @@ from rich_argparse import RichHelpFormatter
 from probely_cli.cli.commands.findings.get import findings_get_command_handler
 from probely_cli.cli.common import (
     show_help,
-    FindingSeverityEnum,
-    FindingStateEnum,
 )
+from probely_cli.sdk.common import FindingSeverityEnum, FindingStateEnum
 from probely_cli.settings import TRUTHY_VALUES, FALSY_VALUES
 
 

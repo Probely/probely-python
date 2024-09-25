@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 import yaml
 
-from probely_cli.cli.common import TargetTypeEnum, APISchemaTypeEnum
+from probely_cli.sdk.common import TargetTypeEnum, APISchemaTypeEnum
 
 
 @pytest.fixture

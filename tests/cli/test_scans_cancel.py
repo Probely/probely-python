@@ -5,7 +5,7 @@ from unittest.mock import patch, Mock
 import pytest
 import yaml
 
-from probely_cli.cli.common import ScanStatusEnum
+from probely_cli.sdk.common import ScanStatusEnum
 
 
 @patch("probely_cli.cli.commands.scans.cancel.cancel_scans")

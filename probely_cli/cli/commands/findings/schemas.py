@@ -2,10 +2,9 @@ import marshmallow
 
 from probely_cli.cli.common import (
     ProbelyCLIEnumField,
-    FindingSeverityEnum,
     ProbelyCLIBaseFiltersSchema,
-    FindingStateEnum,
 )
+from probely_cli.sdk.common import FindingSeverityEnum, FindingStateEnum
 
 
 class FindingsApiFiltersSchema(ProbelyCLIBaseFiltersSchema):

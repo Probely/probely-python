@@ -3,12 +3,12 @@ from unittest.mock import Mock, patch, MagicMock
 
 import pytest
 
-from probely_cli.cli.common import TargetTypeEnum, APISchemaTypeEnum
 from probely_cli.exceptions import (
     ProbelyBadRequest,
     ProbelyRequestFailed,
     ProbelyObjectNotFound,
 )
+from probely_cli.sdk.common import APISchemaTypeEnum, TargetTypeEnum
 from probely_cli.sdk.targets import (
     update_targets,
     delete_targets,

@@ -1,11 +1,10 @@
 import marshmallow
 
 from probely_cli.cli.common import (
-    TargetTypeEnum,
-    TargetRiskEnum,
     ProbelyCLIEnumField,
     ProbelyCLIBaseFiltersSchema,
 )
+from probely_cli.sdk.common import TargetRiskEnum, TargetTypeEnum
 
 
 class TargetApiFiltersSchema(ProbelyCLIBaseFiltersSchema):

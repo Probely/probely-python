@@ -19,7 +19,7 @@ def retrieve_findings(findings_ids: List[str]) -> List[Dict]:
 
 def retrieve_finding(finding_id) -> dict:
     url = PROBELY_API_FINDINGS_RETRIEVE_URL.format(id=finding_id)
-    resp_status_code, resp_content = ProbelyAPIClient().get(url)
+    resp_status_code, resp_content = ProbelyAPIClient.get(url)
 
     if resp_status_code == 404:
         raise ProbelyObjectNotFound(id=finding_id)
@@ -42,7 +42,7 @@ def list_findings(findings_filters: Dict = None) -> Generator[Dict, None, None]:
             **filters,
         }
 
-        resp_status_code, resp_content = ProbelyAPIClient().get(
+        resp_status_code, resp_content = ProbelyAPIClient.get(
             PROBELY_API_FINDINGS_URL,
             query_params=query_params,
         )

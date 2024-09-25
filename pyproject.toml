@@ -40,12 +40,13 @@ dependencies = [
     "pyyaml",
     "mergedeep",
     "python-dateutil", # Python <= 3.10's fromisoformat is not a full ISO-8601 format parser
+    "toml", # Python < 3.11's doesn't support toml
 ]
 
 [project.optional-dependencies]
 test = [
     "pytest",
-    #    "pytest-cov",
+    #"pytest-cov",
     "tox",
 ]
 docs = [

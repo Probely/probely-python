@@ -4,7 +4,7 @@ from argparse import Namespace
 
 from rich.console import Console
 
-from .app import CliApp
+from .app import CLIApp
 from .commands.parsers import build_cli_parser
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ def app():
     args.console = console
     args.err_console = err_console
 
-    cli_app = CliApp(args)
+    cli_app = CLIApp(args)
 
     from .. import settings
 

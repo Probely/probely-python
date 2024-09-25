@@ -2,7 +2,6 @@ import json
 from typing import Dict
 from unittest.mock import patch, Mock
 
-import pytest
 import yaml
 
 

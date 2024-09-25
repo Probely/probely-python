@@ -1,19 +1,21 @@
 import argparse
 import logging
 
-from probely_cli import settings
+from probely_cli import settings, Probely
 from probely_cli.exceptions import ProbelyException, ProbelyCLIValidation
 
 logger = logging.getLogger(__name__)
 
 
-class CliApp:
+class CLIApp:
     args: argparse.Namespace
 
     def __init__(self, args: argparse.Namespace):
+        settings.IS_CLI = True
+
         args_dict = vars(args)
         if args_dict.get("api_key"):
-            settings.PROBELY_API_KEY = args.api_key
+            Probely.init(api_key=args_dict.get("api_key"))
 
         if args_dict.get("debug"):
             settings.IS_DEBUG_MODE = True
