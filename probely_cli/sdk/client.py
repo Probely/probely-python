@@ -76,6 +76,9 @@ class ProbelyAPIClient:
     def patch(cls, url, payload: dict = None):
         return cls._send_request("patch", url, payload=payload)
 
+    def delete(self, url):
+        return self._send_request("delete", url)
+
     @classmethod
     def _send_request(
         cls, method: str, url: str, payload: dict = None, query_params: dict = None

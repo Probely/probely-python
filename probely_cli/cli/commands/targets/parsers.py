@@ -97,7 +97,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
 
     targets_delete_parser = targets_command_parser.add_parser(
         "delete",
-        parents=[configs_parser, target_filters_parser, output_parser],
+        parents=[configs_parser, target_filters_parser],
         formatter_class=RichHelpFormatter,
     )
     targets_delete_parser.add_argument(

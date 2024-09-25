@@ -19,6 +19,7 @@ from ..settings import (
     PROBELY_API_TARGETS_BULK_UPDATE_URL,
     PROBELY_API_TARGETS_URL,
     PROBELY_API_TARGETS_RETRIEVE_URL,
+    PROBELY_API_TARGETS_DELETE_URL,
 )
 
 logger = logging.getLogger(__name__)
@@ -42,6 +43,20 @@ def retrieve_target(target_id: str) -> dict:
         raise ProbelyRequestFailed(resp_content)
 
     return resp_content
+
+
+def delete_target(target_id: str) -> str:
+    url = PROBELY_API_TARGETS_DELETE_URL.format(id=target_id)
+
+    resp_status_code, resp_content = ProbelyAPIClient().delete(url=url)
+
+    if resp_status_code == 404:
+        raise ProbelyObjectNotFound(id=target_id)
+
+    if resp_status_code != 204:
+        raise ProbelyRequestFailed(resp_content)
+
+    return target_id
 
 
 def delete_targets(targets_ids: List[str]):

@@ -17,11 +17,13 @@ from probely_cli.sdk.targets import (
     retrieve_targets,
     update_target,
     add_target,
+    delete_target,
 )
 from probely_cli.settings import (
     PROBELY_API_TARGETS_BULK_DELETE_URL,
     PROBELY_API_TARGETS_BULK_UPDATE_URL,
     PROBELY_API_TARGETS_RETRIEVE_URL,
+    PROBELY_API_TARGETS_DELETE_URL,
 )
 from tests.testable_api_responses import RETRIEVE_TARGET_200_RESPONSE
 
@@ -84,24 +86,48 @@ def test_retrieve_target__success_api_call(api_client_mock: Mock):
     api_client_mock.assert_called_with(expected_call_url)
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely_cli.sdk.client.ProbelyAPIClient.delete")
 def test_delete_target__success_api_call(api_client_mock: Mock):
-    resp_code = 200
+    resp_code = 204
     testable_id = "2DZkoZH8WMEM"
     resp_content = {"id": testable_id}
 
     api_client_mock.return_value = (resp_code, resp_content)
 
-    delete_targets([testable_id])
+    delete_target(testable_id)
 
-    expected_call_url = PROBELY_API_TARGETS_BULK_DELETE_URL
-    api_client_mock.assert_called_with(
-        url=expected_call_url, payload={"ids": [testable_id]}
-    )
+    expected_call_url = PROBELY_API_TARGETS_DELETE_URL.format(id=testable_id)
+
+    api_client_mock.assert_called_with(url=expected_call_url)
+
+
+@patch("probely_cli.sdk.client.ProbelyAPIClient.delete")
+def test_delete_target__unsuccessful_api_call(api_client_mock: Mock):
+    resp_code = 400
+    testable_id = "2DZkoZH8WMEM"
+
+    api_client_mock.return_value = (resp_code, {})
+    with pytest.raises(BaseException) as exc_info:
+        delete_target([testable_id])
+
+    raised_exception = exc_info.value
+    assert isinstance(raised_exception, ProbelyRequestFailed)
+
+    api_client_mock.reset_mock()
+
+    not_found_id = "random_target_id"
+    api_client_mock.return_value = (404, {})
+
+    with pytest.raises(BaseException) as exc_info:
+        delete_target(not_found_id)
+
+    raised_exception = exc_info.value
+    assert isinstance(raised_exception, ProbelyObjectNotFound)
+    assert raised_exception.not_found_object_id == not_found_id
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-def test_delete_target__unsuccessful_api_call(api_client_mock: Mock):
+def test_delete_targets__unsuccessful_api_call(api_client_mock: Mock):
     resp_code = 400
     testable_id = "2DZkoZH8WMEM"
 
