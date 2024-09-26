@@ -10,6 +10,7 @@ from probely_cli.cli.common import (
     OutputEnum,
     show_help,
 )
+from probely_cli.version import __version__
 
 
 def build_file_parser():
@@ -74,6 +75,9 @@ def build_cli_parser():
         prog="probely",
         description="Welcome to Probely's CLI",
         formatter_class=RichHelpFormatter,
+    )
+    probely_parser.add_argument(
+        "-V", "--version", action="version", version=f"%(prog)s {__version__}"
     )
     probely_parser.set_defaults(
         command_handler=show_help,
