@@ -20,7 +20,7 @@ class TargetRiskEnum(ProbelyCLIEnum):
     NA = (None, "null")
     NO_RISK = (0, "0")
     LOW = (10, "10")
-    NORMAL = (20, "20")
+    MEDIUM = (20, "20")
     HIGH = (30, "30")
 
 
@@ -31,7 +31,7 @@ class TargetTypeEnum(ProbelyCLIEnum):
 
 class FindingSeverityEnum(ProbelyCLIEnum):
     LOW = (TargetRiskEnum.LOW.value, TargetRiskEnum.LOW.api_filter_value)
-    NORMAL = (TargetRiskEnum.NORMAL.value, TargetRiskEnum.NORMAL.api_filter_value)
+    MEDIUM = (TargetRiskEnum.MEDIUM.value, TargetRiskEnum.MEDIUM.api_filter_value)
     HIGH = (TargetRiskEnum.HIGH.value, TargetRiskEnum.HIGH.api_filter_value)
 
 

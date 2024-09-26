@@ -74,7 +74,7 @@ def test_findings_get__table_last_found_date_output(
     [
         (0, "UNKNOWN"),
         (10, FindingSeverityEnum.LOW.name),
-        (20, FindingSeverityEnum.NORMAL.name),
+        (20, FindingSeverityEnum.MEDIUM.name),
         (30, FindingSeverityEnum.HIGH.name),
         (None, "UNKNOWN"),
         (323232320, "UNKNOWN"),
@@ -169,8 +169,8 @@ def test_findings_get__table_labels_output(
             {"severity": [FindingSeverityEnum.LOW.api_filter_value]},
         ),
         (
-            f"--f-severity={FindingSeverityEnum.NORMAL.name}",
-            {"severity": [FindingSeverityEnum.NORMAL.api_filter_value]},
+            f"--f-severity={FindingSeverityEnum.MEDIUM.name}",
+            {"severity": [FindingSeverityEnum.MEDIUM.api_filter_value]},
         ),
         (
             f"--f-severity {FindingSeverityEnum.LOW.name} {FindingSeverityEnum.HIGH.name}",
@@ -247,11 +247,11 @@ def test_findings_get__arg_filters_success(
         ),
         (
             "--f-severity=invalid_value",
-            "error: argument --f-severity: invalid choice: 'INVALID_VALUE' (choose from 'LOW', 'NORMAL', 'HIGH')",
+            "error: argument --f-severity: invalid choice: 'INVALID_VALUE' (choose from 'LOW', 'MEDIUM', 'HIGH')",
         ),
         (
             "--f-severity invalid_value",
-            "error: argument --f-severity: invalid choice: 'INVALID_VALUE' (choose from 'LOW', 'NORMAL', 'HIGH')",
+            "error: argument --f-severity: invalid choice: 'INVALID_VALUE' (choose from 'LOW', 'MEDIUM', 'HIGH')",
         ),
         (
             "--f-state",

@@ -73,7 +73,7 @@ def test_targets_get__table_last_scan_date_output(
     [
         (0, TargetRiskEnum.NO_RISK.name),
         (10, TargetRiskEnum.LOW.name),
-        (20, TargetRiskEnum.NORMAL.name),
+        (20, TargetRiskEnum.MEDIUM.name),
         (30, TargetRiskEnum.HIGH.name),
         (None, TargetRiskEnum.NA.name),
         (323232320, "UNKNOWN"),
@@ -164,11 +164,11 @@ def test_targets_get__table_labels_output(
             },
         ),
         (
-            "--f-risk high normal",
+            "--f-risk high medium",
             {
                 "risk": [
                     TargetRiskEnum.HIGH.api_filter_value,
-                    TargetRiskEnum.NORMAL.api_filter_value,
+                    TargetRiskEnum.MEDIUM.api_filter_value,
                 ]
             },
         ),
@@ -241,11 +241,11 @@ def test_targets_get__arg_filters_success(
         ),
         (
             "--f-risk=random_value",
-            "error: argument --f-risk: invalid choice: 'RANDOM_VALUE' (choose from 'NA', 'NO_RISK', 'LOW', 'NORMAL', 'HIGH')",
+            "error: argument --f-risk: invalid choice: 'RANDOM_VALUE' (choose from 'NA', 'NO_RISK', 'LOW', 'MEDIUM', 'HIGH')",
         ),
         (
             "--f-risk=",
-            "error: argument --f-risk: invalid choice: '' (choose from 'NA', 'NO_RISK', 'LOW', 'NORMAL', 'HIGH')",
+            "error: argument --f-risk: invalid choice: '' (choose from 'NA', 'NO_RISK', 'LOW', 'MEDIUM', 'HIGH')",
         ),
         (
             "--f-type=random_value, ",

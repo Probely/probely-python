@@ -105,7 +105,7 @@ def list_targets(targets_filters: dict = None) -> List[Dict]:
     return resp_content["results"]
 
 
-def add_target(  # TODO: needs testing
+def add_target(
     target_url: str,
     target_name: Union[str, None] = None,
     target_type: TargetTypeEnum = TargetTypeEnum.WEB,
