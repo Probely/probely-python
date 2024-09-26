@@ -23,7 +23,12 @@ def scans_cancel_command_handler(args):
 
     if filters:
         scan_list = list_scans(scans_filters=filters)
-        scan_ids = [scan.get("id") for scan in scan_list]
+        searched_scan_ids = [scan.get("id") for scan in scan_list]
+
+        if not searched_scan_ids:
+            raise ProbelyCLIValidation("Selected Filters returned no results")
+
+        scan_ids = searched_scan_ids
 
     logger.debug("Cancelling scan for scan ids: {}".format(scan_ids))
 

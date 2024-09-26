@@ -17,8 +17,11 @@ def targets_delete_command_handler(args):
         raise ProbelyCLIValidation("filters and Target IDs are mutually exclusive.")
 
     if filters:
-        targets_list = list_targets(targets_filters=filters)
-        targets_ids = [target.get("id") for target in targets_list]
+        searched_targets = list_targets(targets_filters=filters)
+        if not searched_targets:
+            raise ProbelyCLIValidation("Selected Filters returned no results")
+
+        targets_ids = [target.get("id") for target in searched_targets]
 
     if len(targets_ids) == 1:
         target_id = delete_target(targets_ids[0])

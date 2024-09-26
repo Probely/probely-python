@@ -1,4 +1,5 @@
 import json
+from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
@@ -191,3 +192,37 @@ def test_targets_update__with_filters(
         update_target_mock.assert_called_once_with(target_ids[0], update_payload)
     else:
         update_targets_mock.assert_called_once_with(target_ids, update_payload)
+
+
+@patch("probely_cli.cli.commands.targets.update.update_target")
+@patch("probely_cli.cli.commands.targets.update.update_targets")
+@patch("probely_cli.cli.commands.targets.update.list_targets")
+@patch("probely_cli.cli.commands.targets.update.validate_and_retrieve_yaml_content")
+def test_targets_update__filters_with_no_results(
+    get_yaml_file_content_mock: MagicMock,
+    sdk_list_targets_mock: MagicMock,
+    sdk_delete_targets_mock: MagicMock,
+    sdk_delete_target_mock: MagicMock,
+    probely_cli,
+):
+    get_yaml_file_content_mock.return_value = {"something": "something"}
+    sdk_list_targets_mock.return_value = []
+
+    stdout_lines, stderr_lines = probely_cli(
+        "targets",
+        "update",
+        "--f-search=test",
+        "-f mocked",
+        return_list=True,
+    )
+
+    assert stdout_lines == [], "Expected no output"
+    assert len(stderr_lines) == 1, "Expected error output"
+
+    expected_error = (
+        "probely targets update: error: Selected Filters returned no results"
+    )
+    assert stderr_lines[-1] == expected_error
+
+    sdk_delete_targets_mock.assert_not_called()
+    sdk_delete_target_mock.assert_not_called()

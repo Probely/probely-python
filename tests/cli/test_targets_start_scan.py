@@ -1,5 +1,5 @@
 import json
-from unittest.mock import Mock, patch
+from unittest.mock import patch, Mock, MagicMock
 
 import pytest
 import yaml
@@ -161,31 +161,18 @@ def test_targets_start_scan__with_filters(
     probely_cli,
     filtered_targets,
 ):
-    yaml_file_content = {
-        "overrides": {
-            "ignore_blackout_period": True,
-            "scan_profile": "lightning",
-            "reduced_scopes": [{"url": "https//example.com", "enabled": True}],
-        }
-    }
-    yaml_file_path = create_testable_yaml_file(
-        file_name="test_start_scans_yaml_file_argument.yaml",
-        file_content=yaml_file_content,
-    )
-
     list_targets_mock.return_value = filtered_targets
 
     _, stderr = probely_cli(
         "targets",
         "start-scan",
-        "--f-has-unlimited-scans=True",
-        "--f-is-url-verified=False",
-        "-f",
-        yaml_file_path,
+        "--f-has-unlimited-scans=True",  # random filter
+        "--f-is-url-verified=False",  # random filter
         return_list=True,
     )
 
-    assert len(stderr) == 0, f"Expected no errors, but got: {stderr}"
+    assert stderr == [], "Expected no errors"
+
     list_targets_mock.assert_called_once_with(
         targets_filters={"unlimited": True, "verified": False}
     )
@@ -193,9 +180,40 @@ def test_targets_start_scan__with_filters(
     target_ids = [target["id"] for target in filtered_targets]
 
     if len(target_ids) == 1:
-        start_scan_mock.assert_called_once_with(target_ids[0], yaml_file_content)
+        start_scan_mock.assert_called_once_with(target_ids[0], {})
     else:
-        start_scans_mock.assert_called_once_with(target_ids, yaml_file_content)
+        start_scans_mock.assert_called_once_with(target_ids, {})
+
+
+@patch("probely_cli.cli.commands.targets.start_scan.start_scan")
+@patch("probely_cli.cli.commands.targets.start_scan.start_scans")
+@patch("probely_cli.cli.commands.targets.start_scan.list_targets")
+def test_targets_start_scan__filters_with_no_results(
+    sdk_list_targets_mock: MagicMock,
+    sdk_start_scans_mock: MagicMock,
+    sdk_start_scan_mock: MagicMock,
+    probely_cli,
+):
+
+    sdk_list_targets_mock.return_value = []
+
+    stdout_lines, stderr_lines = probely_cli(
+        "targets",
+        "start-scan",
+        "--f-search=test",
+        return_list=True,
+    )
+
+    assert stdout_lines == [], "Expected no output"
+    assert len(stderr_lines) == 1, "Expected error output"
+
+    expected_error = (
+        "probely targets start-scan: error: Selected Filters returned no results"
+    )
+    assert stderr_lines[-1] == expected_error
+
+    sdk_start_scans_mock.assert_not_called()
+    sdk_start_scan_mock.assert_not_called()
 
 
 @patch("probely_cli.cli.commands.targets.start_scan.start_scan")

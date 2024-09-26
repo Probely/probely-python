@@ -1,6 +1,6 @@
 import json
 from typing import Dict
-from unittest.mock import Mock, patch
+from unittest.mock import patch, Mock, MagicMock
 
 import pytest
 import yaml
@@ -9,7 +9,7 @@ from probely_cli.sdk.enums import ScanStatusEnum
 
 
 @patch("probely_cli.cli.commands.scans.cancel.cancel_scans")
-def test_cancel_scans__command_handler(
+def test_scans_cancel__command_handler(
     sdk_cancel_scan_mock: Mock,
     valid_scans_cancel_api_response: Dict,
     probely_cli,
@@ -30,7 +30,7 @@ def test_cancel_scans__command_handler(
 
 
 @patch("probely_cli.cli.commands.scans.cancel.cancel_scan")
-def test_scans_cancel_request_with_exception(
+def test_scans_cancel__request_with_exception(
     sdk_cancel_scan_mock: Mock,
     probely_cli,
 ):
@@ -99,17 +99,51 @@ def test_scans_cancel__no_arguments_passed(probely_cli):
         ),
     ],
 )
-@patch("probely_cli.cli.commands.scans.get.list_scans")
+@patch("probely_cli.cli.commands.scans.cancel.cancel_scan")
+@patch("probely_cli.cli.commands.scans.cancel.cancel_scans")
+@patch("probely_cli.cli.commands.scans.cancel.list_scans")
 def test_scans_cancel__arg_filters_success(
-    sdk_list_scans_mock: Mock,
+    sdk_list_scans_mock: MagicMock,
+    _cancel_scans_mock: MagicMock,
+    _cancel_scan_mock: MagicMock,
     filter_arg,
     expected_filter_request,
     probely_cli,
 ):
-    stdout, stderr = probely_cli("scans", "get", filter_arg, return_list=True)
+    sdk_list_scans_mock.return_value = [{"id": "scan_id1"}]
 
-    assert len(stderr) == 0, "Expected no errors"
+    stdout, stderr = probely_cli("scans", "cancel", filter_arg, return_list=True)
+
+    assert sdk_list_scans_mock.call_count == 1
+    assert stderr == [], "Expected no errors"
     sdk_list_scans_mock.assert_called_once_with(scans_filters=expected_filter_request)
+
+
+@patch("probely_cli.cli.commands.scans.cancel.cancel_scan")
+@patch("probely_cli.cli.commands.scans.cancel.cancel_scans")
+@patch("probely_cli.cli.commands.scans.cancel.list_scans")
+def test_scans_cancel__filters_with_no_results(
+    sdk_list_scans_mock: MagicMock,
+    _cancel_scans_mock: MagicMock,
+    _cancel_scan_mock: MagicMock,
+    probely_cli,
+):
+
+    sdk_list_scans_mock.return_value = []
+
+    stdout_lines, stderr_lines = probely_cli(
+        "scans",
+        "cancel",
+        "--f-search=test",
+        return_list=True,
+    )
+
+    assert stdout_lines == [], "Expected no output"
+
+    assert len(stderr_lines) == 1, "Expected error output"
+
+    expected_error = "probely scans cancel: error: Selected Filters returned no results"
+    assert stderr_lines[-1] == expected_error
 
 
 @patch("probely_cli.cli.commands.scans.cancel.cancel_scans")

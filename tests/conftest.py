@@ -2,6 +2,7 @@ import sys
 from io import StringIO
 from pathlib import Path
 from typing import Callable, Dict, List, Tuple, Union
+from unittest.mock import patch
 
 import pytest
 import yaml
@@ -17,6 +18,19 @@ from tests.testable_api_responses import (
     RETRIEVE_TARGET_200_RESPONSE,
     START_SCAN_200_RESPONSE,
 )
+
+
+@pytest.fixture(autouse=True)
+def api_call_blocker():
+    """
+    Final line of defence for accidental api calls in tests.
+    :return:
+    """
+    msg = "Your tests are leaking. An API call was attempted"
+
+    with patch("probely_cli.sdk.client.requests.Session.send") as mock_session_send:
+        yield
+        assert mock_session_send.call_count == 0, msg
 
 
 @pytest.fixture

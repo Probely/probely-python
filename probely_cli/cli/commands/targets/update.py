@@ -9,7 +9,11 @@ from probely_cli.cli.commands.targets.get import target_filters_handler
 from probely_cli.cli.common import validate_and_retrieve_yaml_content
 from probely_cli.cli.enums import OutputEnum
 from probely_cli.exceptions import ProbelyCLIValidation
-from probely_cli.sdk.targets import list_targets, update_target, update_targets
+from probely_cli.sdk.targets import (
+    update_targets,
+    list_targets,
+    update_target,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +70,13 @@ def update_targets_command_handler(args):
 
     # Fetch all Targets that match the filters and update them
     targets_for_update = list_targets(targets_filters=filters)
-    target_ids = [target["id"] for target in targets_for_update]
+    searched_targets_ids = [target["id"] for target in targets_for_update]
+
+    if not searched_targets_ids:  # TODO test
+        raise ProbelyCLIValidation("Selected Filters returned no results")
+
+    target_ids = searched_targets_ids
+
     if len(target_ids) == 1:
         updated_targets = [update_target(target_ids[0], payload)]
     else:

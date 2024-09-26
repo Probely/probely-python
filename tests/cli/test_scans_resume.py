@@ -1,6 +1,6 @@
 import json
 from typing import Dict
-from unittest.mock import Mock, patch
+from unittest.mock import patch, Mock, MagicMock
 
 import yaml
 
@@ -73,6 +73,35 @@ def test_scans_resume_scans_with_filters(
     assert len(stderr_lines) == 0
     assert len(stdout_lines) == 1, "Expected to have 1 item in data"
     assert scan_id1 in stdout_lines
+
+
+@patch("probely_cli.cli.commands.scans.resume.resume_scan")
+@patch("probely_cli.cli.commands.scans.resume.resume_scans")
+@patch("probely_cli.cli.commands.scans.resume.list_scans")
+def test_scans_resume__filters_with_no_results(
+    sdk_list_scans_mock: MagicMock,
+    resume_scans_mock: MagicMock,
+    resume_scan_mock: MagicMock,
+    probely_cli,
+):
+
+    sdk_list_scans_mock.return_value = []
+
+    stdout_lines, stderr_lines = probely_cli(
+        "scans",
+        "resume",
+        "--f-search=test",
+        return_list=True,
+    )
+
+    assert stdout_lines == [], "Expected no output"
+    assert len(stderr_lines) == 1, "Expected error output"
+
+    expected_error = "probely scans resume: error: Selected Filters returned no results"
+    assert stderr_lines[-1] == expected_error
+
+    resume_scans_mock.assert_not_called()
+    resume_scan_mock.assert_not_called()
 
 
 @patch("probely_cli.cli.commands.scans.resume.resume_scan")

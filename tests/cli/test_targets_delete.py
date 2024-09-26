@@ -158,3 +158,65 @@ def test_targets_delete__without_any_argument(
 
     delete_targets_mock.assert_not_called()
     delete_target_mock.assert_not_called()
+
+
+@patch("probely_cli.cli.commands.targets.delete.delete_target")
+@patch("probely_cli.cli.commands.targets.delete.delete_targets")
+@patch("probely_cli.cli.commands.targets.delete.list_targets")
+def test_targets_delete__delete_with_filters(
+    list_targets_mock: Mock,
+    delete_targets_mock: Mock,
+    delete_target_mock: Mock,
+    probely_cli,
+):
+    target_id1 = "target_id1"
+    target_id2 = "target_id2"
+
+    list_targets_mock.return_value = [{"id": target_id1}, {"id": target_id2}]
+    delete_targets_mock.return_value = {"ids": [target_id1, target_id2]}
+
+    stdout_lines, stderr_lines = probely_cli(
+        "targets",
+        "delete",
+        "--f-search=test",
+        return_list=True,
+    )
+    list_targets_mock.assert_called_with(targets_filters={"search": "test"})
+    delete_targets_mock.assert_called_once_with(targets_ids=[target_id1, target_id2])
+    assert stderr_lines == []
+    assert len(stdout_lines) == 2, "Expected to have 2 line with the resumed scan id"
+    assert target_id1 == stdout_lines[0]
+    assert target_id2 == stdout_lines[1]
+
+    delete_target_mock.assert_not_called()
+
+
+@patch("probely_cli.cli.commands.targets.delete.delete_target")
+@patch("probely_cli.cli.commands.targets.delete.delete_targets")
+@patch("probely_cli.cli.commands.targets.delete.list_targets")
+def test_targets_delete__filters_with_no_results(
+    sdk_list_targets_mock: Mock,
+    sdk_delete_targets_mock: Mock,
+    sdk_delete_target_mock: Mock,
+    probely_cli,
+):
+
+    sdk_list_targets_mock.return_value = []
+
+    stdout_lines, stderr_lines = probely_cli(
+        "targets",
+        "delete",
+        "--f-search=test",
+        return_list=True,
+    )
+
+    assert stdout_lines == [], "Expected no output"
+    assert len(stderr_lines) == 1, "Expected error output"
+
+    expected_error = (
+        "probely targets delete: error: Selected Filters returned no results"
+    )
+    assert stderr_lines[-1] == expected_error
+
+    sdk_delete_targets_mock.assert_not_called()
+    sdk_delete_target_mock.assert_not_called()

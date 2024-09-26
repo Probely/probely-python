@@ -1,6 +1,6 @@
 import json
 from typing import Dict
-from unittest.mock import Mock, patch
+from unittest.mock import patch, Mock, MagicMock
 
 import pytest
 import yaml
@@ -127,6 +127,35 @@ def test_scans_pause_scans_with_filters(
     assert len(stderr_lines) == 0
     assert len(stdout_lines) == 1, "Expected to have 1 line with the resumed scan id"
     assert scan_id1 == stdout_lines[0]
+
+
+@patch("probely_cli.cli.commands.scans.pause.pause_scan")
+@patch("probely_cli.cli.commands.scans.pause.pause_scans")
+@patch("probely_cli.cli.commands.scans.pause.list_scans")
+def test_scans_pause__filters_with_no_results(
+    sdk_list_scans_mock: MagicMock,
+    pause_scans_mock: MagicMock,
+    pause_scan_mock: MagicMock,
+    probely_cli,
+):
+
+    sdk_list_scans_mock.return_value = []
+
+    stdout_lines, stderr_lines = probely_cli(
+        "scans",
+        "pause",
+        "--f-search=test",
+        return_list=True,
+    )
+
+    assert stdout_lines == [], "Expected no output"
+    assert len(stderr_lines) == 1, "Expected error output"
+
+    expected_error = "probely scans pause: error: Selected Filters returned no results"
+    assert stderr_lines[-1] == expected_error
+
+    pause_scans_mock.assert_not_called()
+    pause_scan_mock.assert_not_called()
 
 
 @patch("probely_cli.cli.commands.scans.pause.pause_scans")
