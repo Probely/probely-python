@@ -1,8 +1,8 @@
 import argparse
 import logging
 
-from probely_cli import settings, Probely
-from probely_cli.exceptions import ProbelyException, ProbelyCLIValidation
+from probely_cli import Probely, settings
+from probely_cli.exceptions import ProbelyCLIValidation, ProbelyException
 
 logger = logging.getLogger(__name__)
 

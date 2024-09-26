@@ -1,4 +1,4 @@
-from probely_cli.utils import ProbelyCLIEnum
+from probely_cli.sdk.enums import ProbelyCLIEnum
 
 
 def test_probely_cli_enum():

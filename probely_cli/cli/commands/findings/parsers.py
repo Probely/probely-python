@@ -3,11 +3,9 @@ import argparse
 from rich_argparse import RichHelpFormatter
 
 from probely_cli.cli.commands.findings.get import findings_get_command_handler
-from probely_cli.cli.common import (
-    show_help,
-)
-from probely_cli.sdk.common import FindingSeverityEnum, FindingStateEnum
-from probely_cli.settings import TRUTHY_VALUES, FALSY_VALUES
+from probely_cli.cli.common import show_help
+from probely_cli.sdk.enums import FindingSeverityEnum, FindingStateEnum
+from probely_cli.settings import FALSY_VALUES, TRUTHY_VALUES
 
 
 def build_findings_filters_parser() -> argparse.ArgumentParser:

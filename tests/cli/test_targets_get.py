@@ -1,11 +1,11 @@
 import json
 import re
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 import pytest
 import yaml
 
-from probely_cli.sdk.common import TargetRiskEnum, TargetTypeEnum
+from probely_cli.sdk.enums import TargetRiskEnum, TargetTypeEnum
 from tests.testable_api_responses import RETRIEVE_TARGET_200_RESPONSE
 
 

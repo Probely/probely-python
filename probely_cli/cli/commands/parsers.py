@@ -6,10 +6,8 @@ from probely_cli.cli.commands.apply.apply import apply_command_handler
 from probely_cli.cli.commands.findings.parsers import build_findings_parser
 from probely_cli.cli.commands.scans.parsers import build_scans_parser
 from probely_cli.cli.commands.targets.parsers import build_targets_parser
-from probely_cli.cli.common import (
-    OutputEnum,
-    show_help,
-)
+from probely_cli.cli.common import show_help
+from probely_cli.cli.enums import OutputEnum
 from probely_cli.version import __version__
 
 

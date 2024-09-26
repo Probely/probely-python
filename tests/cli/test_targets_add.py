@@ -1,10 +1,10 @@
 import json
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
 
-from probely_cli.sdk.common import TargetTypeEnum, APISchemaTypeEnum
+from probely_cli.sdk.enums import APISchemaTypeEnum, TargetTypeEnum
 
 
 @pytest.fixture

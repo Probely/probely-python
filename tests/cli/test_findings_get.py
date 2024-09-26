@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 import pytest
 import yaml
 
-from probely_cli.sdk.common import FindingSeverityEnum, FindingStateEnum
+from probely_cli.sdk.enums import FindingSeverityEnum, FindingStateEnum
 from tests.testable_api_responses import RETRIEVE_FINDING_200_RESPONSE
 
 
@@ -346,7 +346,7 @@ def test_findings_get__mutually_exclusive_arguments(probely_cli):
     assert len(stderr_lines) == 1, "Expected error output"
 
     assert stderr_lines[0] == (
-        "probely findings get: error: filters and finding ids are mutually exclusive."
+        "probely findings get: error: filters and Finding IDs are mutually exclusive."
     )
 
 

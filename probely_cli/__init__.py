@@ -1,11 +1,11 @@
 from .sdk.client import Probely
 from .sdk.targets import (
+    add_target,
+    delete_target,
+    delete_targets,
     list_targets,
     retrieve_target,
     retrieve_targets,
-    delete_target,
-    delete_targets,
-    add_target,
     update_target,
     update_targets,
 )

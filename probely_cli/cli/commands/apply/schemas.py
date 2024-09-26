@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, INCLUDE
+from marshmallow import INCLUDE, Schema, fields
 
 
 class ApplyFileSchema(Schema):

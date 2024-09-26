@@ -9,7 +9,7 @@ import requests
 from requests import Request, Session
 
 from probely_cli import settings
-from probely_cli.exceptions import ProbelyMissConfig, ProbelyApiUnavailable
+from probely_cli.exceptions import ProbelyApiUnavailable, ProbelyMissConfig
 from probely_cli.version import __version__
 
 logger = logging.getLogger(__name__)

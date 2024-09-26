@@ -1,13 +1,13 @@
 import importlib
 import json
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 from urllib.parse import urlencode
 
 import pytest
 import requests
 from requests import PreparedRequest
 
-from probely_cli import settings, retrieve_target
+from probely_cli import retrieve_target, settings
 from probely_cli.exceptions import ProbelyApiUnavailable, ProbelyMissConfig
 from probely_cli.sdk.client import Probely, ProbelyAPIClient
 from tests.conftest import probely_cli

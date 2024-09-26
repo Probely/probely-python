@@ -1,13 +1,10 @@
 import json
 from unittest.mock import patch
 
+import pytest
 import yaml
 
 from tests.testable_api_responses import RETRIEVE_TARGET_200_RESPONSE
-
-
-import pytest
-from unittest.mock import patch
 
 
 @pytest.mark.parametrize(

@@ -1,5 +1,5 @@
 from typing import Dict
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -9,12 +9,12 @@ from probely_cli.exceptions import (
     ProbelyRequestFailed,
 )
 from probely_cli.sdk.scans import (
+    cancel_scans,
     list_scans,
     pause_scan,
     pause_scans,
     resume_scans,
     start_scan,
-    cancel_scans,
     start_scans,
 )
 from probely_cli.settings import (
@@ -183,11 +183,11 @@ def test_cancel_scan_failed(
 @patch("probely_cli.sdk.client.ProbelyAPIClient.get")
 def test_list_scans__ok(api_client_mock: Mock):
     expected_content = [{"id": "scan1"}, {"id": "scan2"}]
-    response_content = {"results": expected_content}
+    response_content = {"results": expected_content, "page_total": 1}
 
     api_client_mock.return_value = (200, response_content)
 
-    r = list_scans()
+    r = list(list_scans())
     assert r == expected_content
 
 
@@ -200,7 +200,7 @@ def test_list_scans__notok(api_client_mock: Mock):
     api_client_mock.return_value = (invalid_status_code, error_response_content)
 
     with pytest.raises(ProbelyRequestFailed) as exc:
-        list_scans()
+        list(list_scans())
         raised_exception = exc.value
         assert str(raised_exception) == error_message
 

@@ -7,11 +7,9 @@ from probely_cli.cli.commands.targets.delete import targets_delete_command_handl
 from probely_cli.cli.commands.targets.get import targets_get_command_handler
 from probely_cli.cli.commands.targets.start_scan import start_scans_command_handler
 from probely_cli.cli.commands.targets.update import update_targets_command_handler
-from probely_cli.cli.common import (
-    show_help,
-)
-from probely_cli.sdk.common import TargetRiskEnum, TargetTypeEnum, APISchemaTypeEnum
-from probely_cli.settings import TRUTHY_VALUES, FALSY_VALUES
+from probely_cli.cli.common import show_help
+from probely_cli.sdk.enums import APISchemaTypeEnum, TargetRiskEnum, TargetTypeEnum
+from probely_cli.settings import FALSY_VALUES, TRUTHY_VALUES
 
 
 def build_targets_filters_parser() -> argparse.ArgumentParser:

@@ -1,10 +1,8 @@
 import marshmallow
 
-from probely_cli.cli.common import (
-    ProbelyCLIEnumField,
-    ProbelyCLIBaseFiltersSchema,
-)
-from probely_cli.sdk.common import FindingSeverityEnum, FindingStateEnum
+from probely_cli.cli.schemas.base_schema import ProbelyCLIBaseFiltersSchema
+from probely_cli.cli.schemas.custom_fields import ProbelyCLIEnumField
+from probely_cli.sdk.enums import FindingSeverityEnum, FindingStateEnum
 
 
 class FindingsApiFiltersSchema(ProbelyCLIBaseFiltersSchema):

@@ -1,11 +1,11 @@
 import json
 from typing import Dict
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 import pytest
 import yaml
 
-from probely_cli.sdk.common import ScanStatusEnum
+from probely_cli.sdk.enums import ScanStatusEnum
 
 
 @patch("probely_cli.cli.commands.scans.cancel.cancel_scans")

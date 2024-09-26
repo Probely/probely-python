@@ -1,17 +1,19 @@
 import logging
-from probely_cli.cli.commands.scans.get import (
-    prepare_scan_filters_for_api,
+
+from probely_cli.cli.commands.scans.schemas import ScanApiFiltersSchema
+from probely_cli.cli.common import (
+    display_scans_response_output,
+    prepare_filters_for_api,
 )
-from probely_cli.cli.common import display_scans_response_output
 from probely_cli.exceptions import ProbelyCLIValidation
-from probely_cli.sdk.scans import cancel_scans, cancel_scan, list_scans
+from probely_cli.sdk.scans import cancel_scan, cancel_scans, list_scans
 
 logger = logging.getLogger(__name__)
 
 
 def scans_cancel_command_handler(args):
     scan_ids = args.scan_ids
-    filters = prepare_scan_filters_for_api(args)
+    filters = prepare_filters_for_api(ScanApiFiltersSchema, args)
 
     if not scan_ids and not filters:
         raise ProbelyCLIValidation("Expected scan_ids or filters")

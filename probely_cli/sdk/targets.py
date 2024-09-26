@@ -1,26 +1,24 @@
 import logging
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
-from mergedeep import merge, Strategy
+from mergedeep import Strategy, merge
 
 from probely_cli.exceptions import (
-    ProbelyRequestFailed,
     ProbelyBadRequest,
     ProbelyObjectNotFound,
+    ProbelyRequestFailed,
 )
-from probely_cli.sdk.common import (
-    validate_resource_ids,
-    TargetTypeEnum,
-    APISchemaTypeEnum,
-)
-from .client import ProbelyAPIClient
+from probely_cli.sdk.enums import APISchemaTypeEnum, TargetTypeEnum
+from probely_cli.sdk.helpers import validate_resource_ids
+
 from ..settings import (
     PROBELY_API_TARGETS_BULK_DELETE_URL,
     PROBELY_API_TARGETS_BULK_UPDATE_URL,
-    PROBELY_API_TARGETS_URL,
-    PROBELY_API_TARGETS_RETRIEVE_URL,
     PROBELY_API_TARGETS_DELETE_URL,
+    PROBELY_API_TARGETS_RETRIEVE_URL,
+    PROBELY_API_TARGETS_URL,
 )
+from .client import ProbelyAPIClient
 
 logger = logging.getLogger(__name__)
 

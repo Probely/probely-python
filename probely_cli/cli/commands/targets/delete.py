@@ -1,8 +1,6 @@
-from probely_cli.cli.commands.targets.get import (
-    target_filters_handler,
-)
+from probely_cli.cli.commands.targets.get import target_filters_handler
 from probely_cli.exceptions import ProbelyCLIValidation
-from probely_cli.sdk.targets import delete_targets, list_targets, delete_target
+from probely_cli.sdk.targets import delete_target, delete_targets, list_targets
 
 
 def targets_delete_command_handler(args):

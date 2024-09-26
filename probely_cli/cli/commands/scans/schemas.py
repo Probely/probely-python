@@ -1,11 +1,11 @@
 import marshmallow
 
-from probely_cli.cli.common import (
+from probely_cli.cli.schemas.base_schema import ProbelyCLIBaseFiltersSchema
+from probely_cli.cli.schemas.custom_fields import (
     ISO8601DateTimeField,
-    ProbelyCLIBaseFiltersSchema,
     ProbelyCLIEnumField,
 )
-from probely_cli.sdk.common import ScanStatusEnum
+from probely_cli.sdk.enums import ScanStatusEnum
 
 
 class ScanApiFiltersSchema(ProbelyCLIBaseFiltersSchema):

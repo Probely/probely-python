@@ -1,26 +1,20 @@
+import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Type, Union
+from typing import Dict, List, Type, Union
 
-import dateutil.parser
 import marshmallow
 import yaml
-from marshmallow import post_load
 
 import probely_cli.settings as settings
+from probely_cli.cli.enums import OutputEnum
 from probely_cli.exceptions import ProbelyCLIValidation
-from probely_cli.utils import ProbelyCLIEnum
 
 
 def show_help(args):
     if args.is_no_action_parser:
         args.parser.print_help()
-
-
-class OutputEnum(ProbelyCLIEnum):
-    YAML = "yaml"
-    JSON = "json"
 
 
 def validate_and_retrieve_yaml_content(yaml_file_path: Union[str, None]):
@@ -56,83 +50,11 @@ def validate_and_retrieve_yaml_content(yaml_file_path: Union[str, None]):
     return yaml_content
 
 
-class ProbelyCLIBaseFiltersSchema(marshmallow.Schema):
-    @post_load
-    def ignore_unused_filters(self, data, **kwargs):
-        """
-        All argparse arguments default to None, which means they must be removed.
-        This avoids errors when calling the API.
-        """
-        command_filters = {f: v for f, v in data.items() if v is not None}
-        return command_filters
-
-    class Meta:
-        # ignores other args that are not filters
-        unknown = marshmallow.EXCLUDE
-
-
-class ProbelyCLIEnumField(marshmallow.fields.Enum):
-    enum_class: Type[ProbelyCLIEnum]
-
-    def __init__(self, enum_class: Type[ProbelyCLIEnum], *args, **kwargs):
-        self.enum_class = enum_class
-        super().__init__(enum=enum_class, *args, **kwargs)
-
-    def _serialize(self, value, attr, obj, **kwargs):
-        raise NotImplementedError()
-
-    def _deserialize(self, value, attr, data, **kwargs):
-        try:
-            return self.enum_class[value].api_filter_value
-        except:
-            raise marshmallow.ValidationError("Values not within the accepted values.")
-
-
-class ISO8601DateTimeField(marshmallow.fields.Field):
+def display_scans_response_output(args, scans: List[Dict]):
     """
-    Field for parsing ISO 8601 datetime strings into datetime objects and serializing them back.
-
-    An ISO-8601 datetime string consists of a date portion, followed optionally by a time
-    portion - the date and time portions are separated by a single character separator,
-    which is ``T`` in the official standard.
-
-    Supported common date formats are:
-    - ``YYYY``
-    - ``YYYY-MM``
-    - ``YYYY-MM-DD`` or ``YYYYMMDD``
-
-    Supported common time formats are:
-    - ``hh``
-    - ``hh:mm`` or ``hhmm``
-    - ``hh:mm:ss`` or ``hhmmss``
-    - ``hh:mm:ss.ssssss`` (Up to 6 sub-second digits)
+    If the --output arg is provided, display Scans' data in the specified format (JSON/YAML).
+    Otherwise, display only the Scan IDs line by line.
     """
-
-    def _deserialize(self, value, attr, data, **kwargs):
-        try:
-            return dateutil.parser.isoparse(value)
-        except (ValueError, TypeError, OverflowError):
-            raise marshmallow.ValidationError(
-                "Invalid datetime format. Please provide a valid datetime in ISO 8601 format."
-            )
-
-    def _serialize(self, value, attr, obj, **kwargs):
-        if value is None:
-            return None
-        return value.isoformat()
-
-
-def display_scans_response_output(args, scans):
-    """
-    Args:
-        args: Command-line arguments that include output format (optional) and console for printing.
-              It is expected to have an 'output' attribute indicating the desired format and a 'console' attribute for printing.
-        scans: The list of scans to be formatted and displayed.
-
-    Output:
-        The formatted scans is printed to the console in the specified format (JSON, YAML), or in a default format.
-    """
-
     output_type = OutputEnum[args.output] if args.output else None
 
     if not output_type:
@@ -146,3 +68,17 @@ def display_scans_response_output(args, scans):
         output = yaml.dump(scans, indent=2, width=sys.maxsize)
 
     args.console.print(output)
+
+
+def prepare_filters_for_api(
+    schema: Type[marshmallow.Schema], args: argparse.Namespace
+) -> dict:
+    """
+    Prepares and validates filters using the provided Marshmallow schema.
+    """
+    filters_schema = schema()
+    try:
+        filters = filters_schema.load(vars(args))
+    except marshmallow.ValidationError as ex:
+        raise ProbelyCLIValidation(f"Invalid filters: {ex}")
+    return filters

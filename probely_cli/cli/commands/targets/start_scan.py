@@ -1,37 +1,15 @@
-import json
 import logging
-import sys
-from typing import Dict, List
-
-import yaml
 
 from probely_cli.cli.commands.targets.get import target_filters_handler
-from probely_cli.cli.common import OutputEnum, validate_and_retrieve_yaml_content
+from probely_cli.cli.common import (
+    display_scans_response_output,
+    validate_and_retrieve_yaml_content,
+)
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.scans import start_scan, start_scans
 from probely_cli.sdk.targets import list_targets
 
 logger = logging.getLogger(__name__)
-
-
-def display_cmd_output(args, scans: List[Dict]):
-    """
-    If the --output arg is provided, display Scans' data in the specified format (JSON/YAML).
-    Otherwise, display only the Scan IDs line by line.
-    """
-    output_type = OutputEnum[args.output] if args.output else None
-
-    if not output_type:
-        for scan in scans:
-            args.console.print(scan["id"])
-        return
-
-    if output_type == OutputEnum.JSON:
-        output = json.dumps(scans, indent=2)
-    else:
-        output = yaml.dump(scans, indent=2, width=sys.maxsize)
-
-    args.console.print(output)
 
 
 def start_scans_command_handler(args):
@@ -59,7 +37,7 @@ def start_scans_command_handler(args):
             scans = [start_scan(targets_ids[0], extra_payload)]
         else:
             scans = start_scans(targets_ids, extra_payload)
-        display_cmd_output(args, scans)
+        display_scans_response_output(args, scans)
         return
 
     # Fetch all Targets that match the filters and start Scans for them
@@ -69,4 +47,4 @@ def start_scans_command_handler(args):
         scans = [start_scan(targets_ids[0], extra_payload)]
     else:
         scans = start_scans(targets_ids, extra_payload)
-    display_cmd_output(args, scans)
+    display_scans_response_output(args, scans)

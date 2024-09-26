@@ -1,29 +1,29 @@
 from copy import deepcopy
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
 from probely_cli.exceptions import (
     ProbelyBadRequest,
-    ProbelyRequestFailed,
     ProbelyObjectNotFound,
+    ProbelyRequestFailed,
 )
-from probely_cli.sdk.common import APISchemaTypeEnum, TargetTypeEnum
+from probely_cli.sdk.enums import APISchemaTypeEnum, TargetTypeEnum
 from probely_cli.sdk.targets import (
-    update_targets,
+    add_target,
+    delete_target,
     delete_targets,
     list_targets,
     retrieve_target,
     retrieve_targets,
     update_target,
-    add_target,
-    delete_target,
+    update_targets,
 )
 from probely_cli.settings import (
     PROBELY_API_TARGETS_BULK_DELETE_URL,
     PROBELY_API_TARGETS_BULK_UPDATE_URL,
-    PROBELY_API_TARGETS_RETRIEVE_URL,
     PROBELY_API_TARGETS_DELETE_URL,
+    PROBELY_API_TARGETS_RETRIEVE_URL,
 )
 from tests.testable_api_responses import RETRIEVE_TARGET_200_RESPONSE
 

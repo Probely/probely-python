@@ -7,7 +7,7 @@ from probely_cli.cli.commands.scans.get import scans_get_command_handler
 from probely_cli.cli.commands.scans.pause import scans_pause_command_handler
 from probely_cli.cli.commands.scans.resume import scans_resume_command_handler
 from probely_cli.cli.common import show_help
-from probely_cli.sdk.common import ScanStatusEnum
+from probely_cli.sdk.enums import ScanStatusEnum
 
 
 def build_scan_filters_parser() -> argparse.ArgumentParser:

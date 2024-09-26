@@ -1,4 +1,4 @@
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 
 
 @patch("probely_cli.cli.commands.targets.delete.delete_target")

@@ -1,20 +1,12 @@
-from typing import Generator, List, Dict
+from typing import Dict, Generator, List
 
-from probely_cli.exceptions import ProbelyRequestFailed, ProbelyObjectNotFound
+from probely_cli.exceptions import ProbelyObjectNotFound, ProbelyRequestFailed
 from probely_cli.sdk.client import ProbelyAPIClient
 from probely_cli.settings import (
-    PROBELY_API_FINDINGS_URL,
     PROBELY_API_FINDINGS_RETRIEVE_URL,
+    PROBELY_API_FINDINGS_URL,
     PROBELY_API_PAGE_SIZE,
 )
-
-
-def retrieve_findings(findings_ids: List[str]) -> List[Dict]:
-    findings = []
-    for target_id in findings_ids:
-        finding = retrieve_finding(target_id)
-        findings.append(finding)
-    return findings
 
 
 def retrieve_finding(finding_id) -> dict:
@@ -28,6 +20,10 @@ def retrieve_finding(finding_id) -> dict:
         raise ProbelyRequestFailed(resp_content)
 
     return resp_content
+
+
+def retrieve_findings(findings_ids: List[str]) -> List[Dict]:
+    return [retrieve_finding(finding_id) for finding_id in findings_ids]
 
 
 def list_findings(findings_filters: Dict = None) -> Generator[Dict, None, None]:
@@ -56,7 +52,7 @@ def list_findings(findings_filters: Dict = None) -> Generator[Dict, None, None]:
         for result in results:
             yield result
 
-        if total_pages_count >= page:
+        if page >= total_pages_count:
             break
 
         page += 1

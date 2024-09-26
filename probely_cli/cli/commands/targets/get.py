@@ -1,6 +1,6 @@
 import json
 import sys
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 import marshmallow
 import yaml
@@ -8,14 +8,13 @@ from marshmallow import Schema
 from rich.table import Table
 
 from probely_cli.cli.commands.targets.schemas import TargetApiFiltersSchema
-from probely_cli.cli.common import OutputEnum
-from probely_cli.cli.formatters import (
+from probely_cli.cli.enums import OutputEnum
+from probely_cli.cli.renderers import (
     get_printable_date,
-    get_printable_enum_value,
-    get_printable_labels,
 )
+from probely_cli.cli.renderers import get_printable_enum_value, get_printable_labels
 from probely_cli.exceptions import ProbelyCLIValidation
-from probely_cli.sdk.common import TargetRiskEnum
+from probely_cli.sdk.enums import TargetRiskEnum
 from probely_cli.sdk.targets import list_targets, retrieve_targets
 
 TARGET_NEVER_SCANNED_OUTPUT: str = "Never_scanned"

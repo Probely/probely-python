@@ -6,14 +6,10 @@ from typing import Optional
 
 import yaml
 
-from probely_cli.cli.common import (
-    validate_and_retrieve_yaml_content,
-    OutputEnum,
-)
-from probely_cli.exceptions import (
-    ProbelyCLIValidation,
-)
-from probely_cli.sdk.common import TargetTypeEnum, APISchemaTypeEnum
+from probely_cli.cli.common import validate_and_retrieve_yaml_content
+from probely_cli.cli.enums import OutputEnum
+from probely_cli.exceptions import ProbelyCLIValidation
+from probely_cli.sdk.enums import APISchemaTypeEnum, TargetTypeEnum
 from probely_cli.sdk.targets import add_target
 
 logger = logging.getLogger(__name__)
