@@ -11,6 +11,7 @@ from probely_cli.sdk.targets import list_targets
 
 logger = logging.getLogger(__name__)
 
+
 def validate_and_retrieve_extra_payload(args):
     extra_payload = validate_and_retrieve_yaml_content(args.yaml_file_path)
 
@@ -47,4 +48,5 @@ def start_scans_command_handler(args):
         scans = [start_scan(targets_ids[0], extra_payload)]
     else:
         scans = start_scans(targets_ids, extra_payload)
+
     display_scans_response_output(args, scans)

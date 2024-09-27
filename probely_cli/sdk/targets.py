@@ -10,7 +10,7 @@ from probely_cli.exceptions import (
 )
 from probely_cli.sdk.enums import TargetAPISchemaTypeEnum, TargetTypeEnum
 from probely_cli.sdk.helpers import validate_resource_ids
-
+from .client import ProbelyAPIClient
 from ..settings import (
     PROBELY_API_TARGETS_BULK_DELETE_URL,
     PROBELY_API_TARGETS_BULK_UPDATE_URL,
@@ -18,7 +18,6 @@ from ..settings import (
     PROBELY_API_TARGETS_RETRIEVE_URL,
     PROBELY_API_TARGETS_URL,
 )
-from .client import ProbelyAPIClient
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +45,7 @@ def retrieve_target(target_id: str) -> dict:
 def delete_target(target_id: str) -> str:
     url = PROBELY_API_TARGETS_DELETE_URL.format(id=target_id)
 
-    resp_status_code, resp_content = ProbelyAPIClient().delete(url=url)
+    resp_status_code, resp_content = ProbelyAPIClient.delete(url=url)
 
     if resp_status_code == 404:
         raise ProbelyObjectNotFound(id=target_id)
@@ -160,7 +159,7 @@ def add_target(
 
     merge(body_data, arguments_settings, strategy=Strategy.REPLACE)
 
-    resp_status_code, resp_content = ProbelyAPIClient().post(
+    resp_status_code, resp_content = ProbelyAPIClient.post(
         url=create_target_url, query_params=query_params, payload=body_data
     )
 
@@ -177,7 +176,7 @@ def add_target(
 def update_target(target_id: str, payload: dict) -> dict:
     url = PROBELY_API_TARGETS_RETRIEVE_URL.format(id=target_id)
 
-    resp_status_code, resp_content = ProbelyAPIClient.patch(url, payload)
+    resp_status_code, resp_content = ProbelyAPIClient.patch(url, payload=payload)
 
     if resp_status_code != 200:
         if resp_status_code == 400:
@@ -195,7 +194,7 @@ def update_targets(target_ids: List[str], payload: dict) -> List[Dict]:
     url = PROBELY_API_TARGETS_BULK_UPDATE_URL
     update_payload = {"ids": target_ids, **payload}
 
-    resp_status_code, resp_content = ProbelyAPIClient.post(url, update_payload)
+    resp_status_code, resp_content = ProbelyAPIClient.post(url, payload=update_payload)
 
     if resp_status_code != 200:
         if resp_status_code == 400:

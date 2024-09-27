@@ -379,7 +379,7 @@ def test_update_target__successful_api_call(api_client_mock: Mock):
     result = update_target(target_id, payload)
 
     assert result == expected_response_content
-    api_client_mock.assert_called_with(expected_endpoint_url, payload)
+    api_client_mock.assert_called_with(expected_endpoint_url, payload=payload)
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.patch")
@@ -434,7 +434,7 @@ def test_update_targets__successful_api_call(
     result = update_targets(target_ids, payload)
 
     api_client_mock.assert_called_with(
-        PROBELY_API_TARGETS_BULK_UPDATE_URL, expected_payload_on_api_call
+        PROBELY_API_TARGETS_BULK_UPDATE_URL, payload=expected_payload_on_api_call
     )
 
     # Ensure that Targets are retrieved after update, to get the updated data

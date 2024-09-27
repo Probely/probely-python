@@ -10,7 +10,7 @@ from probely_cli.exceptions import (
 from probely_cli.sdk.client import ProbelyAPIClient
 from probely_cli.sdk.helpers import validate_resource_ids
 from probely_cli.settings import (
-    PROBELY_API_BULK_START_SCANS_URL,
+    PROBELY_API_SCANS_BULK_START_URL,
     PROBELY_API_PAGE_SIZE,
     PROBELY_API_SCAN_CANCEL_URL,
     PROBELY_API_SCAN_PAUSE_URL,
@@ -19,7 +19,7 @@ from probely_cli.settings import (
     PROBELY_API_SCANS_BULK_PAUSE_URL,
     PROBELY_API_SCANS_BULK_RESUME_URL,
     PROBELY_API_SCANS_URL,
-    PROBELY_API_START_SCAN_URL,
+    PROBELY_API_TARGETS_START_SCAN_URL,
     PROBELY_API_TARGETS_URL,
 )
 
@@ -27,10 +27,10 @@ logger = logging.getLogger(__name__)
 
 
 def start_scan(target_id: str, extra_payload: dict = None) -> dict:
-    scan_target_url = PROBELY_API_START_SCAN_URL.format(target_id=target_id)
+    scan_target_url = PROBELY_API_TARGETS_START_SCAN_URL.format(target_id=target_id)
 
     resp_status_code, resp_content = ProbelyAPIClient.post(
-        scan_target_url, extra_payload
+        scan_target_url, payload=extra_payload
     )
 
     if resp_status_code != 200:
@@ -47,7 +47,7 @@ def start_scan(target_id: str, extra_payload: dict = None) -> dict:
 def start_scans(target_ids: List[str], extra_payload: dict = None) -> List[dict]:
     validate_resource_ids(PROBELY_API_TARGETS_URL, target_ids)
 
-    url = PROBELY_API_BULK_START_SCANS_URL
+    url = PROBELY_API_SCANS_BULK_START_URL
     extra_payload = extra_payload or {}
 
     payload = {
@@ -55,11 +55,12 @@ def start_scans(target_ids: List[str], extra_payload: dict = None) -> List[dict]
         **extra_payload,
     }
 
-    resp_status_code, resp_content = ProbelyAPIClient.post(url, payload)
+    resp_status_code, resp_content = ProbelyAPIClient.post(url, payload=payload)
+
+    if resp_status_code == 400:
+        raise ProbelyBadRequest(resp_content)
 
     if resp_status_code != 200:
-        if resp_status_code == 400:
-            raise ProbelyBadRequest(resp_content)
         raise ProbelyRequestFailed(resp_content)
 
     scans = resp_content
@@ -72,8 +73,10 @@ def cancel_scans(scan_ids: List[str]) -> List[dict]:
     for scan_id in scan_ids:
         retrieve_scan(scan_id)
 
+    payload = {"scans": [{"id": scan_id} for scan_id in scan_ids]}
+
     resp_status_code, resp_content = ProbelyAPIClient.post(
-        scan_cancel_url, {"scans": [{"id": scan_id} for scan_id in scan_ids]}
+        scan_cancel_url, payload=payload
     )
 
     if resp_status_code != 200:
@@ -88,7 +91,6 @@ def cancel_scans(scan_ids: List[str]) -> List[dict]:
 
 
 def cancel_scan(scan_id: str) -> dict:
-
     scan = retrieve_scan(scan_id)
     target = scan.get("target", {})
 
@@ -96,16 +98,18 @@ def cancel_scan(scan_id: str) -> dict:
         target_id=target.get("id"), scan_id=scan_id
     )
 
-    resp_status_code, resp_content = ProbelyAPIClient().post(
-        scan_cancel_url,
-        {
-            "target_options": {
-                "site": target.get("site"),
-                "scanning_agent": target.get("scanning_agent"),
-            },
-            "has_sequence_navigation": scan.get("has_sequence_navigation"),
-            "user_data": scan.get("user_data"),
+    payload = {
+        "target_options": {
+            "site": target.get("site"),
+            "scanning_agent": target.get("scanning_agent"),
         },
+        "has_sequence_navigation": scan.get("has_sequence_navigation"),
+        "user_data": scan.get("user_data"),
+    }
+
+    resp_status_code, resp_content = ProbelyAPIClient.post(
+        scan_cancel_url,
+        payload=payload,
     )
 
     if resp_status_code != 200:
@@ -122,16 +126,18 @@ def pause_scan(scan_id: str) -> dict:
         target_id=target.get("id"), scan_id=scan_id
     )
 
+    payload = {
+        "target_options": {
+            "site": target.get("site"),
+            "scanning_agent": target.get("scanning_agent"),
+        },
+        "has_sequence_navigation": scan.get("has_sequence_navigation"),
+        "user_data": scan.get("user_data"),
+    }
+
     resp_status_code, resp_content = ProbelyAPIClient.post(
         scan_pause_url,
-        {
-            "target_options": {
-                "site": target.get("site"),
-                "scanning_agent": target.get("scanning_agent"),
-            },
-            "has_sequence_navigation": scan.get("has_sequence_navigation"),
-            "user_data": scan.get("user_data"),
-        },
+        payload=payload,
     )
 
     if resp_status_code != 200:
@@ -146,8 +152,11 @@ def pause_scans(scan_ids: List[str]) -> List[dict]:
     for scan_id in scan_ids:
         scan = retrieve_scan(scan_id)
 
+    payload = {"scans": [{"id": scan_id} for scan_id in scan_ids]}
+
     resp_status_code, resp_content = ProbelyAPIClient.post(
-        scan_pause_url, {"scans": [{"id": scan_id} for scan_id in scan_ids]}
+        scan_pause_url,
+        payload=payload,
     )
 
     if resp_status_code != 200:
@@ -169,16 +178,18 @@ def resume_scan(scan_id: str) -> dict:
         target_id=target.get("id"), scan_id=scan_id
     )
 
-    resp_status_code, resp_content = ProbelyAPIClient().post(
-        scan_resume_url,
-        {
-            "target_options": {
-                "site": target.get("site"),
-                "scanning_agent": target.get("scanning_agent"),
-            },
-            "has_sequence_navigation": scan.get("has_sequence_navigation"),
-            "user_data": scan.get("user_data"),
+    payload = {
+        "target_options": {
+            "site": target.get("site"),
+            "scanning_agent": target.get("scanning_agent"),
         },
+        "has_sequence_navigation": scan.get("has_sequence_navigation"),
+        "user_data": scan.get("user_data"),
+    }
+
+    resp_status_code, resp_content = ProbelyAPIClient.post(
+        scan_resume_url,
+        payload=payload,
     )
 
     if resp_status_code != 200:
@@ -198,7 +209,9 @@ def resume_scans(scan_ids: List[str], ignore_blackout_period=False) -> List[Dict
         "overrides": {"ignore_blackout_period": ignore_blackout_period},
     }
 
-    resp_status_code, resp_content = ProbelyAPIClient.post(scan_resume_url, payload)
+    resp_status_code, resp_content = ProbelyAPIClient.post(
+        scan_resume_url, payload=payload
+    )
 
     if resp_status_code != 200:
         raise ProbelyRequestFailed(resp_content, resp_status_code)

@@ -18,8 +18,8 @@ from probely_cli.sdk.scans import (
     start_scans,
 )
 from probely_cli.settings import (
-    PROBELY_API_BULK_START_SCANS_URL,
-    PROBELY_API_START_SCAN_URL,
+    PROBELY_API_SCANS_BULK_START_URL,
+    PROBELY_API_TARGETS_START_SCAN_URL,
 )
 
 
@@ -32,7 +32,9 @@ from probely_cli.settings import (
 )
 @patch("probely_cli.sdk.client.ProbelyAPIClient.post")
 def test_start_scan(
-    api_client_mock: Mock, valid_scans_start_api_response: Dict, payload
+    api_client_mock: Mock,
+    valid_scans_start_api_response: Dict,
+    payload,
 ):
     """
     Test that start_scan successfully starts a scan and returns the scan details,
@@ -40,14 +42,16 @@ def test_start_scan(
     """
     target_id = valid_scans_start_api_response["target"]["id"]
     expected_response = valid_scans_start_api_response
-    expected_endpoint_url = PROBELY_API_START_SCAN_URL.format(target_id=target_id)
+    expected_endpoint_url = PROBELY_API_TARGETS_START_SCAN_URL.format(
+        target_id=target_id
+    )
 
     api_client_mock.return_value = (200, expected_response)
 
-    result = start_scan(target_id, payload) if payload else start_scan(target_id)
+    result = start_scan(target_id, payload)
 
     assert result == expected_response
-    api_client_mock.assert_called_once_with(expected_endpoint_url, payload)
+    api_client_mock.assert_called_once_with(expected_endpoint_url, payload=payload)
 
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.post")
@@ -82,7 +86,7 @@ def test_start_scans__successful_api_call(
     valid_scans_start_api_response: Dict,
 ):
     validate_resource_ids_mock.return_value = None  # target IDs are valid
-    expected_endpoint_url = PROBELY_API_BULK_START_SCANS_URL
+    expected_endpoint_url = PROBELY_API_SCANS_BULK_START_URL
     payload = {"overrides": {"scan_profile": "lightning"}}
     target_ids = ["target_id1", "target_id2"]
     expected_payload_on_api_call = {
@@ -96,7 +100,7 @@ def test_start_scans__successful_api_call(
 
     assert result == expected_response
     api_client_mock.assert_called_once_with(
-        expected_endpoint_url, expected_payload_on_api_call
+        expected_endpoint_url, payload=expected_payload_on_api_call
     )
 
 
@@ -154,7 +158,9 @@ def test_cancel_scan(
     scan = cancel_scans([scan_id_to_cancel])
 
     mock_client.assert_called_once()
-    scans_to_cancel = mock_client.call_args[0][1]
+    _args, kwargs = mock_client.call_args
+
+    scans_to_cancel = kwargs["payload"]
 
     assert scans_to_cancel is not None
     assert scans_to_cancel["scans"][0]["id"] == scan_id_to_cancel
@@ -223,7 +229,9 @@ def test_resume_scan(
     scan = resume_scans([scan_id_to_resume])
 
     mock_client.assert_called_once()
-    scans_to_resume = mock_client.call_args[0][1]
+    _args, kwargs = mock_client.call_args
+
+    scans_to_resume = kwargs["payload"]
 
     assert scans_to_resume is not None
     assert scans_to_resume["scans"][0]["id"] == scan_id_to_resume
@@ -282,7 +290,9 @@ def test_pause_scans(
     scan = pause_scans([scan_id_to_pause])
 
     mock_client.assert_called_once()
-    scans_to_pause = mock_client.call_args[0][1]
+    _args, kwargs = mock_client.call_args
+
+    scans_to_pause = kwargs["payload"]
 
     assert scans_to_pause is not None
     assert scans_to_pause["scans"][0]["id"] == scan_id_to_pause

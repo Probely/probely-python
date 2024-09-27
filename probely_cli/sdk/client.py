@@ -63,8 +63,8 @@ class ProbelyAPIClient:
     _session_cache: Union[Session, None] = None
 
     @classmethod
-    def get(cls, url, query_params=None):
-        return cls._send_request("get", url, query_params=query_params)
+    def get(cls, url, query_params: dict = None, payload: dict = None):
+        return cls._send_request("get", url, query_params=query_params, payload=payload)
 
     @classmethod
     def post(cls, url, query_params: dict = None, payload: dict = None):
@@ -73,11 +73,16 @@ class ProbelyAPIClient:
         )
 
     @classmethod
-    def patch(cls, url, payload: dict = None):
-        return cls._send_request("patch", url, payload=payload)
+    def patch(cls, url, query_params: dict = None, payload: dict = None):
+        return cls._send_request(
+            "patch", url, query_params=query_params, payload=payload
+        )
 
-    def delete(self, url):
-        return self._send_request("delete", url)
+    @classmethod
+    def delete(cls, url, query_params: dict = None, payload: dict = None):
+        return cls._send_request(
+            "delete", url, query_params=query_params, payload=payload
+        )
 
     @classmethod
     def _send_request(
