@@ -12,7 +12,7 @@
 
 * Environment Variables
   ```
-  export PROBELY_API_BASE_URL=<your_api_key>
+  export PROBELY_API_KEY=<your_api_key>
   ```
 * Tool specific config (see below)
 
@@ -50,7 +50,7 @@
 * Follow CLI output good practices. Valid output to `stdout`, errors to `stderr`
 * Custom tooling, developers should be aware
     * `rich.console` is always available on the `args`
-    * `probely_cli` fixture (to test CLI OUTPUT)
+    * `probely_cli`  pytest fixture (to call CLI commands)
 * Error message should have the following structure: `{cmd}: error: {message}`,
   following the default implementation of argparse
     * eg: `probely targets get: error: filters and target ids are mutually exclusive.`
