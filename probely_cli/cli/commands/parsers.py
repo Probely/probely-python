@@ -89,15 +89,15 @@ def build_cli_parser():
     build_scans_parser(commands_parser, configs_parser, file_parser, output_parser)
     build_findings_parser(commands_parser, configs_parser, output_parser)
 
-    apply_parser = commands_parser.add_parser(
-        "apply",
-        parents=[configs_parser],
-        formatter_class=RichHelpFormatter,
-    )
-    apply_parser.add_argument("yaml_file")
-    apply_parser.set_defaults(
-        command_handler=apply_command_handler,
-        parser=apply_parser,
-    )
+    # apply_parser = commands_parser.add_parser(
+    #     "apply",
+    #     parents=[configs_parser],
+    #     formatter_class=RichHelpFormatter,
+    # )
+    # apply_parser.add_argument("yaml_file")
+    # apply_parser.set_defaults(
+    #     command_handler=apply_command_handler,
+    #     parser=apply_parser,
+    # )
 
     return probely_parser
