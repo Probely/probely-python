@@ -1,4 +1,32 @@
+from .exceptions import (
+    ProbelyApiUnavailable,
+    ProbelyException,
+    ProbelyMissConfig,
+    ProbelyObjectNotFound,
+    ProbelyRequestFailed,
+)
 from .sdk.client import Probely
+from .sdk.enums import (
+    FindingSeverityEnum,
+    FindingStateEnum,
+    ScanStatusEnum,
+    TargetRiskEnum,
+    TargetTypeEnum,
+)
+from .sdk.findings import list_findings, retrieve_finding, retrieve_findings
+from .sdk.scans import (
+    cancel_scan,
+    cancel_scans,
+    list_scans,
+    pause_scan,
+    pause_scans,
+    resume_scan,
+    resume_scans,
+    retrieve_scan,
+    retrieve_scans,
+    start_scan,
+    start_scans,
+)
 from .sdk.targets import (
     add_target,
     delete_target,
@@ -9,7 +37,6 @@ from .sdk.targets import (
     update_target,
     update_targets,
 )
-from .version import __version__
 
 __all__ = [
     "Probely",
@@ -21,4 +48,29 @@ __all__ = [
     "delete_targets",
     "update_target",
     "update_targets",
+    "list_scans",
+    "retrieve_scan",
+    "retrieve_scans",
+    "start_scan",
+    "start_scans",
+    "cancel_scan",
+    "cancel_scans",
+    "resume_scan",
+    "resume_scans",
+    "pause_scan",
+    "pause_scans",
+    "list_findings",
+    "retrieve_finding",
+    "retrieve_findings",
+    "ProbelyException",
+    "ProbelyObjectNotFound",
+    "ProbelyMissConfig",
+    "ProbelyApiUnavailable",
+    "ProbelyRequestFailed",
+    "TargetRiskEnum",
+    "TargetTypeEnum",
+    "TargetAPISchemaTypeEnum",
+    "FindingSeverityEnum",
+    "FindingStateEnum",
+    "ScanStatusEnum",
 ]

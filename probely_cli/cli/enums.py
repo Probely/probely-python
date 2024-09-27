@@ -1,4 +1,5 @@
 from enum import Enum
+
 from probely_cli.sdk.enums import ProbelyCLIEnum
 
 

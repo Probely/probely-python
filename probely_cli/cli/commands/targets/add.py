@@ -9,7 +9,7 @@ import yaml
 from probely_cli.cli.common import validate_and_retrieve_yaml_content
 from probely_cli.cli.enums import OutputEnum
 from probely_cli.exceptions import ProbelyCLIValidation
-from probely_cli.sdk.enums import APISchemaTypeEnum, TargetTypeEnum
+from probely_cli.sdk.enums import TargetAPISchemaTypeEnum, TargetTypeEnum
 from probely_cli.sdk.targets import add_target
 
 logger = logging.getLogger(__name__)
@@ -76,7 +76,7 @@ def get_target_type(args, file_input):
 
 def get_api_schema_type(args, file_input):
     if args.api_schema_type:
-        return APISchemaTypeEnum[args.api_schema_type]
+        return TargetAPISchemaTypeEnum[args.api_schema_type]
 
     api_schema_type_from_file: Optional[str] = (
         file_input.get("site", {})
@@ -86,7 +86,7 @@ def get_api_schema_type(args, file_input):
 
     if api_schema_type_from_file:
         try:
-            return APISchemaTypeEnum.get_by_api_response_value(
+            return TargetAPISchemaTypeEnum.get_by_api_response_value(
                 api_schema_type_from_file
             )
         except ValueError:

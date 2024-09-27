@@ -11,8 +11,9 @@ from probely_cli.cli.commands.targets.schemas import TargetApiFiltersSchema
 from probely_cli.cli.enums import OutputEnum
 from probely_cli.cli.renderers import (
     get_printable_date,
+    get_printable_enum_value,
+    get_printable_labels,
 )
-from probely_cli.cli.renderers import get_printable_enum_value, get_printable_labels
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.enums import TargetRiskEnum
 from probely_cli.sdk.targets import list_targets, retrieve_targets

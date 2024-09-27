@@ -88,18 +88,28 @@ IS_DEBUG_MODE = _get_probely_debug()
 
 CLI_ACCEPTED_FILE_EXTENSIONS = [".yaml", ".yml"]
 
-PROBELY_API_URL_BASE = os.getenv(
-    "PROBELY_API_URL_BASE",
-    default="https://api.qa.probely.dev/",
-)
 
-PROBELY_API_TARGETS_URL = PROBELY_API_URL_BASE + "targets/"
+def get_probely_api_base_url():
+    probely_api_url: str = os.getenv(
+        "PROBELY_API_BASE_URL",
+        default="https://api.probely.com/",
+    )
+
+    if probely_api_url and probely_api_url[-1] != "/":
+        probely_api_url = f"{probely_api_url}/"
+
+    return probely_api_url
+
+
+PROBELY_API_BASE_URL = get_probely_api_base_url()
+
+PROBELY_API_TARGETS_URL = PROBELY_API_BASE_URL + "targets/"
 PROBELY_API_TARGETS_RETRIEVE_URL = PROBELY_API_TARGETS_URL + "{id}/"
 PROBELY_API_TARGETS_DELETE_URL = PROBELY_API_TARGETS_URL + "{id}/"
 PROBELY_API_TARGETS_BULK_DELETE_URL = PROBELY_API_TARGETS_URL + "bulk/delete/"
 PROBELY_API_TARGETS_BULK_UPDATE_URL = PROBELY_API_TARGETS_URL + "bulk/update/"
 
-PROBELY_API_SCANS_URL = PROBELY_API_URL_BASE + "scans/"
+PROBELY_API_SCANS_URL = PROBELY_API_BASE_URL + "scans/"
 PROBELY_API_START_SCAN_URL = PROBELY_API_TARGETS_URL + "{target_id}/scan_now/"
 PROBELY_API_SCANS_BULK_CANCEL_URL = PROBELY_API_SCANS_URL + "bulk/cancel/"
 PROBELY_API_SCANS_BULK_RESUME_URL = PROBELY_API_SCANS_URL + "bulk/resume/"
@@ -115,7 +125,7 @@ PROBELY_API_SCAN_RESUME_URL = (
     PROBELY_API_TARGETS_URL + "{target_id}/scans/{scan_id}/resume/"
 )
 
-PROBELY_API_FINDINGS_URL = PROBELY_API_URL_BASE + "findings/"
+PROBELY_API_FINDINGS_URL = PROBELY_API_BASE_URL + "findings/"
 PROBELY_API_FINDINGS_RETRIEVE_URL = PROBELY_API_FINDINGS_URL + "{id}/"
 
 PROBELY_API_PAGE_SIZE = 50

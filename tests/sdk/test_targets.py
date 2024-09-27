@@ -8,7 +8,7 @@ from probely_cli.exceptions import (
     ProbelyObjectNotFound,
     ProbelyRequestFailed,
 )
-from probely_cli.sdk.enums import APISchemaTypeEnum, TargetTypeEnum
+from probely_cli.sdk.enums import TargetAPISchemaTypeEnum, TargetTypeEnum
 from probely_cli.sdk.targets import (
     add_target,
     delete_target,
@@ -276,7 +276,7 @@ def test_add_target__arguments_are_api_call_arguments(
     target_name = "name_overwrite"
     target_type = TargetTypeEnum.API
     api_schema_file_url = "https://api_schema_file_url_overwrite.com/sh.yaml"
-    api_schema_type = APISchemaTypeEnum.OPENAPI
+    api_schema_type = TargetAPISchemaTypeEnum.OPENAPI
 
     other_api_properties = {"random_api_property": "random_value"}
 
@@ -331,7 +331,7 @@ def test_add_target__api_call_with_payload_overrides(
     target_url_overwrite = "https://www.name_overwrite.com"
     target_name_overwrite = "name_overwrite"
     target_type_overwrite = TargetTypeEnum.API
-    api_schema_type_overwrite = APISchemaTypeEnum.OPENAPI
+    api_schema_type_overwrite = TargetAPISchemaTypeEnum.OPENAPI
     api_schema_file_url_overwrite = "https://api_schema_file_url_overwrite.com/sh.yaml"
 
     expected_payload = deepcopy(valid_file_input)

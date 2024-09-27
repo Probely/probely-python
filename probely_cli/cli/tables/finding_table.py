@@ -2,8 +2,9 @@ from rich.table import Table
 
 from probely_cli.cli.renderers import (
     get_printable_date,
+    get_printable_enum_value,
+    get_printable_labels,
 )
-from probely_cli.cli.renderers import get_printable_enum_value, get_printable_labels
 from probely_cli.cli.tables.base_table import BaseOutputTable
 from probely_cli.sdk.enums import FindingSeverityEnum
 

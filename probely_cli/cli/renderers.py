@@ -1,18 +1,15 @@
 import json
 import sys
 import textwrap
-from typing import Dict, Generator, List, Optional, Type
+from typing import Dict, Generator, List, Optional, Type, Union
 
-from dateutil import parser
 import yaml
+from dateutil import parser
 from rich.console import Console
 from rich.live import Live
 
 from probely_cli.cli.enums import EntityTypeEnum, OutputEnum
 from probely_cli.sdk.enums import ProbelyCLIEnum
-
-from typing import Union
-
 
 UNKNOWN_VALUE_REP = "UNKNOWN"
 
@@ -57,9 +54,9 @@ class OutputRenderer:
             self.console.print(yaml.dump([record], indent=2, width=sys.maxsize))
 
     def _render_table(self) -> None:
-        from probely_cli.cli.tables.table_factory import (
+        from probely_cli.cli.tables.table_factory import (  # Avoid circular import
             TableFactory,
-        )  # Avoid circular import
+        )
 
         table_cls = TableFactory.get_table_class(self.entity_type)
         table = table_cls().create_table(show_header=True)

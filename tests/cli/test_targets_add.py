@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 
-from probely_cli.sdk.enums import APISchemaTypeEnum, TargetTypeEnum
+from probely_cli.sdk.enums import TargetAPISchemaTypeEnum, TargetTypeEnum
 
 
 @pytest.fixture
@@ -112,7 +112,7 @@ def test_targets_add__api_target_argument_validation(
                 "site": {
                     "url": "https://example.com",
                     "api_scan_settings": {
-                        "api_schema_type": APISchemaTypeEnum.OPENAPI.api_request_value,
+                        "api_schema_type": TargetAPISchemaTypeEnum.OPENAPI.api_request_value,
                     },
                 },
             },
@@ -165,7 +165,7 @@ def _valid_yaml_file_content() -> dict:
             "name": "testable_target_name_from_file",
             "url": "https://testable_url_from_file.com",
             "api_scan_settings": {
-                "api_schema_type": APISchemaTypeEnum.POSTMAN.api_request_value,
+                "api_schema_type": TargetAPISchemaTypeEnum.POSTMAN.api_request_value,
                 "api_schema_url": "https://target_from_file.com/api_schema.json",
                 "other_api_schema_property": "control_value",
             },
@@ -209,7 +209,7 @@ def test_targets_add__arguments_extracted_from_file_content(
         "api_schema_file_url": _valid_yaml_file_content["site"]["api_scan_settings"][
             "api_schema_url"
         ],
-        "api_schema_type": APISchemaTypeEnum.get_by_api_response_value(
+        "api_schema_type": TargetAPISchemaTypeEnum.get_by_api_response_value(
             _valid_yaml_file_content["site"]["api_scan_settings"]["api_schema_type"]
         ),
         "extra_payload": _valid_yaml_file_content,
@@ -263,7 +263,7 @@ def test_targets_add__command_arguments_override_file_content(
         "target_url": expected_url,
         "target_name": expected_target_name,
         "target_type": TargetTypeEnum[expected_target_type],
-        "api_schema_type": APISchemaTypeEnum[expected_api_schema_type],
+        "api_schema_type": TargetAPISchemaTypeEnum[expected_api_schema_type],
         "api_schema_file_url": expected_api_schema_url,
         "extra_payload": _valid_yaml_file_content,
     }

@@ -8,7 +8,11 @@ from probely_cli.cli.commands.targets.get import targets_get_command_handler
 from probely_cli.cli.commands.targets.start_scan import start_scans_command_handler
 from probely_cli.cli.commands.targets.update import update_targets_command_handler
 from probely_cli.cli.common import show_help
-from probely_cli.sdk.enums import APISchemaTypeEnum, TargetRiskEnum, TargetTypeEnum
+from probely_cli.sdk.enums import (
+    TargetAPISchemaTypeEnum,
+    TargetRiskEnum,
+    TargetTypeEnum,
+)
 from probely_cli.settings import FALSY_VALUES, TRUTHY_VALUES
 
 
@@ -134,7 +138,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
     targets_add_parser.add_argument(
         "--api-schema-type",
         type=str.upper,
-        choices=APISchemaTypeEnum.cli_input_choices(),
+        choices=TargetAPISchemaTypeEnum.cli_input_choices(),
         help="Type of schema for API Targets",
     )
     targets_add_parser.add_argument(

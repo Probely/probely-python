@@ -1,6 +1,6 @@
 import json
 from typing import Dict
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 
 import yaml
 

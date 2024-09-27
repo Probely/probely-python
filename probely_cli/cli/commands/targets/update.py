@@ -9,11 +9,7 @@ from probely_cli.cli.commands.targets.get import target_filters_handler
 from probely_cli.cli.common import validate_and_retrieve_yaml_content
 from probely_cli.cli.enums import OutputEnum
 from probely_cli.exceptions import ProbelyCLIValidation
-from probely_cli.sdk.targets import (
-    update_targets,
-    list_targets,
-    update_target,
-)
+from probely_cli.sdk.targets import list_targets, update_target, update_targets
 
 logger = logging.getLogger(__name__)
 

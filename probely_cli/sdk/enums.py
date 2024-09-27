@@ -53,6 +53,11 @@ class TargetTypeEnum(ProbelyCLIEnum):
     API = "api"
 
 
+class TargetAPISchemaTypeEnum(ProbelyCLIEnum):
+    OPENAPI = "openapi"
+    POSTMAN = "postman"
+
+
 class FindingSeverityEnum(ProbelyCLIEnum):
     LOW = (TargetRiskEnum.LOW.value, TargetRiskEnum.LOW.api_filter_value)
     MEDIUM = (TargetRiskEnum.MEDIUM.value, TargetRiskEnum.MEDIUM.api_filter_value)
@@ -64,11 +69,6 @@ class FindingStateEnum(ProbelyCLIEnum):
     NOT_FIXED = "notfixed"
     ACCEPTED = "accepted"
     RETESTING = "retesting"
-
-
-class APISchemaTypeEnum(ProbelyCLIEnum):
-    OPENAPI = "openapi"
-    POSTMAN = "postman"
 
 
 class ScanStatusEnum(ProbelyCLIEnum):

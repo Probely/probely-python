@@ -1,12 +1,10 @@
 import json
 from typing import List
 
-from probely_cli import Probely, list_targets
-from probely_cli.exceptions import ProbelyException
+from probely_cli import Probely, ProbelyException, list_targets
 
 if __name__ == "__main__":
 
-    # You can config programmatically
     Probely.init(api_key="your_api_key")
 
     try:

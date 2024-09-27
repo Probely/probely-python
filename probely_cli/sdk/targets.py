@@ -8,7 +8,7 @@ from probely_cli.exceptions import (
     ProbelyObjectNotFound,
     ProbelyRequestFailed,
 )
-from probely_cli.sdk.enums import APISchemaTypeEnum, TargetTypeEnum
+from probely_cli.sdk.enums import TargetAPISchemaTypeEnum, TargetTypeEnum
 from probely_cli.sdk.helpers import validate_resource_ids
 
 from ..settings import (
@@ -108,7 +108,7 @@ def add_target(
     target_name: Union[str, None] = None,
     target_type: TargetTypeEnum = TargetTypeEnum.WEB,
     api_schema_file_url: Union[str, None] = None,
-    api_schema_type: Union[APISchemaTypeEnum, None] = None,
+    api_schema_type: Union[TargetAPISchemaTypeEnum, None] = None,
     extra_payload: Union[dict, None] = None,
 ) -> Dict:
     """Creates new target
