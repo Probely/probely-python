@@ -1,4 +1,5 @@
-from probely_cli.cli.commands.targets.get import target_filters_handler
+from probely_cli.cli.commands.targets.schemas import TargetApiFiltersSchema
+from probely_cli.cli.common import prepare_filters_for_api
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.targets import delete_target, delete_targets, list_targets
 
@@ -7,7 +8,7 @@ def targets_delete_command_handler(args):
     """
     Delete targets
     """
-    filters = target_filters_handler(args)
+    filters = prepare_filters_for_api(TargetApiFiltersSchema, args)
     targets_ids = args.target_ids
 
     if not filters and not targets_ids:
@@ -17,11 +18,15 @@ def targets_delete_command_handler(args):
         raise ProbelyCLIValidation("filters and Target IDs are mutually exclusive.")
 
     if filters:
-        searched_targets = list_targets(targets_filters=filters)
-        if not searched_targets:
+        generator = list_targets(targets_filters=filters)
+        first_target = next(generator, None)
+
+        if not first_target:
             raise ProbelyCLIValidation("Selected Filters returned no results")
 
-        targets_ids = [target.get("id") for target in searched_targets]
+        targets_ids = [first_target.get("id")] + [
+            target.get("id") for target in generator
+        ]
 
     if len(targets_ids) == 1:
         target_id = delete_target(targets_ids[0])

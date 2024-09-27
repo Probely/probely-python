@@ -161,7 +161,7 @@ def test_targets_start_scan__with_filters(
     probely_cli,
     filtered_targets,
 ):
-    list_targets_mock.return_value = filtered_targets
+    list_targets_mock.return_value = iter(filtered_targets)
 
     _, stderr = probely_cli(
         "targets",
@@ -195,7 +195,7 @@ def test_targets_start_scan__filters_with_no_results(
     probely_cli,
 ):
 
-    sdk_list_targets_mock.return_value = []
+    sdk_list_targets_mock.return_value = iter([])
 
     stdout_lines, stderr_lines = probely_cli(
         "targets",

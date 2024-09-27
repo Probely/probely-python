@@ -5,8 +5,11 @@ from typing import Dict, List
 
 import yaml
 
-from probely_cli.cli.commands.targets.get import target_filters_handler
-from probely_cli.cli.common import validate_and_retrieve_yaml_content
+from probely_cli.cli.commands.targets.schemas import TargetApiFiltersSchema
+from probely_cli.cli.common import (
+    prepare_filters_for_api,
+    validate_and_retrieve_yaml_content,
+)
 from probely_cli.cli.enums import OutputEnum
 from probely_cli.exceptions import ProbelyCLIValidation
 from probely_cli.sdk.targets import list_targets, update_target, update_targets
@@ -45,7 +48,7 @@ def update_targets_command_handler(args):
         )
     payload = validate_and_retrieve_yaml_content(yaml_file_path)
 
-    filters = target_filters_handler(args)
+    filters = prepare_filters_for_api(TargetApiFiltersSchema, args)
     targets_ids = args.target_ids
 
     if not filters and not targets_ids:
@@ -65,16 +68,16 @@ def update_targets_command_handler(args):
         return
 
     # Fetch all Targets that match the filters and update them
-    targets_for_update = list_targets(targets_filters=filters)
-    searched_targets_ids = [target["id"] for target in targets_for_update]
+    generator = list_targets(targets_filters=filters)
+    first_target = next(generator, None)
 
-    if not searched_targets_ids:  # TODO test
+    if not first_target:
         raise ProbelyCLIValidation("Selected Filters returned no results")
 
-    target_ids = searched_targets_ids
+    targets_ids = [first_target["id"]] + [target["id"] for target in generator]
 
-    if len(target_ids) == 1:
-        updated_targets = [update_target(target_ids[0], payload)]
+    if len(targets_ids) == 1:
+        updated_targets = [update_target(targets_ids[0], payload)]
     else:
-        updated_targets = update_targets(target_ids, payload)
+        updated_targets = update_targets(targets_ids, payload)
     display_cmd_output(args, updated_targets)

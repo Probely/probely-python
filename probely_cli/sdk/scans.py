@@ -1,5 +1,10 @@
 import logging
-from typing import Dict, Generator, List
+from typing import (
+    Dict,
+    Generator,
+    List,
+    Optional,
+)
 from urllib.parse import urljoin
 
 from probely_cli.exceptions import (
@@ -44,7 +49,7 @@ def start_scan(target_id: str, extra_payload: dict = None) -> dict:
     return scan
 
 
-def start_scans(target_ids: List[str], extra_payload: dict = None) -> List[dict]:
+def start_scans(target_ids: List[str], extra_payload: Dict = None) -> List[Dict]:
     validate_resource_ids(PROBELY_API_TARGETS_URL, target_ids)
 
     url = PROBELY_API_SCANS_BULK_START_URL
@@ -67,7 +72,7 @@ def start_scans(target_ids: List[str], extra_payload: dict = None) -> List[dict]
     return scans
 
 
-def cancel_scans(scan_ids: List[str]) -> List[dict]:
+def cancel_scans(scan_ids: List[str]) -> List[Dict]:
     scan_cancel_url = PROBELY_API_SCANS_BULK_CANCEL_URL
 
     for scan_id in scan_ids:
@@ -118,7 +123,7 @@ def cancel_scan(scan_id: str) -> dict:
     return resp_content
 
 
-def pause_scan(scan_id: str) -> dict:
+def pause_scan(scan_id: str) -> Dict:
     scan = retrieve_scan(scan_id)
     target = scan.get("target", {})
 
@@ -146,7 +151,7 @@ def pause_scan(scan_id: str) -> dict:
     return resp_content
 
 
-def pause_scans(scan_ids: List[str]) -> List[dict]:
+def pause_scans(scan_ids: List[str]) -> List[Dict]:
     scan_pause_url = PROBELY_API_SCANS_BULK_PAUSE_URL
 
     for scan_id in scan_ids:
@@ -170,7 +175,7 @@ def pause_scans(scan_ids: List[str]) -> List[dict]:
     return scans
 
 
-def resume_scan(scan_id: str) -> dict:
+def resume_scan(scan_id: str) -> Dict:
     scan = retrieve_scan(scan_id)
     target = scan.get("target", {})
 
@@ -224,7 +229,7 @@ def resume_scans(scan_ids: List[str], ignore_blackout_period=False) -> List[Dict
     return scans
 
 
-def retrieve_scan(scan_id: str) -> dict:
+def retrieve_scan(scan_id: str) -> Dict:
     url = urljoin(PROBELY_API_SCANS_URL, scan_id)
 
     resp_status_code, resp_content = ProbelyAPIClient.get(url)
@@ -240,7 +245,7 @@ def retrieve_scans(scan_ids: List[str]) -> List[Dict]:
     return [retrieve_scan(scan_id) for scan_id in scan_ids]
 
 
-def list_scans(scans_filters: Dict = None) -> Generator[Dict, None, None]:
+def list_scans(scans_filters: Optional[Dict] = None) -> Generator[Dict, None, None]:
     filters = scans_filters or {}
     page = 1
 

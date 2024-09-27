@@ -1,8 +1,9 @@
 import logging
 
-from probely_cli.cli.commands.targets.get import target_filters_handler
+from probely_cli.cli.commands.targets.schemas import TargetApiFiltersSchema
 from probely_cli.cli.common import (
     display_scans_response_output,
+    prepare_filters_for_api,
     validate_and_retrieve_yaml_content,
 )
 from probely_cli.exceptions import ProbelyCLIValidation
@@ -25,7 +26,7 @@ def validate_and_retrieve_extra_payload(args):
 
 
 def start_scans_command_handler(args):
-    filters = target_filters_handler(args)
+    filters = prepare_filters_for_api(TargetApiFiltersSchema, args)
     targets_ids = args.target_ids
 
     if not filters and not targets_ids:
@@ -37,12 +38,13 @@ def start_scans_command_handler(args):
     extra_payload = validate_and_retrieve_extra_payload(args)
 
     if filters:
-        searched_targets = list_targets(targets_filters=filters)
+        generator = list_targets(targets_filters=filters)
+        first_target = next(generator, None)
 
-        if not searched_targets:
+        if not first_target:
             raise ProbelyCLIValidation("Selected Filters returned no results")
 
-        targets_ids = [target["id"] for target in searched_targets]
+        targets_ids = [first_target["id"]] + [target["id"] for target in generator]
 
     if len(targets_ids) == 1:
         scans = [start_scan(targets_ids[0], extra_payload)]

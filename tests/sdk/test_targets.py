@@ -31,11 +31,11 @@ from tests.testable_api_responses import RETRIEVE_TARGET_200_RESPONSE
 @patch("probely_cli.sdk.client.ProbelyAPIClient.get")
 def test_list_targets__ok(api_client_mock: Mock):
     expected_content = [{"list": "of objects1"}, {"list": "of objects2"}]
-    response_content = {"results": expected_content}
+    response_content = {"results": expected_content, "page_total": 1}
 
     api_client_mock.return_value = (200, response_content)
 
-    r = list_targets()
+    r = list(list_targets())
     assert r == expected_content
 
 
@@ -48,7 +48,7 @@ def test_list_targets__unsuccessful(api_client_mock: Mock):
     api_client_mock.return_value = (invalid_status_code, error_response_content)
 
     with pytest.raises(ProbelyRequestFailed) as exc:
-        list_targets()
+        list(list_targets())
 
         raised_exception = exc.value
         assert str(raised_exception) == error_message
@@ -56,14 +56,14 @@ def test_list_targets__unsuccessful(api_client_mock: Mock):
 
 @patch("probely_cli.sdk.client.ProbelyAPIClient.get")
 def test_list_targets__filters(api_client_mock: Mock):
-    resp_code = 200  # random
-    resp_content = {"results": "content"}  # random
+    resp_code = 200
+    resp_content = {"results": "random content", "page_total": 1}
 
     api_client_mock.return_value = (resp_code, resp_content)
 
     expected_filter_key = "filter1"
     filters = {expected_filter_key: "value1"}
-    list_targets(targets_filters=filters)
+    list(list_targets(targets_filters=filters))
 
     query_params_args = api_client_mock.call_args[1]["query_params"]
 

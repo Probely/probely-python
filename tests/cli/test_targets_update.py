@@ -169,7 +169,7 @@ def test_targets_update__with_filters(
 ):
     update_payload = {"name": "Updated name"}
     get_yaml_file_content_mock.return_value = update_payload
-    list_targets_mock.return_value = filtered_targets
+    list_targets_mock.return_value = iter(filtered_targets)
 
     _, stderr = probely_cli(
         "targets",
@@ -205,7 +205,7 @@ def test_targets_update__filters_with_no_results(
     probely_cli,
 ):
     get_yaml_file_content_mock.return_value = {"something": "something"}
-    sdk_list_targets_mock.return_value = []
+    sdk_list_targets_mock.return_value = iter([])
 
     stdout_lines, stderr_lines = probely_cli(
         "targets",

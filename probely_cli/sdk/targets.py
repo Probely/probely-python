@@ -1,5 +1,11 @@
 import logging
-from typing import Dict, List, Union
+from typing import (
+    Dict,
+    Generator,
+    List,
+    Optional,
+    Union,
+)
 
 from mergedeep import Strategy, merge
 
@@ -12,6 +18,7 @@ from probely_cli.sdk.enums import TargetAPISchemaTypeEnum, TargetTypeEnum
 from probely_cli.sdk.helpers import validate_resource_ids
 from .client import ProbelyAPIClient
 from ..settings import (
+    PROBELY_API_PAGE_SIZE,
     PROBELY_API_TARGETS_BULK_DELETE_URL,
     PROBELY_API_TARGETS_BULK_UPDATE_URL,
     PROBELY_API_TARGETS_DELETE_URL,
@@ -30,7 +37,7 @@ def retrieve_targets(targets_ids: List[str]) -> List[Dict]:
     return retrieved_targets
 
 
-def retrieve_target(target_id: str) -> dict:
+def retrieve_target(target_id: str) -> Dict:
     url = PROBELY_API_TARGETS_RETRIEVE_URL.format(id=target_id)
     resp_status_code, resp_content = ProbelyAPIClient.get(url)
     if resp_status_code == 404:
@@ -75,31 +82,36 @@ def delete_targets(targets_ids: List[str]):
     return resp_content
 
 
-def list_targets(targets_filters: dict = None) -> List[Dict]:
-    """Lists existing account's targets
-
-    :return: All Targets of account
-    :rtype: List[Dict]
-
-    """
+def list_targets(targets_filters: Optional[Dict] = None) -> Generator[Dict, None, None]:
     filters = targets_filters or {}
+    page = 1
 
-    query_params = {
-        "ordering": "-changed",
-        **filters,
-    }
+    while True:
+        query_params = {
+            "ordering": "-changed",
+            "length": PROBELY_API_PAGE_SIZE,
+            "page": page,
+            **filters,
+        }
 
-    # TODO: go through pagination?
-    # or maybe the option to return a generator for the sdk??
-    resp_status_code, resp_content = ProbelyAPIClient.get(
-        PROBELY_API_TARGETS_URL,
-        query_params=query_params,
-    )
+        resp_status_code, resp_content = ProbelyAPIClient.get(
+            PROBELY_API_TARGETS_URL,
+            query_params=query_params,
+        )
 
-    if resp_status_code != 200:  # TODO: needs testing
-        raise ProbelyRequestFailed(resp_content)
+        if resp_status_code != 200:
+            raise ProbelyRequestFailed(resp_content)
 
-    return resp_content["results"]
+        results = resp_content["results"]
+        total_pages_count = resp_content.get("page_total")
+
+        for result in results:
+            yield result
+
+        if page >= total_pages_count:
+            break
+
+        page += 1
 
 
 def add_target(
@@ -173,7 +185,7 @@ def add_target(
     return created_target
 
 
-def update_target(target_id: str, payload: dict) -> dict:
+def update_target(target_id: str, payload: Dict) -> Dict:
     url = PROBELY_API_TARGETS_RETRIEVE_URL.format(id=target_id)
 
     resp_status_code, resp_content = ProbelyAPIClient.patch(url, payload=payload)
@@ -188,7 +200,7 @@ def update_target(target_id: str, payload: dict) -> dict:
     return resp_content
 
 
-def update_targets(target_ids: List[str], payload: dict) -> List[Dict]:
+def update_targets(target_ids: List[str], payload: Dict) -> List[Dict]:
     validate_resource_ids(PROBELY_API_TARGETS_URL, target_ids)
 
     url = PROBELY_API_TARGETS_BULK_UPDATE_URL

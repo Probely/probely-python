@@ -1,3 +1,4 @@
+from typing import Dict
 from rich.table import Table
 
 from probely_cli.cli.renderers import (
@@ -25,7 +26,7 @@ class FindingTable(BaseOutputTable):
 
         return table
 
-    def add_row(self, table: Table, finding: dict) -> None:
+    def add_row(self, table: Table, finding: Dict) -> None:
         target = finding.get("target", {})
 
         table.add_row(

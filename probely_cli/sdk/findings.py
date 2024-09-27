@@ -1,4 +1,9 @@
-from typing import Dict, Generator, List
+from typing import (
+    Dict,
+    Generator,
+    List,
+    Optional,
+)
 
 from probely_cli.exceptions import ProbelyObjectNotFound, ProbelyRequestFailed
 from probely_cli.sdk.client import ProbelyAPIClient
@@ -9,7 +14,7 @@ from probely_cli.settings import (
 )
 
 
-def retrieve_finding(finding_id) -> dict:
+def retrieve_finding(finding_id) -> Dict:
     url = PROBELY_API_FINDINGS_RETRIEVE_URL.format(id=finding_id)
     resp_status_code, resp_content = ProbelyAPIClient.get(url)
 
@@ -26,7 +31,9 @@ def retrieve_findings(findings_ids: List[str]) -> List[Dict]:
     return [retrieve_finding(finding_id) for finding_id in findings_ids]
 
 
-def list_findings(findings_filters: Dict = None) -> Generator[Dict, None, None]:
+def list_findings(
+    findings_filters: Optional[Dict] = None,
+) -> Generator[Dict, None, None]:
     filters = findings_filters or {}
     page = 1
 

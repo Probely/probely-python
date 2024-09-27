@@ -1,7 +1,14 @@
 import json
 import sys
 import textwrap
-from typing import Dict, Generator, List, Optional, Type, Union
+from typing import (
+    Dict,
+    Generator,
+    List,
+    Optional,
+    Type,
+    Union,
+)
 
 import yaml
 from dateutil import parser
@@ -12,6 +19,7 @@ from probely_cli.cli.enums import EntityTypeEnum, OutputEnum
 from probely_cli.sdk.enums import ProbelyCLIEnum
 
 UNKNOWN_VALUE_REP = "UNKNOWN"
+TARGET_NEVER_SCANNED_OUTPUT = "Never_scanned"
 
 
 class OutputRenderer:
@@ -104,3 +112,14 @@ def get_printable_date(
         return default_string
 
     return ""
+
+
+def get_printable_last_scan_date(target: Dict) -> str:
+    last_scan_obj: Union[dict, None] = target.get("last_scan", None)
+
+    if last_scan_obj is None:
+        return TARGET_NEVER_SCANNED_OUTPUT
+
+    last_scan_start_date_str: Union[str, None] = last_scan_obj.get("started", None)
+
+    return get_printable_date(last_scan_start_date_str, TARGET_NEVER_SCANNED_OUTPUT)

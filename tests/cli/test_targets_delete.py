@@ -69,7 +69,7 @@ def test_targets_delete__filters_with_multiple_results(
 ):
     target_id1 = "target_id1"
     target_id2 = "target_id2"
-    list_targets_mock.return_value = [{"id": target_id1}, {"id": target_id2}]
+    list_targets_mock.return_value = iter([{"id": target_id1}, {"id": target_id2}])
 
     delete_targets_mock.return_value = {"ids": [target_id1, target_id2]}
 
@@ -100,7 +100,7 @@ def test_targets_delete__filters_with_single_result(
     probely_cli,
 ):
     target_id1 = "target_id1"
-    list_targets_mock.return_value = [{"id": target_id1}]
+    list_targets_mock.return_value = iter([{"id": target_id1}])
 
     delete_target_mock.return_value = target_id1
 
@@ -172,7 +172,7 @@ def test_targets_delete__delete_with_filters(
     target_id1 = "target_id1"
     target_id2 = "target_id2"
 
-    list_targets_mock.return_value = [{"id": target_id1}, {"id": target_id2}]
+    list_targets_mock.return_value = iter([{"id": target_id1}, {"id": target_id2}])
     delete_targets_mock.return_value = {"ids": [target_id1, target_id2]}
 
     stdout_lines, stderr_lines = probely_cli(
@@ -201,7 +201,7 @@ def test_targets_delete__filters_with_no_results(
     probely_cli,
 ):
 
-    sdk_list_targets_mock.return_value = []
+    sdk_list_targets_mock.return_value = iter([])
 
     stdout_lines, stderr_lines = probely_cli(
         "targets",
