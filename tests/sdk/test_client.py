@@ -7,9 +7,9 @@ import pytest
 import requests
 from requests import PreparedRequest
 
-from probely_cli import retrieve_target, settings
-from probely_cli.exceptions import ProbelyApiUnavailable, ProbelyMissConfig
-from probely_cli.sdk.client import Probely, ProbelyAPIClient
+from probely import retrieve_target, settings
+from probely.exceptions import ProbelyApiUnavailable, ProbelyMissConfig
+from probely.sdk.client import Probely, ProbelyAPIClient
 from tests.conftest import probely_cli
 
 
@@ -22,7 +22,7 @@ def api_calls_without_session_cache():
 
 @pytest.fixture
 def set_default_api_key():
-    with patch("probely_cli.sdk.client.settings.PROBELY_API_KEY", "random_key"):
+    with patch("probely.sdk.client.settings.PROBELY_API_KEY", "random_key"):
         yield
 
 
@@ -32,7 +32,7 @@ def test_probely_api_client__session_auth_api_key_from_settings(
     env_var_api_key: str = "test_probely_api_key"
 
     with patch(
-        "probely_cli.sdk.client.settings.PROBELY_API_KEY",
+        "probely.sdk.client.settings.PROBELY_API_KEY",
         new=env_var_api_key,
     ):
         session = ProbelyAPIClient._build_session()
@@ -73,7 +73,7 @@ def test_probely_api_client__session_auth_api_key_args_overwrites_settings(
     Probely.init(api_key=args_api_key)  # simulation of command with --api_key arg
 
     env_var_api_key: str = "test_probely_api_key"
-    with patch("probely_cli.sdk.client.settings.PROBELY_API_KEY", env_var_api_key):
+    with patch("probely.sdk.client.settings.PROBELY_API_KEY", env_var_api_key):
         session = ProbelyAPIClient._build_session()
 
     assert (
@@ -88,7 +88,7 @@ def test_probely_api_client__session_is_being_cached(api_calls_without_session_c
     assert id(session_first_run) == id(session_second_run)
 
 
-@patch("probely_cli.sdk.client.requests.Session.send")
+@patch("probely.sdk.client.requests.Session.send")
 def test_probely_api_client__cli_user_agent_is_added(
     requests_session_send_mock: MagicMock,
     api_calls_without_session_cache,
@@ -120,7 +120,7 @@ def test_probely_api_client__cli_user_agent_is_added(
     importlib.reload(settings)
 
 
-@patch("probely_cli.sdk.client.requests.Session.send")
+@patch("probely.sdk.client.requests.Session.send")
 def test_probely_api_client__sdk_user_agent_is_added(
     requests_session_send_mock: MagicMock,
     api_calls_without_session_cache,
@@ -157,7 +157,7 @@ def test_probely_api_client__sdk_user_agent_is_added(
     importlib.reload(settings)
 
 
-@patch("probely_cli.sdk.client.requests.Session.send")
+@patch("probely.sdk.client.requests.Session.send")
 def test_probely_api_client__correct_content_and_url_are_request(
     requests_session_send_mock: Mock,
     set_default_api_key,
@@ -183,7 +183,7 @@ def test_probely_api_client__correct_content_and_url_are_request(
     assert args.url == random_url
 
 
-@patch("probely_cli.sdk.client.requests.Session.send")
+@patch("probely.sdk.client.requests.Session.send")
 def test_probely_api_client__url_is_populated_with_query_params(
     requests_session_send_mock: Mock,
     set_default_api_key,
@@ -207,7 +207,7 @@ def test_probely_api_client__url_is_populated_with_query_params(
     assert args.url == random_url + "?" + expected_url_query_params
 
 
-@patch("probely_cli.sdk.client.requests.Session.send")
+@patch("probely.sdk.client.requests.Session.send")
 def test_probely_api_client__content_when_content_invalid(
     requests_session_send_mock: Mock,
     set_default_api_key,
@@ -222,7 +222,7 @@ def test_probely_api_client__content_when_content_invalid(
     assert str(raised_ex.value) == "API is unavailable. Contact support."
 
 
-@patch("probely_cli.sdk.client.requests.Session.send")
+@patch("probely.sdk.client.requests.Session.send")
 def test_probely_api_client__return_is_correct(
     requests_session_send_mock: Mock,
     set_default_api_key,
@@ -243,7 +243,7 @@ def test_probely_api_client__return_is_correct(
     assert returned_content == expected_content
 
 
-@patch("probely_cli.sdk.client.requests.Session.send")
+@patch("probely.sdk.client.requests.Session.send")
 def test_probely_api_client__filters_added_as_query_params(
     requests_session_send_mock: Mock,
     set_default_api_key,
@@ -289,7 +289,7 @@ def test_probely_instance__cant_be_instantiated():
     assert str(exc) == "Use Probely.init() to configure"
 
 
-@patch("probely_cli.sdk.client.settings.PROBELY_API_KEY", None)
+@patch("probely.sdk.client.settings.PROBELY_API_KEY", None)
 def test_probely_instance__no_api_key():
     Probely.reset_config()
     assert Probely._instance is None, "Test setup fail. Expected no config instance"
@@ -310,9 +310,7 @@ def test_probely_instance__config_from_settings():
 
     api_key_from_settings = "api_key_from_settings"
 
-    with patch(
-        "probely_cli.sdk.client.settings.PROBELY_API_KEY", api_key_from_settings
-    ):
+    with patch("probely.sdk.client.settings.PROBELY_API_KEY", api_key_from_settings):
         Probely.init()
 
     assert Probely.get_config()["api_key"] == api_key_from_settings
@@ -327,9 +325,7 @@ def test_probely_instance__config_from_instantiation():
     api_key_from_settings = "api_key_from_settings"
     api_key_from_instantiation = "api_key_from_instantiation"
 
-    with patch(
-        "probely_cli.sdk.client.settings.PROBELY_API_KEY", api_key_from_settings
-    ):
+    with patch("probely.sdk.client.settings.PROBELY_API_KEY", api_key_from_settings):
         Probely.init(api_key=api_key_from_instantiation)
 
     current_probely_config = Probely.get_config()
@@ -348,9 +344,7 @@ def test_probely_instance__reconfig_exiting_config():
     api_key_from_settings = "api_key_from_settings"
     api_key_from_init = "api_key_from_init"
 
-    with patch(
-        "probely_cli.sdk.client.settings.PROBELY_API_KEY", api_key_from_settings
-    ):
+    with patch("probely.sdk.client.settings.PROBELY_API_KEY", api_key_from_settings):
         current_probely_config: dict = Probely.get_config()
         assert (
             current_probely_config["api_key"] == api_key_from_settings

@@ -3,12 +3,12 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from probely_cli.exceptions import (
+from probely.exceptions import (
     ProbelyBadRequest,
     ProbelyObjectNotFound,
     ProbelyRequestFailed,
 )
-from probely_cli.sdk.scans import (
+from probely.sdk.scans import (
     cancel_scans,
     list_scans,
     pause_scan,
@@ -17,7 +17,7 @@ from probely_cli.sdk.scans import (
     start_scan,
     start_scans,
 )
-from probely_cli.settings import (
+from probely.settings import (
     PROBELY_API_SCANS_BULK_START_URL,
     PROBELY_API_TARGETS_START_SCAN_URL,
 )
@@ -30,7 +30,7 @@ from probely_cli.settings import (
         {"key": "value"},
     ],
 )
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
 def test_start_scan(
     api_client_mock: Mock,
     valid_scans_start_api_response: Dict,
@@ -54,7 +54,7 @@ def test_start_scan(
     api_client_mock.assert_called_once_with(expected_endpoint_url, payload=payload)
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
 def test_start_scan_failed(api_client_mock: Mock):
     # Ensure ProbelyBadRequest is raised if API returns status code 400
     api_validation_error = {"error": "A scan is already in progress for this target."}
@@ -78,8 +78,8 @@ def test_start_scan_failed(api_client_mock: Mock):
         assert exc_info.value.reason == api_error
 
 
-@patch("probely_cli.sdk.scans.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.validate_resource_ids")
+@patch("probely.sdk.scans.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.validate_resource_ids")
 def test_start_scans__successful_api_call(
     validate_resource_ids_mock: Mock,
     api_client_mock: Mock,
@@ -104,8 +104,8 @@ def test_start_scans__successful_api_call(
     )
 
 
-@patch("probely_cli.sdk.scans.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.validate_resource_ids")
+@patch("probely.sdk.scans.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.validate_resource_ids")
 def test_start_scans__unsuccessful_api_call(
     validate_resource_ids_mock: Mock, api_client_mock: Mock
 ):
@@ -140,8 +140,8 @@ def test_start_scans__unsuccessful_api_call(
         assert exc_info.value.reason == api_error
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.retrieve_scan")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.retrieve_scan")
 def test_cancel_scan(
     sdk_retrieve_scan_mock: Mock,
     mock_client: Mock,
@@ -167,8 +167,8 @@ def test_cancel_scan(
     assert scan == [response_content]
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.retrieve_scan")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.retrieve_scan")
 def test_cancel_scan_failed(
     sdk_retrieve_scan_mock: Mock, mock_client, valid_scans_cancel_api_response
 ):
@@ -186,7 +186,7 @@ def test_cancel_scan_failed(
     mock_client.assert_called_once()
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+@patch("probely.sdk.client.ProbelyAPIClient.get")
 def test_list_scans__ok(api_client_mock: Mock):
     expected_content = [{"id": "scan1"}, {"id": "scan2"}]
     response_content = {"results": expected_content, "page_total": 1}
@@ -197,7 +197,7 @@ def test_list_scans__ok(api_client_mock: Mock):
     assert r == expected_content
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+@patch("probely.sdk.client.ProbelyAPIClient.get")
 def test_list_scans__notok(api_client_mock: Mock):
     invalid_status_code = 400
     error_message = "request invalid"
@@ -211,8 +211,8 @@ def test_list_scans__notok(api_client_mock: Mock):
         assert str(raised_exception) == error_message
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.retrieve_scan")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.retrieve_scan")
 def test_resume_scan(
     sdk_retrieve_scan_mock: Mock,
     mock_client: Mock,
@@ -238,8 +238,8 @@ def test_resume_scan(
     assert scan == [response_content]
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.retrieve_scan")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.retrieve_scan")
 def test_resume_scan_failed(
     sdk_retrieve_scan_mock: Mock, mock_client, valid_scans_resume_api_response
 ):
@@ -255,8 +255,8 @@ def test_resume_scan_failed(
     mock_client.assert_called_once()
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.retrieve_scan")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.retrieve_scan")
 def test_resume_scan_failed_invalid_ids(
     sdk_retrieve_scan_mock: Mock, mock_client: Mock
 ):
@@ -272,8 +272,8 @@ def test_resume_scan_failed_invalid_ids(
     mock_client.assert_not_called()
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.retrieve_scan")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.retrieve_scan")
 def test_pause_scans(
     sdk_retrieve_scan_mock: Mock,
     mock_client: Mock,
@@ -299,8 +299,8 @@ def test_pause_scans(
     assert scan == [response_content]
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.retrieve_scan")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.retrieve_scan")
 def test_pause_scans_failed(
     sdk_retrieve_scan_mock: Mock, mock_client, valid_scans_pause_api_response
 ):
@@ -319,8 +319,8 @@ def test_pause_scans_failed(
     mock_client.assert_called_once()
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.retrieve_scan")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.retrieve_scan")
 def test_pause_scans_failed_invalid_ids(
     sdk_retrieve_scan_mock: Mock, mock_client: Mock
 ):
@@ -335,8 +335,8 @@ def test_pause_scans_failed_invalid_ids(
     mock_client.assert_not_called()
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.retrieve_scan")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.retrieve_scan")
 def test_pause_scan(
     sdk_retrieve_scan_mock: Mock,
     mock_client: Mock,
@@ -356,8 +356,8 @@ def test_pause_scan(
     assert scan == response_content
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.scans.retrieve_scan")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.scans.retrieve_scan")
 def test_pause_scans_failed(
     sdk_retrieve_scan_mock: Mock, mock_client, valid_scans_pause_api_response
 ):

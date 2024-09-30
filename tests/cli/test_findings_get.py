@@ -5,12 +5,12 @@ from unittest.mock import Mock, patch
 import pytest
 import yaml
 
-from probely_cli.sdk.enums import FindingSeverityEnum, FindingStateEnum
+from probely.sdk.enums import FindingSeverityEnum, FindingStateEnum
 from tests.testable_api_responses import RETRIEVE_FINDING_200_RESPONSE
 
 
 @pytest.mark.skip(reason="Skipping this test temporarily")
-@patch("probely_cli.cli.commands.findings.get.list_findings")
+@patch("probely.cli.commands.findings.get.list_findings")
 def test_findings_get__table_headers_output(
     sdk_list_findings_mock: Mock,
     probely_cli,
@@ -40,7 +40,7 @@ def test_findings_get__table_headers_output(
         ("2024-07-15T17:27:52.608557Z", "2024-07-15 17:27"),
     ],
 )
-@patch("probely_cli.cli.commands.findings.get.list_findings")
+@patch("probely.cli.commands.findings.get.list_findings")
 def test_findings_get__table_last_found_date_output(
     sdk_list_findings_mock: Mock,
     testing_value,
@@ -82,7 +82,7 @@ def test_findings_get__table_last_found_date_output(
         ("10", "UNKNOWN"),
     ],
 )
-@patch("probely_cli.cli.commands.findings.get.list_findings")
+@patch("probely.cli.commands.findings.get.list_findings")
 def test_findings_get__table_severity_output(
     sdk_list_findings_mock: Mock,
     testing_value,
@@ -124,7 +124,7 @@ def test_findings_get__table_severity_output(
         ([{"no_name_key": "no"}], "UNKNOWN_LABELS"),
     ],
 )
-@patch("probely_cli.cli.commands.findings.get.list_findings")
+@patch("probely.cli.commands.findings.get.list_findings")
 def test_findings_get__table_labels_output(
     sdk_list_findings_mock: Mock,
     testing_value,
@@ -219,7 +219,7 @@ def test_findings_get__table_labels_output(
         ("--f-is-new false", {"new": False}),
     ],
 )
-@patch("probely_cli.cli.commands.findings.get.list_findings")
+@patch("probely.cli.commands.findings.get.list_findings")
 def test_findings_get__arg_filters_success(
     sdk_list_findings_mock: Mock,
     filter_arg,
@@ -283,7 +283,7 @@ def test_findings_get__arg_filters_success(
         ),
     ],
 )
-@patch("probely_cli.cli.commands.findings.get.list_findings")
+@patch("probely.cli.commands.findings.get.list_findings")
 def test_findings_get__arg_filters_validations(
     _: Mock,
     filter_arg,
@@ -301,7 +301,7 @@ def test_findings_get__arg_filters_validations(
     assert expected_error_content in error_message
 
 
-@patch("probely_cli.cli.commands.findings.get.retrieve_findings")
+@patch("probely.cli.commands.findings.get.retrieve_findings")
 def test_findings_get__retrieve_by_ids(retrieve_findings_mock: Mock, probely_cli):
     finding_id1 = "f1"
     finding_id2 = "f2"
@@ -350,7 +350,7 @@ def test_findings_get__mutually_exclusive_arguments(probely_cli):
     )
 
 
-@patch("probely_cli.cli.commands.findings.get.retrieve_findings")
+@patch("probely.cli.commands.findings.get.retrieve_findings")
 def test_targets_get__output_argument_output(retrieve_findings_mock, probely_cli):
     findings_id0 = "f0"
     findings_id1 = "f1"

@@ -1,10 +1,10 @@
 import importlib
 from unittest.mock import MagicMock, patch
 
-from probely_cli import Probely, settings
+from probely import Probely, settings
 
 
-@patch("probely_cli.sdk.client.requests.Session.send")
+@patch("probely.sdk.client.requests.Session.send")
 def test_probely_cli__is_cli_setting(
     _requests_session_send_mock: MagicMock,
     probely_cli,
@@ -22,7 +22,7 @@ def test_probely_cli__is_cli_setting(
     importlib.reload(settings)
 
 
-@patch("probely_cli.sdk.client.requests.Session.send")
+@patch("probely.sdk.client.requests.Session.send")
 def test_probely_cli__api_key_argument_overrides_config(
     _requests_session_send_mock: MagicMock,
     probely_cli,
@@ -30,9 +30,7 @@ def test_probely_cli__api_key_argument_overrides_config(
     api_key_from_settings = "api_key_from_settings"
     api_key_from_args = "api_key_from_args"
 
-    with patch(
-        "probely_cli.sdk.client.settings.PROBELY_API_KEY", api_key_from_settings
-    ):
+    with patch("probely.sdk.client.settings.PROBELY_API_KEY", api_key_from_settings):
         Probely.init()
         assert Probely.get_config()["api_key"] == api_key_from_settings
 

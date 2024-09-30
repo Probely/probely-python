@@ -3,13 +3,13 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from probely_cli.exceptions import (
+from probely.exceptions import (
     ProbelyBadRequest,
     ProbelyObjectNotFound,
     ProbelyRequestFailed,
 )
-from probely_cli.sdk.enums import TargetAPISchemaTypeEnum, TargetTypeEnum
-from probely_cli.sdk.targets import (
+from probely.sdk.enums import TargetAPISchemaTypeEnum, TargetTypeEnum
+from probely.sdk.targets import (
     add_target,
     delete_target,
     delete_targets,
@@ -19,7 +19,7 @@ from probely_cli.sdk.targets import (
     update_target,
     update_targets,
 )
-from probely_cli.settings import (
+from probely.settings import (
     PROBELY_API_TARGETS_BULK_DELETE_URL,
     PROBELY_API_TARGETS_BULK_UPDATE_URL,
     PROBELY_API_TARGETS_DELETE_URL,
@@ -28,7 +28,7 @@ from probely_cli.settings import (
 from tests.testable_api_responses import RETRIEVE_TARGET_200_RESPONSE
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+@patch("probely.sdk.client.ProbelyAPIClient.get")
 def test_list_targets__ok(api_client_mock: Mock):
     expected_content = [{"list": "of objects1"}, {"list": "of objects2"}]
     response_content = {"results": expected_content, "page_total": 1}
@@ -39,7 +39,7 @@ def test_list_targets__ok(api_client_mock: Mock):
     assert r == expected_content
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+@patch("probely.sdk.client.ProbelyAPIClient.get")
 def test_list_targets__unsuccessful(api_client_mock: Mock):
     invalid_status_code = 400
     error_message = "request invalid"
@@ -54,7 +54,7 @@ def test_list_targets__unsuccessful(api_client_mock: Mock):
         assert str(raised_exception) == error_message
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+@patch("probely.sdk.client.ProbelyAPIClient.get")
 def test_list_targets__filters(api_client_mock: Mock):
     resp_code = 200
     resp_content = {"results": "random content", "page_total": 1}
@@ -72,7 +72,7 @@ def test_list_targets__filters(api_client_mock: Mock):
     ), "Filters should be inject in the request as query params"
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+@patch("probely.sdk.client.ProbelyAPIClient.get")
 def test_retrieve_target__success_api_call(api_client_mock: Mock):
     resp_code = 200
     testable_id = "2DZkoZH8WMEM"
@@ -86,7 +86,7 @@ def test_retrieve_target__success_api_call(api_client_mock: Mock):
     api_client_mock.assert_called_with(expected_call_url)
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.delete")
+@patch("probely.sdk.client.ProbelyAPIClient.delete")
 def test_delete_target__success_api_call(api_client_mock: Mock):
     resp_code = 204
     testable_id = "2DZkoZH8WMEM"
@@ -101,7 +101,7 @@ def test_delete_target__success_api_call(api_client_mock: Mock):
     api_client_mock.assert_called_with(url=expected_call_url)
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.delete")
+@patch("probely.sdk.client.ProbelyAPIClient.delete")
 def test_delete_target__unsuccessful_api_call(api_client_mock: Mock):
     resp_code = 400
     testable_id = "2DZkoZH8WMEM"
@@ -126,7 +126,7 @@ def test_delete_target__unsuccessful_api_call(api_client_mock: Mock):
     assert raised_exception.not_found_object_id == not_found_id
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
 def test_delete_targets__unsuccessful_api_call(api_client_mock: Mock):
     resp_code = 400
     testable_id = "2DZkoZH8WMEM"
@@ -143,7 +143,7 @@ def test_delete_targets__unsuccessful_api_call(api_client_mock: Mock):
     assert isinstance(raised_exception, ProbelyRequestFailed)
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+@patch("probely.sdk.client.ProbelyAPIClient.get")
 def test_retrieve_target__unsuccessful_api_call(api_client_mock: Mock):
     not_found_id = "random_target_id"
     api_client_mock.return_value = (404, {})
@@ -168,7 +168,7 @@ def test_retrieve_target__unsuccessful_api_call(api_client_mock: Mock):
     assert raised_exception.reason == expected_error
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+@patch("probely.sdk.client.ProbelyAPIClient.get")
 def test_retrieve_targets__success_api_calls(api_client_mock: Mock):
     ids_list = ["id1", "id2"]
     api_client_mock.side_effect = [
@@ -186,7 +186,7 @@ def test_retrieve_targets__success_api_calls(api_client_mock: Mock):
     assert results_ids == set(ids_list), "Expected one result for each target ID"
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
 def test_add_target__success_api_call(
     api_client_mock: MagicMock,
     valid_add_targets_api_response,
@@ -200,7 +200,7 @@ def test_add_target__success_api_call(
     assert r == expected_content, "Expected object output from API"
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
 def test_add_target__unsuccessful_api_call(
     api_client_mock: MagicMock,
 ):
@@ -217,7 +217,7 @@ def test_add_target__unsuccessful_api_call(
         assert str(raised_exception) == error_message
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
 def test_add_target__api_call_with_default_query_params(
     api_client_mock: MagicMock,
 ):
@@ -234,7 +234,7 @@ def test_add_target__api_call_with_default_query_params(
     assert kwargs["query_params"] == base_query_params
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
 def test_add_target__api_call_with_payload(
     api_client_mock: MagicMock,
 ):
@@ -268,7 +268,7 @@ def test_add_target__api_call_with_payload(
     ), "Watch out for ids of test data"
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
 def test_add_target__arguments_are_api_call_arguments(
     api_client_mock: MagicMock,
 ):
@@ -311,7 +311,7 @@ def test_add_target__arguments_are_api_call_arguments(
     ), "Expected arguments to be sent as pyload"
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
 def test_add_target__api_call_with_payload_overrides(
     api_client_mock: MagicMock,
 ):
@@ -364,7 +364,7 @@ def test_add_target__api_call_with_payload_overrides(
     ), "Watch out for ids of test data"
 
 
-@patch("probely_cli.sdk.targets.ProbelyAPIClient.patch")
+@patch("probely.sdk.targets.ProbelyAPIClient.patch")
 def test_update_target__successful_api_call(api_client_mock: Mock):
     target_id = "sample_target_id"
     payload = {"description": "Updated description"}
@@ -382,7 +382,7 @@ def test_update_target__successful_api_call(api_client_mock: Mock):
     api_client_mock.assert_called_with(expected_endpoint_url, payload=payload)
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.patch")
+@patch("probely.sdk.client.ProbelyAPIClient.patch")
 def test_update_target__unsuccessful_api_call(api_client_mock: Mock):
     target_id = "sample_target_id"
     payload = {"type": "apiX"}
@@ -409,9 +409,9 @@ def test_update_target__unsuccessful_api_call(api_client_mock: Mock):
         assert exc_info.value.reason == api_error
 
 
-@patch("probely_cli.sdk.targets.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.targets.validate_resource_ids")
-@patch("probely_cli.sdk.targets.retrieve_targets")
+@patch("probely.sdk.targets.ProbelyAPIClient.post")
+@patch("probely.sdk.targets.validate_resource_ids")
+@patch("probely.sdk.targets.retrieve_targets")
 def test_update_targets__successful_api_call(
     retrieve_targets_mock: Mock,
     validate_resource_ids_mock: Mock,
@@ -443,8 +443,8 @@ def test_update_targets__successful_api_call(
     assert result == expected_target_bodies
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.post")
-@patch("probely_cli.sdk.targets.validate_resource_ids")
+@patch("probely.sdk.client.ProbelyAPIClient.post")
+@patch("probely.sdk.targets.validate_resource_ids")
 def test_update_targets__unsuccessful_api_call(
     validate_resource_ids_mock: Mock,
     api_client_mock: Mock,

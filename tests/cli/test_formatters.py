@@ -1,7 +1,7 @@
 import pytest
 
-from probely_cli.cli.renderers import UNKNOWN_VALUE_REP, get_printable_enum_value
-from probely_cli.sdk.enums import ProbelyCLIEnum
+from probely.cli.renderers import UNKNOWN_VALUE_REP, get_printable_enum_value
+from probely.sdk.enums import ProbelyCLIEnum
 
 
 class EnumTestable(ProbelyCLIEnum):

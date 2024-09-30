@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, Mock, patch
 import yaml
 
 
-@patch("probely_cli.cli.commands.scans.resume.resume_scans")
+@patch("probely.cli.commands.scans.resume.resume_scans")
 def test_resume_scans__command_handler(
     sdk_resume_scan_mock: Mock,
     valid_scans_resume_api_response: Dict,
@@ -27,7 +27,7 @@ def test_resume_scans__command_handler(
     assert resp2["id"] in stdout_lines
 
 
-@patch("probely_cli.cli.commands.scans.resume.resume_scan")
+@patch("probely.cli.commands.scans.resume.resume_scan")
 def test_scans_resume_request_with_exception(
     sdk_resume_scan_mock: Mock,
     probely_cli,
@@ -48,8 +48,8 @@ def test_scans_resume_request_with_exception(
     assert stderr == f"probely scans resume: error: {exception_message}\n"
 
 
-@patch("probely_cli.cli.commands.scans.resume.resume_scan")
-@patch("probely_cli.cli.commands.scans.resume.list_scans")
+@patch("probely.cli.commands.scans.resume.resume_scan")
+@patch("probely.cli.commands.scans.resume.list_scans")
 def test_scans_resume_scans_with_filters(
     list_scans_mock: Mock,
     resume_scans_mock: Mock,
@@ -75,9 +75,9 @@ def test_scans_resume_scans_with_filters(
     assert scan_id1 in stdout_lines
 
 
-@patch("probely_cli.cli.commands.scans.resume.resume_scan")
-@patch("probely_cli.cli.commands.scans.resume.resume_scans")
-@patch("probely_cli.cli.commands.scans.resume.list_scans")
+@patch("probely.cli.commands.scans.resume.resume_scan")
+@patch("probely.cli.commands.scans.resume.resume_scans")
+@patch("probely.cli.commands.scans.resume.list_scans")
 def test_scans_resume__filters_with_no_results(
     sdk_list_scans_mock: MagicMock,
     resume_scans_mock: MagicMock,
@@ -104,7 +104,7 @@ def test_scans_resume__filters_with_no_results(
     resume_scan_mock.assert_not_called()
 
 
-@patch("probely_cli.cli.commands.scans.resume.resume_scan")
+@patch("probely.cli.commands.scans.resume.resume_scan")
 def test_scans_resume_scans_with_ignore_blackout(
     resume_scans_mock: Mock,
     valid_scans_resume_api_response,
@@ -158,7 +158,7 @@ def test_scans_resume__without_any_argument(probely_cli):
     )
 
 
-@patch("probely_cli.cli.commands.scans.resume.resume_scans")
+@patch("probely.cli.commands.scans.resume.resume_scans")
 def test_scans_resume__output_argument_output(
     resume_scans_mock, valid_scans_resume_api_response: dict, probely_cli
 ):
@@ -199,8 +199,8 @@ def test_scans_resume__output_argument_output(
     assert json_content[1]["id"] == scan_id1, "Expected scan_id1 in json"
 
 
-@patch("probely_cli.cli.commands.scans.resume.resume_scans")
-@patch("probely_cli.cli.commands.scans.resume.resume_scan")
+@patch("probely.cli.commands.scans.resume.resume_scans")
+@patch("probely.cli.commands.scans.resume.resume_scan")
 def test_resume_single_scan__command_handler(
     sdk_resume_scan_mock: Mock,
     sdk_resume_scans_mock: Mock,

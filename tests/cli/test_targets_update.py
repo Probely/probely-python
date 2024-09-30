@@ -30,7 +30,7 @@ from tests.testable_api_responses import RETRIEVE_TARGET_200_RESPONSE
         ),
     ],
 )
-@patch("probely_cli.cli.commands.targets.update.validate_and_retrieve_yaml_content")
+@patch("probely.cli.commands.targets.update.validate_and_retrieve_yaml_content")
 def test_targets_update__validation(
     get_yaml_file_content_mock, probely_cli, args, expected_error
 ):
@@ -52,8 +52,8 @@ def test_targets_update__validation(
     ), f"Unexpected error message: {stderr_lines[0]}"
 
 
-@patch("probely_cli.cli.commands.targets.update.update_target")
-@patch("probely_cli.cli.commands.targets.update.validate_and_retrieve_yaml_content")
+@patch("probely.cli.commands.targets.update.update_target")
+@patch("probely.cli.commands.targets.update.validate_and_retrieve_yaml_content")
 def test_target_update__output_format(
     get_yaml_file_content_mock,
     update_targets_mock,
@@ -112,9 +112,9 @@ def test_target_update__output_format(
     assert stdout == f"{target_id}\n", stdout
 
 
-@patch("probely_cli.cli.commands.targets.update.update_target")
-@patch("probely_cli.cli.commands.targets.update.update_targets")
-@patch("probely_cli.cli.commands.targets.update.validate_and_retrieve_yaml_content")
+@patch("probely.cli.commands.targets.update.update_target")
+@patch("probely.cli.commands.targets.update.update_targets")
+@patch("probely.cli.commands.targets.update.validate_and_retrieve_yaml_content")
 def test_targets_update__calls_correct_sdk_function(
     get_yaml_file_content_mock,
     sdk_update_targets_mock,
@@ -155,10 +155,10 @@ def test_targets_update__calls_correct_sdk_function(
         ([{"id": "target_id1"}, {"id": "target_id2"}]),
     ],
 )
-@patch("probely_cli.cli.commands.targets.update.list_targets")
-@patch("probely_cli.cli.commands.targets.update.update_target")
-@patch("probely_cli.cli.commands.targets.update.update_targets")
-@patch("probely_cli.cli.commands.targets.update.validate_and_retrieve_yaml_content")
+@patch("probely.cli.commands.targets.update.list_targets")
+@patch("probely.cli.commands.targets.update.update_target")
+@patch("probely.cli.commands.targets.update.update_targets")
+@patch("probely.cli.commands.targets.update.validate_and_retrieve_yaml_content")
 def test_targets_update__with_filters(
     get_yaml_file_content_mock,
     update_targets_mock,
@@ -193,10 +193,10 @@ def test_targets_update__with_filters(
         update_targets_mock.assert_called_once_with(target_ids, update_payload)
 
 
-@patch("probely_cli.cli.commands.targets.update.update_target")
-@patch("probely_cli.cli.commands.targets.update.update_targets")
-@patch("probely_cli.cli.commands.targets.update.list_targets")
-@patch("probely_cli.cli.commands.targets.update.validate_and_retrieve_yaml_content")
+@patch("probely.cli.commands.targets.update.update_target")
+@patch("probely.cli.commands.targets.update.update_targets")
+@patch("probely.cli.commands.targets.update.list_targets")
+@patch("probely.cli.commands.targets.update.validate_and_retrieve_yaml_content")
 def test_targets_update__filters_with_no_results(
     get_yaml_file_content_mock: MagicMock,
     sdk_list_targets_mock: MagicMock,

@@ -5,10 +5,10 @@ from unittest.mock import MagicMock, Mock, patch
 import pytest
 import yaml
 
-from probely_cli.sdk.enums import ScanStatusEnum
+from probely.sdk.enums import ScanStatusEnum
 
 
-@patch("probely_cli.cli.commands.scans.cancel.cancel_scans")
+@patch("probely.cli.commands.scans.cancel.cancel_scans")
 def test_scans_cancel__command_handler(
     sdk_cancel_scan_mock: Mock,
     valid_scans_cancel_api_response: Dict,
@@ -29,7 +29,7 @@ def test_scans_cancel__command_handler(
     assert resp2["id"] in stdout_lines
 
 
-@patch("probely_cli.cli.commands.scans.cancel.cancel_scan")
+@patch("probely.cli.commands.scans.cancel.cancel_scan")
 def test_scans_cancel__request_with_exception(
     sdk_cancel_scan_mock: Mock,
     probely_cli,
@@ -99,9 +99,9 @@ def test_scans_cancel__no_arguments_passed(probely_cli):
         ),
     ],
 )
-@patch("probely_cli.cli.commands.scans.cancel.cancel_scan")
-@patch("probely_cli.cli.commands.scans.cancel.cancel_scans")
-@patch("probely_cli.cli.commands.scans.cancel.list_scans")
+@patch("probely.cli.commands.scans.cancel.cancel_scan")
+@patch("probely.cli.commands.scans.cancel.cancel_scans")
+@patch("probely.cli.commands.scans.cancel.list_scans")
 def test_scans_cancel__arg_filters_success(
     sdk_list_scans_mock: MagicMock,
     _cancel_scans_mock: MagicMock,
@@ -119,9 +119,9 @@ def test_scans_cancel__arg_filters_success(
     sdk_list_scans_mock.assert_called_once_with(scans_filters=expected_filter_request)
 
 
-@patch("probely_cli.cli.commands.scans.cancel.cancel_scan")
-@patch("probely_cli.cli.commands.scans.cancel.cancel_scans")
-@patch("probely_cli.cli.commands.scans.cancel.list_scans")
+@patch("probely.cli.commands.scans.cancel.cancel_scan")
+@patch("probely.cli.commands.scans.cancel.cancel_scans")
+@patch("probely.cli.commands.scans.cancel.list_scans")
 def test_scans_cancel__filters_with_no_results(
     sdk_list_scans_mock: MagicMock,
     _cancel_scans_mock: MagicMock,
@@ -146,7 +146,7 @@ def test_scans_cancel__filters_with_no_results(
     assert stderr_lines[-1] == expected_error
 
 
-@patch("probely_cli.cli.commands.scans.cancel.cancel_scans")
+@patch("probely.cli.commands.scans.cancel.cancel_scans")
 def test_scans_cancel__output_argument_output(
     cancel_scans_mock, valid_scans_cancel_api_response: dict, probely_cli
 ):
@@ -187,8 +187,8 @@ def test_scans_cancel__output_argument_output(
     assert json_content[1]["id"] == scan_id1, "Expected scan_id1 in json"
 
 
-@patch("probely_cli.cli.commands.scans.cancel.cancel_scans")
-@patch("probely_cli.cli.commands.scans.cancel.cancel_scan")
+@patch("probely.cli.commands.scans.cancel.cancel_scans")
+@patch("probely.cli.commands.scans.cancel.cancel_scan")
 def test_cancel_single_scan__command_handler(
     sdk_cancel_scan_mock: Mock,
     sdk_cancel_scans_mock: Mock,

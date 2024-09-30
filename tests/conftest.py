@@ -8,7 +8,7 @@ import pytest
 import yaml
 from rich.console import Console
 
-from probely_cli.cli import CLIApp, build_cli_parser
+from probely.cli import CLIApp, build_cli_parser
 from tests.testable_api_responses import (
     CANCEL_SCAN_200_RESPONSE,
     GET_FINDINGS_200_RESPONSE,
@@ -28,7 +28,7 @@ def api_call_blocker():
     """
     msg = "Your tests are leaking. An API call was attempted"
 
-    with patch("probely_cli.sdk.client.requests.Session.send") as mock_session_send:
+    with patch("probely.sdk.client.requests.Session.send") as mock_session_send:
         yield
         assert mock_session_send.call_count == 0, msg
 

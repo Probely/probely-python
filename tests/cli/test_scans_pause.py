@@ -8,7 +8,7 @@ import yaml
 from tests.testable_api_responses import PAUSE_SCAN_200_RESPONSE
 
 
-@patch("probely_cli.cli.commands.scans.pause.pause_scans")
+@patch("probely.cli.commands.scans.pause.pause_scans")
 def test_pause_scans__command_handler(
     sdk_pause_scan_mock: Mock,
     valid_scans_pause_api_response: Dict,
@@ -29,8 +29,8 @@ def test_pause_scans__command_handler(
     assert resp2["id"] == stdout_lines[1]
 
 
-@patch("probely_cli.cli.commands.scans.pause.pause_scans")
-@patch("probely_cli.cli.commands.scans.pause.pause_scan")
+@patch("probely.cli.commands.scans.pause.pause_scans")
+@patch("probely.cli.commands.scans.pause.pause_scan")
 def test_pause_single_scan__command_handler(
     sdk_pause_scan_mock: Mock,
     sdk_pause_scans_mock: Mock,
@@ -51,7 +51,7 @@ def test_pause_single_scan__command_handler(
     assert valid_scans_pause_api_response["id"] == stdout_lines[0]
 
 
-@patch("probely_cli.cli.commands.scans.pause.pause_scan")
+@patch("probely.cli.commands.scans.pause.pause_scan")
 def test_scans_pause_request_with_exception(
     sdk_pause_scan_mock: Mock,
     probely_cli,
@@ -103,8 +103,8 @@ def test_scans_pause__without_any_argument(probely_cli):
     )
 
 
-@patch("probely_cli.cli.commands.scans.pause.pause_scan")
-@patch("probely_cli.cli.commands.scans.pause.list_scans")
+@patch("probely.cli.commands.scans.pause.pause_scan")
+@patch("probely.cli.commands.scans.pause.list_scans")
 def test_scans_pause_scans_with_filters(
     list_scans_mock: Mock,
     pause_scan_mock: Mock,
@@ -129,9 +129,9 @@ def test_scans_pause_scans_with_filters(
     assert scan_id1 == stdout_lines[0]
 
 
-@patch("probely_cli.cli.commands.scans.pause.pause_scan")
-@patch("probely_cli.cli.commands.scans.pause.pause_scans")
-@patch("probely_cli.cli.commands.scans.pause.list_scans")
+@patch("probely.cli.commands.scans.pause.pause_scan")
+@patch("probely.cli.commands.scans.pause.pause_scans")
+@patch("probely.cli.commands.scans.pause.list_scans")
 def test_scans_pause__filters_with_no_results(
     sdk_list_scans_mock: MagicMock,
     pause_scans_mock: MagicMock,
@@ -158,7 +158,7 @@ def test_scans_pause__filters_with_no_results(
     pause_scan_mock.assert_not_called()
 
 
-@patch("probely_cli.cli.commands.scans.pause.pause_scans")
+@patch("probely.cli.commands.scans.pause.pause_scans")
 def test_scans_pause__output_argument_output(pause_scans_mock, probely_cli):
     scan_id0 = "scan_id0"
     scan_id1 = "scan_id1"

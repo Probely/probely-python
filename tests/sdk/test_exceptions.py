@@ -1,4 +1,4 @@
-from probely_cli.exceptions import ProbelyObjectNotFound, ProbelyRequestFailed
+from probely.exceptions import ProbelyObjectNotFound, ProbelyRequestFailed
 
 
 def test_probely_object_not_found_exception():

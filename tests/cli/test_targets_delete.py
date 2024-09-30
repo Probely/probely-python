@@ -1,9 +1,9 @@
 from unittest.mock import MagicMock, Mock, patch
 
 
-@patch("probely_cli.cli.commands.targets.delete.delete_target")
-@patch("probely_cli.cli.commands.targets.delete.delete_targets")
-@patch("probely_cli.cli.commands.targets.delete.list_targets")
+@patch("probely.cli.commands.targets.delete.delete_target")
+@patch("probely.cli.commands.targets.delete.delete_targets")
+@patch("probely.cli.commands.targets.delete.list_targets")
 def test_targets_delete__multiple_targets(
     list_targets_mock: Mock,
     delete_targets_mock: Mock,
@@ -33,9 +33,9 @@ def test_targets_delete__multiple_targets(
     assert target_id2 == stdout_lines[1]
 
 
-@patch("probely_cli.cli.commands.targets.delete.delete_targets")
-@patch("probely_cli.cli.commands.targets.delete.delete_target")
-@patch("probely_cli.cli.commands.targets.delete.list_targets")
+@patch("probely.cli.commands.targets.delete.delete_targets")
+@patch("probely.cli.commands.targets.delete.delete_target")
+@patch("probely.cli.commands.targets.delete.list_targets")
 def test_targets_delete__one_target(
     list_targets_mock: Mock,
     delete_target_mock: MagicMock,
@@ -58,9 +58,9 @@ def test_targets_delete__one_target(
     assert stdout_lines[-1] == testable_target_id
 
 
-@patch("probely_cli.cli.commands.targets.delete.delete_target")
-@patch("probely_cli.cli.commands.targets.delete.delete_targets")
-@patch("probely_cli.cli.commands.targets.delete.list_targets")
+@patch("probely.cli.commands.targets.delete.delete_target")
+@patch("probely.cli.commands.targets.delete.delete_targets")
+@patch("probely.cli.commands.targets.delete.list_targets")
 def test_targets_delete__filters_with_multiple_results(
     list_targets_mock: Mock,
     delete_targets_mock: Mock,
@@ -90,9 +90,9 @@ def test_targets_delete__filters_with_multiple_results(
     assert target_id2 == stdout_lines[1]
 
 
-@patch("probely_cli.cli.commands.targets.delete.delete_target")
-@patch("probely_cli.cli.commands.targets.delete.delete_targets")
-@patch("probely_cli.cli.commands.targets.delete.list_targets")
+@patch("probely.cli.commands.targets.delete.delete_target")
+@patch("probely.cli.commands.targets.delete.delete_targets")
+@patch("probely.cli.commands.targets.delete.list_targets")
 def test_targets_delete__filters_with_single_result(
     list_targets_mock: Mock,
     delete_targets_mock: Mock,
@@ -137,8 +137,8 @@ def test_targets_delete__mutually_exclusive_arguments(probely_cli):
     )
 
 
-@patch("probely_cli.cli.commands.targets.delete.delete_target")
-@patch("probely_cli.cli.commands.targets.delete.delete_targets")
+@patch("probely.cli.commands.targets.delete.delete_target")
+@patch("probely.cli.commands.targets.delete.delete_targets")
 def test_targets_delete__without_any_argument(
     delete_targets_mock: Mock,
     delete_target_mock: Mock,
@@ -160,9 +160,9 @@ def test_targets_delete__without_any_argument(
     delete_target_mock.assert_not_called()
 
 
-@patch("probely_cli.cli.commands.targets.delete.delete_target")
-@patch("probely_cli.cli.commands.targets.delete.delete_targets")
-@patch("probely_cli.cli.commands.targets.delete.list_targets")
+@patch("probely.cli.commands.targets.delete.delete_target")
+@patch("probely.cli.commands.targets.delete.delete_targets")
+@patch("probely.cli.commands.targets.delete.list_targets")
 def test_targets_delete__delete_with_filters(
     list_targets_mock: Mock,
     delete_targets_mock: Mock,
@@ -191,9 +191,9 @@ def test_targets_delete__delete_with_filters(
     delete_target_mock.assert_not_called()
 
 
-@patch("probely_cli.cli.commands.targets.delete.delete_target")
-@patch("probely_cli.cli.commands.targets.delete.delete_targets")
-@patch("probely_cli.cli.commands.targets.delete.list_targets")
+@patch("probely.cli.commands.targets.delete.delete_target")
+@patch("probely.cli.commands.targets.delete.delete_targets")
+@patch("probely.cli.commands.targets.delete.list_targets")
 def test_targets_delete__filters_with_no_results(
     sdk_list_targets_mock: Mock,
     sdk_delete_targets_mock: Mock,

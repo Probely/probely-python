@@ -2,11 +2,11 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from probely_cli.exceptions import ProbelyRequestFailed
-from probely_cli.sdk.findings import list_findings
+from probely.exceptions import ProbelyRequestFailed
+from probely.sdk.findings import list_findings
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+@patch("probely.sdk.client.ProbelyAPIClient.get")
 def test_list_findings__ok(api_client_mock: Mock):
     expected_content = [{"list": "of objects1"}, {"list": "of objects2"}]
     response_content = {"results": expected_content, "page_total": 1}
@@ -17,7 +17,7 @@ def test_list_findings__ok(api_client_mock: Mock):
     assert r == expected_content
 
 
-@patch("probely_cli.sdk.client.ProbelyAPIClient.get")
+@patch("probely.sdk.client.ProbelyAPIClient.get")
 def test_list_findings__unsuccessful(api_client_mock: Mock):
     invalid_status_code = 400
     error_message = "request invalid"

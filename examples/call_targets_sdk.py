@@ -1,7 +1,7 @@
 import json
 
-from probely_cli import Probely, ProbelyException, list_targets
-from probely_cli.exceptions import ProbelyRequestFailed
+from probely import Probely, ProbelyException, list_targets
+from probely.exceptions import ProbelyRequestFailed
 
 if __name__ == "__main__":
 

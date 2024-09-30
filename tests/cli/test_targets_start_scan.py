@@ -5,7 +5,7 @@ import pytest
 import yaml
 
 
-@patch("probely_cli.cli.commands.targets.start_scan.start_scan")
+@patch("probely.cli.commands.targets.start_scan.start_scan")
 def test_targets_start_scan__request_with_exception(
     sdk_start_scan_mock: Mock,
     probely_cli,
@@ -94,8 +94,8 @@ def test_targets_start_scan__error_when_target_ids_provided_in_yaml_file(
     ), f"Unexpected error message: {stderr_lines[0]}"
 
 
-@patch("probely_cli.cli.commands.targets.start_scan.start_scan")
-@patch("probely_cli.cli.commands.targets.start_scan.start_scans")
+@patch("probely.cli.commands.targets.start_scan.start_scan")
+@patch("probely.cli.commands.targets.start_scan.start_scans")
 def test_targets_start_scan__calls_correct_sdk_function(
     sdk_start_scans_mock: Mock,
     sdk_start_scan_mock: Mock,
@@ -150,9 +150,9 @@ def test_targets_start_scan__calls_correct_sdk_function(
         ([{"id": "target_id1"}, {"id": "target_id2"}]),
     ],
 )
-@patch("probely_cli.cli.commands.targets.start_scan.start_scan")
-@patch("probely_cli.cli.commands.targets.start_scan.start_scans")
-@patch("probely_cli.cli.commands.targets.start_scan.list_targets")
+@patch("probely.cli.commands.targets.start_scan.start_scan")
+@patch("probely.cli.commands.targets.start_scan.start_scans")
+@patch("probely.cli.commands.targets.start_scan.list_targets")
 def test_targets_start_scan__with_filters(
     list_targets_mock: Mock,
     start_scans_mock: Mock,
@@ -185,9 +185,9 @@ def test_targets_start_scan__with_filters(
         start_scans_mock.assert_called_once_with(target_ids, {})
 
 
-@patch("probely_cli.cli.commands.targets.start_scan.start_scan")
-@patch("probely_cli.cli.commands.targets.start_scan.start_scans")
-@patch("probely_cli.cli.commands.targets.start_scan.list_targets")
+@patch("probely.cli.commands.targets.start_scan.start_scan")
+@patch("probely.cli.commands.targets.start_scan.start_scans")
+@patch("probely.cli.commands.targets.start_scan.list_targets")
 def test_targets_start_scan__filters_with_no_results(
     sdk_list_targets_mock: MagicMock,
     sdk_start_scans_mock: MagicMock,
@@ -216,7 +216,7 @@ def test_targets_start_scan__filters_with_no_results(
     sdk_start_scan_mock.assert_not_called()
 
 
-@patch("probely_cli.cli.commands.targets.start_scan.start_scan")
+@patch("probely.cli.commands.targets.start_scan.start_scan")
 def test_targets_start_scan__output_format(
     start_scan_mock: Mock, probely_cli, valid_scans_start_api_response
 ):

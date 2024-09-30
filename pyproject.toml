@@ -1,5 +1,5 @@
 [project]
-name = "probely_cli"
+name = "probely"
 version = "0.0.1"
 description = "CLI and SDK wrappers for Probely's API"
 authors = [
@@ -63,9 +63,8 @@ profile = "black"
 include_trailing_comma = true
 line_length = 88
 
-
 [project.scripts]
-probely = "probely_cli.cli:app"
+probely = "probely.cli:app"
 
 [project.urls]
 Homepage = "https://probely.com"
@@ -85,4 +84,4 @@ build-backend = "hatchling.build"
 allow-direct-references = true
 
 #[tool.hatch.build.targets.wheel]
-#packages = ["src/probely_cli"]
+#packages = ["src/probely"]

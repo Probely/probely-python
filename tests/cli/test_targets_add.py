@@ -4,12 +4,12 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 
-from probely_cli.sdk.enums import TargetAPISchemaTypeEnum, TargetTypeEnum
+from probely.sdk.enums import TargetAPISchemaTypeEnum, TargetTypeEnum
 
 
 @pytest.fixture
 def targets__add__sdk_add_target_mock(valid_add_targets_api_response) -> MagicMock:
-    with patch("probely_cli.cli.commands.targets.add.add_target") as add_target_mock:
+    with patch("probely.cli.commands.targets.add.add_target") as add_target_mock:
         add_target_mock.return_value = valid_add_targets_api_response
         yield add_target_mock
 
@@ -176,7 +176,7 @@ def _valid_yaml_file_content() -> dict:
     return valid_content
 
 
-@patch("probely_cli.cli.commands.targets.add.add_target")
+@patch("probely.cli.commands.targets.add.add_target")
 def test_targets_add__arguments_extracted_from_file_content(
     sdk_add_target_mock: MagicMock,
     create_testable_yaml_file,
@@ -219,7 +219,7 @@ def test_targets_add__arguments_extracted_from_file_content(
     assert mock_kwargs == expected_arguments, "Expected request with file content"
 
 
-@patch("probely_cli.cli.commands.targets.add.add_target")
+@patch("probely.cli.commands.targets.add.add_target")
 def test_targets_add__command_arguments_override_file_content(
     sdk_add_target_mock: MagicMock,
     create_testable_yaml_file,
@@ -274,7 +274,7 @@ def test_targets_add__command_arguments_override_file_content(
     ), "Expected sdk call with command args, overwriting --yaml-file input"
 
 
-@patch("probely_cli.cli.commands.targets.add.add_target")
+@patch("probely.cli.commands.targets.add.add_target")
 def test_targets_add__output_argument_validation(_: MagicMock, probely_cli):
     stdout_lines, stderr_lines = probely_cli(
         "targets",
@@ -291,7 +291,7 @@ def test_targets_add__output_argument_validation(_: MagicMock, probely_cli):
     )
 
 
-@patch("probely_cli.cli.commands.targets.add.add_target")
+@patch("probely.cli.commands.targets.add.add_target")
 def test_targets_add__output_argument_output(
     sdk_add_target_mock,
     valid_add_targets_api_response,

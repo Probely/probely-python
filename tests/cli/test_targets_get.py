@@ -5,11 +5,11 @@ from unittest.mock import Mock, patch
 import pytest
 import yaml
 
-from probely_cli.sdk.enums import TargetRiskEnum, TargetTypeEnum
+from probely.sdk.enums import TargetRiskEnum, TargetTypeEnum
 from tests.testable_api_responses import RETRIEVE_TARGET_200_RESPONSE
 
 
-@patch("probely_cli.cli.commands.targets.get.list_targets")
+@patch("probely.cli.commands.targets.get.list_targets")
 def test_targets_get__table_headers_output(
     sdk_list_targets_mock: Mock,
     valid_get_targets_api_response: dict,
@@ -39,7 +39,7 @@ def test_targets_get__table_headers_output(
         ({"started": "2024-07-15T15:47:52.608557Z"}, "2024-07-15 15:47"),
     ],
 )
-@patch("probely_cli.cli.commands.targets.get.list_targets")
+@patch("probely.cli.commands.targets.get.list_targets")
 def test_targets_get__table_last_scan_date_output(
     sdk_list_targets_mock: Mock,
     testing_value,
@@ -81,7 +81,7 @@ def test_targets_get__table_last_scan_date_output(
         ("10", "UNKNOWN"),
     ],
 )
-@patch("probely_cli.cli.commands.targets.get.list_targets")
+@patch("probely.cli.commands.targets.get.list_targets")
 def test_targets_get__table_risk_output(
     sdk_list_targets_mock: Mock,
     testing_value,
@@ -118,7 +118,7 @@ def test_targets_get__table_risk_output(
         ([{"no_name_key": "no"}], "UNKNOWN_LABELS"),
     ],
 )
-@patch("probely_cli.cli.commands.targets.get.list_targets")
+@patch("probely.cli.commands.targets.get.list_targets")
 def test_targets_get__table_labels_output(
     sdk_list_targets_mock: Mock,
     testing_value,
@@ -197,7 +197,7 @@ def test_targets_get__table_labels_output(
         ),
     ],
 )
-@patch("probely_cli.cli.commands.targets.get.list_targets")
+@patch("probely.cli.commands.targets.get.list_targets")
 def test_targets_get__arg_filters_success(
     sdk_list_targets_mock: Mock,
     filter_arg,
@@ -257,7 +257,7 @@ def test_targets_get__arg_filters_success(
         ),
     ],
 )
-@patch("probely_cli.cli.commands.targets.get.list_targets")
+@patch("probely.cli.commands.targets.get.list_targets")
 def test_targets_get__arg_filters_validations(
     _: Mock,
     filter_arg,
@@ -275,7 +275,7 @@ def test_targets_get__arg_filters_validations(
     assert expected_error_content in error_message
 
 
-@patch("probely_cli.cli.commands.targets.get.retrieve_targets")
+@patch("probely.cli.commands.targets.get.retrieve_targets")
 def test_targets_get__retrieve_by_id(retrieve_targets_mock: Mock, probely_cli):
     target_id1 = "target_id1"
     target_id2 = "target_id2"
@@ -322,7 +322,7 @@ def test_targets_get__mutually_exclusive_arguments(probely_cli):
     )
 
 
-@patch("probely_cli.cli.commands.targets.get.retrieve_targets")
+@patch("probely.cli.commands.targets.get.retrieve_targets")
 def test_targets_get__output_argument_validation(_: Mock, probely_cli):
     stdout_lines, stderr_lines = probely_cli(
         "targets",
@@ -339,7 +339,7 @@ def test_targets_get__output_argument_validation(_: Mock, probely_cli):
     )
 
 
-@patch("probely_cli.cli.commands.targets.get.retrieve_targets")
+@patch("probely.cli.commands.targets.get.retrieve_targets")
 def test_targets_get__output_argument_output(retrieve_targets_mock, probely_cli):
     target_id0 = "target_id0"
     target_id1 = "target_id1"
