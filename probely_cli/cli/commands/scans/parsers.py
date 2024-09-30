@@ -33,20 +33,27 @@ def build_scan_filters_parser() -> argparse.ArgumentParser:
         help="Filter by Scan status",
     )
 
+    date_filters_group = scan_filters_parser.add_argument_group(
+        "Date Filters",
+        "Specify the date or datetime for filtering Scans. Use the ISO 8601 format, "
+        "for example: `2020-07-05` for a date, or `2020-07-05T12:45:30` for a datetime.",
+    )
     for date_field in ["completed", "started"]:
-        for filter_lookup in ["gt", "gte", "lt", "lte"]:
-            scan_filters_parser.add_argument(
+        for filter_lookup, description in {
+            "gt": "after",
+            "gte": "on or after",
+            "lt": "before",
+            "lte": "on or before",
+        }.items():
+            date_filters_group.add_argument(
                 f"--f-{date_field}-{filter_lookup}",
                 action="store",
                 default=None,
                 metavar="DATETIME",
                 help=(
-                    f"Filter Scans `{date_field}` datetime `{filter_lookup.upper()}` "
-                    f"the specified date or datetime in ISO 8601 format. "
-                    f"For example, `2020-07-05` for a date or `2020-07-05T12:45:30` for a datetime."
+                    f"Show scans {date_field} {description} the specified date or datetime."
                 ),
             )
-
     return scan_filters_parser
 
 
