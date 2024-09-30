@@ -36,6 +36,8 @@ class CLIApp:
             self._print_error_message(str(e))
         except ProbelyException as e:
             self._print_error_message(str(e))
+        except KeyboardInterrupt:
+            self._print_error_message("Operation cancelled by user")
         except Exception as e:
             logger.debug(
                 "Unhandled exception: {name}: {msg}".format(
