@@ -21,8 +21,8 @@
 ### Usage
 
 * Use `-h/--help` for available options
-* General usage
-  `Probely <context> <action> [positional_params ...] [--optinal params ...] -- [positional_params ...]`
+* General usage:
+    * `probely <context> <action> [positional_params ...] [--optinal params ...] -- [positional_params ...]`
     * `--` allows you to add positional args after optional
 * add `--api-key` for command specific api key
 
@@ -41,7 +41,7 @@
   ```
   import probely_cli
 
-  target = probely_cli.add_target("http://target_url.com")
+  target = probely_cli.add_target("https://target_url.com")
   ```
 
 ### Development guidelines:

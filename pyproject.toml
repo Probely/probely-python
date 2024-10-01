@@ -1,8 +1,11 @@
 [project]
 name = "probely"
-version = "0.0.1"
+dynamic = ["version"]
 description = "CLI and SDK wrappers for Probely's API"
 authors = [
+    { name = "Probely", email = "hello@probely.com" },
+]
+maintainers = [
     { name = "João Silva", email = "joao.silva@probely.com" },
     { name = "Vladimir Kontic", email = "vladimir@probely.com" },
     { name = "Temidire Adams", email = "temidire@probely.com" }
@@ -74,8 +77,6 @@ Repository = "https://github.com/probely/probely_cli.git"
 #Changelog = "https://github.com/probely/probely_cli/blob/master/CHANGELOG.md"
 
 
-
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -83,5 +84,19 @@ build-backend = "hatchling.build"
 [tool.hatch.metadata]
 allow-direct-references = true
 
-#[tool.hatch.build.targets.wheel]
-#packages = ["src/probely"]
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.github",
+    "/.gitlab",
+    "/.tox",
+    "/builds",
+    "/docs",
+    "/examples",
+    "/tests",
+    "/tox.ini",
+]
+[tool.hatch.build.targets.wheel]
+packages = ["probely"]
+
+[tool.hatch.version]
+path = "probely/version.py"

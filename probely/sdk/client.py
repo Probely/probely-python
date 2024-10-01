@@ -145,7 +145,6 @@ class ProbelyAPIClient:
         session.headers.update({"Authorization": "JWT " + api_key})
         session.headers.update({"User-Agent": cls._build_user_agent()})
 
-        logger.debug(session.headers)
         cls._session_cache = session
         return session
 
