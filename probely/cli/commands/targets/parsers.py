@@ -68,7 +68,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
 
     targets_parser = commands_parser.add_parser(
         "targets",
-        parents=[configs_parser],
+        help="Create, manage and scan targets",
         formatter_class=RichHelpFormatter,
     )
     targets_parser.set_defaults(

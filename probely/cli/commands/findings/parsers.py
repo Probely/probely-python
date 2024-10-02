@@ -69,7 +69,7 @@ def build_findings_parser(commands_parser, configs_parser, output_parser):
 
     findings_parser = commands_parser.add_parser(
         "findings",
-        parents=[configs_parser],
+        help="List existing findings",
         formatter_class=RichHelpFormatter,
     )
     findings_parser.set_defaults(

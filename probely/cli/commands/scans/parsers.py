@@ -60,7 +60,7 @@ def build_scan_filters_parser() -> argparse.ArgumentParser:
 def build_scans_parser(commands_parser, configs_parser, file_parser, output_parser):
     scans_parser = commands_parser.add_parser(
         "scans",
-        parents=[configs_parser],
+        help="Manage existing scans",
         formatter_class=RichHelpFormatter,
     )
     scans_parser.set_defaults(

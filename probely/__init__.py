@@ -12,6 +12,7 @@ from .sdk.enums import (
     ScanStatusEnum,
     TargetRiskEnum,
     TargetTypeEnum,
+    TargetAPISchemaTypeEnum,
 )
 from .sdk.findings import list_findings, retrieve_finding, retrieve_findings
 from .sdk.scans import (
@@ -37,6 +38,7 @@ from .sdk.targets import (
     update_target,
     update_targets,
 )
+from .version import __version__
 
 __all__ = [
     "Probely",
