@@ -1,57 +1,21 @@
-# probely
+# Probely
 
-### Package level api key setup:
+## Installation
 
-* Config File:
-  Create `~/.probely/config` and add:
+Probely requires Python 3.8 or higher. Install the package using pip
 
-  ```
-  [AUTH]
-  api_key = <your_api_key>
-  ```
+```sh
+pip install probely
+```
 
-* Environment Variables
-  ```
-  export PROBELY_API_KEY=<your_api_key>
-  ```
-* Tool specific config (see below)
+## Overview
 
-## CLI
+Probely is a vulnerability scanner for APIs and web applications, designed to empower security teams and software developers in scanning and securing their web applications and APIs. 
 
-### Usage
+This package provides a Command-Line Interface (CLI) to interact with the Probely API, allowing you to perform actions like scanning targets, listing findings, and managing targets directly from your terminal.
 
-* Use `-h/--help` for available options
-* General usage:
-    * `probely <context> <action> [positional_params ...] [--optinal params ...] -- [positional_params ...]`
-    * `--` allows you to add positional args after optional
-* add `--api-key` for command specific api key
+**For detailed documentation and usage examples, please visit our [CLI documentation](https://developers.probely.com/cli/).**
 
-## SDK
+## Contributing
 
-* Init `Probely` for specific config
-  ```
-  from probely_cli import Probely
-
-  Probely.init(api_key=<your_api_key>)
-  
-  ...
-  ```
-* Import `probely_cli` for public interface
-
-  ```
-  import probely_cli
-
-  target = probely_cli.add_target("https://target_url.com")
-  ```
-
-### Development guidelines:
-
-* Command structure: `Probely <context> <action> params [--optinal params]`
-* Follow CLI output good practices. Valid output to `stdout`, errors to `stderr`
-* Custom tooling, developers should be aware
-    * `rich.console` is always available on the `args`
-    * `probely_cli`  pytest fixture (to call CLI commands)
-* Error message should have the following structure: `{cmd}: error: {message}`,
-  following the default implementation of argparse
-    * eg: `probely targets get: error: filters and target ids are mutually exclusive.`
-
+We appreciate your interest in Probely! While we are not currently accepting external contributions, we welcome feedback and bug reports. If you encounter any issues or have suggestions, please create an issue on our GitHub repository.
