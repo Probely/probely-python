@@ -1,6 +1,7 @@
 from typing import Dict
 
 from rich.table import Table
+
 from probely.cli.renderers import (
     get_printable_enum_value,
     get_printable_labels,
@@ -11,7 +12,8 @@ from probely.sdk.enums import TargetRiskEnum
 
 
 class TargetTable(BaseOutputTable):
-    def create_table(self, show_header: bool = False) -> Table:
+    @classmethod
+    def create_table(cls, show_header: bool = False) -> Table:
         table = Table(show_header=show_header, box=None)
 
         table.add_column("ID", width=12)
@@ -23,7 +25,8 @@ class TargetTable(BaseOutputTable):
 
         return table
 
-    def add_row(self, table: Table, target: Dict) -> None:
+    @classmethod
+    def add_row(cls, table: Table, target: Dict) -> None:
         site = target.get("site")
 
         table.add_row(

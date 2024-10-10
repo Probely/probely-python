@@ -1,4 +1,5 @@
 from typing import Dict
+
 from rich.table import Table
 
 from probely.cli.renderers import (
@@ -13,7 +14,8 @@ DEFAULT_LAST_FOUND_DATE_VALUE = "NO_DATE"
 
 
 class FindingTable(BaseOutputTable):
-    def create_table(self, show_header: bool = False) -> Table:
+    @classmethod
+    def create_table(cls, show_header: bool = False) -> Table:
         table = Table(show_header=show_header, box=None)
 
         table.add_column("ID", width=18)
@@ -26,7 +28,8 @@ class FindingTable(BaseOutputTable):
 
         return table
 
-    def add_row(self, table: Table, finding: Dict) -> None:
+    @classmethod
+    def add_row(cls, table: Table, finding: Dict) -> None:
         target = finding.get("target", {})
 
         table.add_row(

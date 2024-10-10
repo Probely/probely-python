@@ -13,9 +13,9 @@ from typing import (
 import yaml
 from dateutil import parser
 from rich.console import Console
-from rich.live import Live
 
-from probely.cli.enums import EntityTypeEnum, OutputEnum
+from probely.cli.enums import OutputEnum
+from probely.cli.tables.base_table import BaseOutputTable
 from probely.sdk.enums import ProbelyCLIEnum
 
 UNKNOWN_VALUE_REP = "UNKNOWN"
@@ -32,12 +32,12 @@ class OutputRenderer:
         records: Generator[dict, None, None],
         output_type: Optional[OutputEnum],
         console: Console,
-        entity_type: EntityTypeEnum,
+        table_cls: Type[BaseOutputTable],
     ):
         self.records = records
         self.output_type = output_type
         self.console = console
-        self.entity_type = entity_type
+        self.table_cls = table_cls
 
     def render(self) -> None:
         if self.output_type == OutputEnum.JSON:
@@ -62,15 +62,13 @@ class OutputRenderer:
             self.console.print(yaml.dump([record], indent=2, width=sys.maxsize))
 
     def _render_table(self) -> None:
-        from probely.cli.tables.table_factory import (  # Avoid circular import
-            TableFactory,
-        )
+        table = self.table_cls.create_table(show_header=True)
+        self.console.print(table)
 
-        table_cls = TableFactory.get_table_class(self.entity_type)
-        table = table_cls().create_table(show_header=True)
-        with Live(table, console=self.console):
-            for record in self.records:
-                table_cls().add_row(table, record)
+        for record in self.records:
+            table = self.table_cls.create_table(show_header=False)
+            self.table_cls.add_row(table, record)
+            self.console.print(table)
 
 
 def get_printable_enum_value(enum: Type[ProbelyCLIEnum], api_enum_value: str) -> str:

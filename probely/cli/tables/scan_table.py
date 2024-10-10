@@ -5,7 +5,8 @@ from probely.cli.tables.base_table import BaseOutputTable
 
 
 class ScanTable(BaseOutputTable):
-    def create_table(self, show_header: bool = False) -> Table:
+    @classmethod
+    def create_table(cls, show_header: bool = False) -> Table:
         table = Table(show_header=show_header, box=None)
 
         table.add_column("ID", width=12)
@@ -20,7 +21,8 @@ class ScanTable(BaseOutputTable):
 
         return table
 
-    def add_row(self, table: Table, scan: dict) -> None:
+    @classmethod
+    def add_row(cls, table: Table, scan: dict) -> None:
         target = scan.get("target", {})
         site = target.get("site", {})
 

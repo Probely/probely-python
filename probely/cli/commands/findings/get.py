@@ -2,8 +2,9 @@ import argparse
 
 from probely.cli.commands.findings.schemas import FindingsApiFiltersSchema
 from probely.cli.common import prepare_filters_for_api
-from probely.cli.enums import EntityTypeEnum, OutputEnum
+from probely.cli.enums import OutputEnum
 from probely.cli.renderers import OutputRenderer
+from probely.cli.tables.finding_table import FindingTable
 from probely.exceptions import ProbelyCLIValidation
 from probely.sdk.findings import list_findings, retrieve_findings
 
@@ -23,6 +24,6 @@ def findings_get_command_handler(args: argparse.Namespace):
         records=findings_generator,
         output_type=output_type,
         console=args.console,
-        entity_type=EntityTypeEnum.FINDING,
+        table_cls=FindingTable,
     )
     renderer.render()
