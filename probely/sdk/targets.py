@@ -70,6 +70,8 @@ def delete_targets(targets_ids: List[str]):
     :type targets_ids: List[str].
 
     """
+    validate_resource_ids(PROBELY_API_TARGETS_URL, targets_ids)
+
     url = PROBELY_API_TARGETS_BULK_DELETE_URL
 
     logger.debug("Delete targets : %s", targets_ids)

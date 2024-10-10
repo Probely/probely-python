@@ -119,7 +119,7 @@ class ProbelyAPIClient:
 
         status_code = resp.status_code
         try:
-            content = json.loads(resp.content)
+            content = {} if resp.content == b"" else json.loads(resp.content)
         except json.JSONDecodeError:  # todo: needs testing
             logger.debug(
                 "Something wrong with the API. Response content is not valid JSON."

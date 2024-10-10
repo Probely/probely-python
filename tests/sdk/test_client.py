@@ -223,6 +223,22 @@ def test_probely_api_client__content_when_content_invalid(
 
 
 @patch("probely.sdk.client.requests.Session.send")
+def test_probely_api_client__content_is_empty_string(
+    requests_session_send_mock: Mock,
+    set_default_api_key,
+):
+    requests_session_send_mock.return_value = Mock(
+        status_code=204,
+        content=b"",
+    )
+
+    status_code, content = ProbelyAPIClient.delete("https://irrelevant_url.com")
+
+    assert content == {}
+    assert status_code == 204
+
+
+@patch("probely.sdk.client.requests.Session.send")
 def test_probely_api_client__return_is_correct(
     requests_session_send_mock: Mock,
     set_default_api_key,

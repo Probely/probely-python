@@ -90,7 +90,7 @@ def test_retrieve_target__success_api_call(api_client_mock: Mock):
 def test_delete_target__success_api_call(api_client_mock: Mock):
     resp_code = 204
     testable_id = "2DZkoZH8WMEM"
-    resp_content = {"id": testable_id}
+    resp_content = b""
 
     api_client_mock.return_value = (resp_code, resp_content)
 
@@ -127,13 +127,19 @@ def test_delete_target__unsuccessful_api_call(api_client_mock: Mock):
 
 
 @patch("probely.sdk.client.ProbelyAPIClient.post")
-def test_delete_targets__unsuccessful_api_call(api_client_mock: Mock):
+@patch("probely.sdk.targets.validate_resource_ids")
+def test_delete_targets__unsuccessful_api_call(
+    validate_resource_ids_mock: MagicMock, api_client_mock: MagicMock
+):
+    validate_resource_ids_mock.return_value = None
     resp_code = 400
     testable_id = "2DZkoZH8WMEM"
 
-    api_client_mock.return_value = (resp_code, {})
+    api_client_mock.return_value = (resp_code, b"")
     with pytest.raises(BaseException) as exc_info:
         delete_targets([testable_id])
+
+    validate_resource_ids_mock.assert_called_once()
 
     expected_call_url = PROBELY_API_TARGETS_BULK_DELETE_URL
     api_client_mock.assert_called_with(
