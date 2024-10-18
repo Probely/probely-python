@@ -2,7 +2,6 @@ import argparse
 
 from rich_argparse import RichHelpFormatter
 
-from probely.cli.commands.apply.apply import apply_command_handler
 from probely.cli.commands.findings.parsers import build_findings_parser
 from probely.cli.commands.scans.parsers import build_scans_parser
 from probely.cli.commands.targets.parsers import build_targets_parser
@@ -22,7 +21,7 @@ def build_file_parser():
         "--yaml-file",
         dest="yaml_file_path",
         default=None,
-        help="Path to yaml file. Accepts same payload as listed in API docs",
+        help="Path to file with content to apply. Accepts same payload as listed in API docs",
     )
 
     return file_parser
@@ -36,12 +35,12 @@ def build_configs_parser():
     )
     configs_parser.add_argument(
         "--api-key",
-        help="Set API KEY used for requests",
+        help="Authorization token to make requests to the API",
         default=None,
     )
     configs_parser.add_argument(
         "--debug",
-        help="Enable DEBUG mode setting",
+        help="Enables debug mode setting",
         action="store_true",
         default=False,
     )
@@ -59,7 +58,7 @@ def build_output_parser():
         "--output",
         type=str.upper,
         choices=OutputEnum.cli_input_choices(),
-        help="Presets for output formats",
+        help="Changes the output formats based on presets",
     )
     return output_parser
 
@@ -71,7 +70,7 @@ def build_cli_parser():
 
     probely_parser = argparse.ArgumentParser(
         prog="probely",
-        description="Welcome to Probely's CLI",
+        description="Probely's CLI. Check subcommands for available actions",
         formatter_class=RichHelpFormatter,
     )
     probely_parser.add_argument(
@@ -83,7 +82,9 @@ def build_cli_parser():
         parser=probely_parser,
     )
 
-    commands_parser = probely_parser.add_subparsers()
+    commands_parser = probely_parser.add_subparsers(
+        title="Subcommands for available contexts"
+    )
 
     build_targets_parser(commands_parser, configs_parser, file_parser, output_parser)
     build_scans_parser(commands_parser, configs_parser, file_parser, output_parser)

@@ -2,6 +2,15 @@ import argparse
 
 from rich_argparse import RichHelpFormatter
 
+from probely.cli.commands.help_texts import (
+    SUB_COMMAND_AVAILABLE_ACTIONS_TITLE,
+    TARGETS_GET_COMMAND_DESCRIPTION_TEXT,
+    TARGETS_ADD_COMMAND_DESCRIPTION_TEXT,
+    TARGETS_UPDATE_COMMAND_DESCRIPTION_TEXT,
+    TARGETS_START_SCAN_COMMAND_DESCRIPTION_TEXT,
+    TARGETS_DELETE_COMMAND_DESCRIPTION_TEXT,
+    TARGETS_F_SEARCH_TEXT,
+)
 from probely.cli.commands.targets.add import targets_add_command_handler
 from probely.cli.commands.targets.delete import targets_delete_command_handler
 from probely.cli.commands.targets.get import targets_get_command_handler
@@ -33,14 +42,14 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
         "--f-is-url-verified",
         type=str.upper,
         choices=TRUTHY_VALUES + FALSY_VALUES,
-        help="Filter if target URL is verified",
+        help="Filter targets by verified (true) or not verified (false) domain",
         action="store",
     )
     target_filters_parser.add_argument(
         "--f-risk",
         type=str.upper,
         choices=TargetRiskEnum.cli_input_choices(),
-        help="Filter targets by list of risk",
+        help="Filter targets by risk",
         nargs="+",
         action="store",
     )
@@ -48,13 +57,14 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
         "--f-type",
         type=str.upper,
         choices=TargetTypeEnum.cli_input_choices(),
-        help="Filter targets by list of type",
+        help="Filter targets by type",
         nargs="+",
         action="store",
     )
     target_filters_parser.add_argument(
         "--f-search",
-        help="Keyword to match with name, url and labels",
+        metavar="SEARCH_TERM",
+        help=TARGETS_F_SEARCH_TEXT,
         action="store",
         default=None,
     )
@@ -78,10 +88,13 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         formatter_class=RichHelpFormatter,
     )
 
-    targets_command_parser = targets_parser.add_subparsers()
+    targets_command_parser = targets_parser.add_subparsers(
+        title=SUB_COMMAND_AVAILABLE_ACTIONS_TITLE,
+    )
 
     targets_get_parser = targets_command_parser.add_parser(
         "get",
+        help=TARGETS_GET_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, target_filters_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
@@ -89,7 +102,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         "target_ids",
         metavar="TARGET_ID",
         nargs="*",
-        help="IDs of Targets to list",
+        help="Identifiers of the targets to list",
         default=None,
     )
     targets_get_parser.set_defaults(
@@ -97,25 +110,9 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         parser=targets_get_parser,
     )
 
-    targets_delete_parser = targets_command_parser.add_parser(
-        "delete",
-        parents=[configs_parser, target_filters_parser],
-        formatter_class=RichHelpFormatter,
-    )
-    targets_delete_parser.add_argument(
-        "target_ids",
-        metavar="TARGET_ID",
-        nargs="*",
-        help="IDs of targets to delete",
-        default=None,
-    )
-    targets_delete_parser.set_defaults(
-        command_handler=targets_delete_command_handler,
-        parser=targets_delete_parser,
-    )
-
     targets_add_parser = targets_command_parser.add_parser(
         "add",
+        help=TARGETS_ADD_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, file_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
@@ -133,7 +130,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         "--target-type",
         type=str.upper,
         choices=TargetTypeEnum.cli_input_choices(),
-        help="Type of target",
+        help="Set type of target being add",
     )
     targets_add_parser.add_argument(
         "--api-schema-type",
@@ -143,7 +140,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
     )
     targets_add_parser.add_argument(
         "--api-schema-file-url",
-        help="Url for download of API schema of target",
+        help="URL to download the target's API schema",
     )
     targets_add_parser.set_defaults(
         command_handler=targets_add_command_handler,
@@ -152,6 +149,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
 
     targets_update_parser = targets_command_parser.add_parser(
         "update",
+        help=TARGETS_UPDATE_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, target_filters_parser, file_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
@@ -159,7 +157,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         "target_ids",
         metavar="TARGET_ID",
         nargs="*",
-        help="IDs of targets to update",
+        help="Identifiers of the targets to update",
         default=None,
     )
     targets_update_parser.set_defaults(
@@ -169,6 +167,7 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
 
     start_scan_parser = targets_command_parser.add_parser(
         "start-scan",
+        help=TARGETS_START_SCAN_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, target_filters_parser, file_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
@@ -176,10 +175,28 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         "target_ids",
         metavar="TARGET_ID",
         nargs="*",
-        help="IDs of Targets that will be scanned",
+        help="Identifiers of the targets to scan",
         default=None,
     )
     start_scan_parser.set_defaults(
         command_handler=start_scans_command_handler,
         parser=start_scan_parser,
+    )
+
+    targets_delete_parser = targets_command_parser.add_parser(
+        "delete",
+        help=TARGETS_DELETE_COMMAND_DESCRIPTION_TEXT,
+        parents=[configs_parser, target_filters_parser],
+        formatter_class=RichHelpFormatter,
+    )
+    targets_delete_parser.add_argument(
+        "target_ids",
+        metavar="TARGET_ID",
+        nargs="*",
+        help="Identifiers of the targets to delete",
+        default=None,
+    )
+    targets_delete_parser.set_defaults(
+        command_handler=targets_delete_command_handler,
+        parser=targets_delete_parser,
     )

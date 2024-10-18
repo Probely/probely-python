@@ -3,6 +3,11 @@ import argparse
 from rich_argparse import RichHelpFormatter
 
 from probely.cli.commands.findings.get import findings_get_command_handler
+from probely.cli.commands.help_texts import (
+    SUB_COMMAND_AVAILABLE_ACTIONS_TITLE,
+    FINDINGS_F_SEARCH_TEXT,
+    FINDINGS_GET_COMMAND_DESCRIPTION_TEXT,
+)
 from probely.cli.common import show_help
 from probely.sdk.enums import FindingSeverityEnum, FindingStateEnum
 from probely.settings import FALSY_VALUES, TRUTHY_VALUES
@@ -49,7 +54,8 @@ def build_findings_filters_parser() -> argparse.ArgumentParser:
 
     findings_filters_parser.add_argument(
         "--f-search",
-        help="Filter findings by keyword",
+        metavar="SEARCH_TERM",
+        help=FINDINGS_F_SEARCH_TEXT,
         action="store",
     )
 
@@ -79,11 +85,13 @@ def build_findings_parser(commands_parser, configs_parser, output_parser):
         formatter_class=RichHelpFormatter,
     )
 
-    findings_command_parser = findings_parser.add_subparsers()
+    findings_command_parser = findings_parser.add_subparsers(
+        title=SUB_COMMAND_AVAILABLE_ACTIONS_TITLE,
+    )
 
     findings_get_parser = findings_command_parser.add_parser(
         "get",
-        help="Lists all findings",
+        help=FINDINGS_GET_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, findings_filter_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
@@ -92,7 +100,7 @@ def build_findings_parser(commands_parser, configs_parser, output_parser):
         "findings_ids",
         metavar="FINDING_ID",
         nargs="*",
-        help="IDs of findings to list",
+        help="Identifiers of the findings to list",
     )
 
     findings_get_parser.set_defaults(

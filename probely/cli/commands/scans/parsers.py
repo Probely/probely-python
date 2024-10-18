@@ -2,6 +2,14 @@ import argparse
 
 from rich_argparse import RichHelpFormatter
 
+from probely.cli.commands.help_texts import (
+    SCANS_PAUSE_COMMAND_DESCRIPTION_TEXT,
+    SCANS_CANCEL_COMMAND_DESCRIPTION_TEXT,
+    SCANS_RESUME_COMMAND_DESCRIPTION_TEXT,
+    SCANS_GET_COMMAND_DESCRIPTION_TEXT,
+    SUB_COMMAND_AVAILABLE_ACTIONS_TITLE,
+    SCANS_F_SEARCH_TEXT,
+)
 from probely.cli.commands.scans.cancel import scans_cancel_command_handler
 from probely.cli.commands.scans.get import scans_get_command_handler
 from probely.cli.commands.scans.pause import scans_pause_command_handler
@@ -16,12 +24,13 @@ def build_scan_filters_parser() -> argparse.ArgumentParser:
         add_help=False,
         formatter_class=RichHelpFormatter,
     )
+
     scan_filters_parser.add_argument(
         "--f-search",
+        metavar="SEARCH_TERM",
         action="store",
         default=None,
-        metavar="SEARCH TERM",
-        help="Keyword to match with Scan URL, Target name, URL or labels",
+        help=SCANS_F_SEARCH_TEXT,
     )
 
     scan_filters_parser.add_argument(
@@ -51,7 +60,7 @@ def build_scan_filters_parser() -> argparse.ArgumentParser:
                 default=None,
                 metavar="DATETIME",
                 help=(
-                    f"Show scans {date_field} {description} the specified date or datetime."
+                    f"Filter scans {date_field} {description} the specified date or datetime."
                 ),
             )
     return scan_filters_parser
@@ -70,29 +79,15 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
         formatter_class=RichHelpFormatter,
     )
 
-    scans_command_parser = scans_parser.add_subparsers()
+    scans_command_parser = scans_parser.add_subparsers(
+        title=SUB_COMMAND_AVAILABLE_ACTIONS_TITLE,
+    )
 
     scan_filters_parser = build_scan_filters_parser()
 
-    scans_cancel_parser = scans_command_parser.add_parser(
-        "cancel",
-        parents=[configs_parser, scan_filters_parser, output_parser],
-        formatter_class=RichHelpFormatter,
-    )
-    scans_cancel_parser.add_argument(
-        "scan_ids",
-        metavar="SCAN_ID",
-        nargs="*",
-        help="IDs of scans to cancel",
-        default=None,
-    )
-    scans_cancel_parser.set_defaults(
-        command_handler=scans_cancel_command_handler,
-        parser=scans_cancel_parser,
-    )
-
     scans_get_parser = scans_command_parser.add_parser(
         "get",
+        help=SCANS_GET_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, scan_filters_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
@@ -100,7 +95,7 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
         "scan_ids",
         metavar="SCAN_ID",
         nargs="*",
-        help="IDs of Scans to list",
+        help="Identifiers of the scans to list",
         default=None,
     )
     scans_get_parser.set_defaults(
@@ -108,8 +103,45 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
         parser=scans_get_parser,
     )
 
+    scans_pause_parser = scans_command_parser.add_parser(
+        "pause",
+        help=SCANS_PAUSE_COMMAND_DESCRIPTION_TEXT,
+        parents=[configs_parser, scan_filters_parser, output_parser],
+        formatter_class=RichHelpFormatter,
+    )
+    scans_pause_parser.add_argument(
+        "scan_ids",
+        metavar="SCAN_ID",
+        nargs="*",
+        help="Identifiers of the scans to pause.",
+        default=None,
+    )
+    scans_pause_parser.set_defaults(
+        command_handler=scans_pause_command_handler,
+        parser=scans_pause_parser,
+    )
+
+    scans_cancel_parser = scans_command_parser.add_parser(
+        "cancel",
+        help=SCANS_CANCEL_COMMAND_DESCRIPTION_TEXT,
+        parents=[configs_parser, scan_filters_parser, output_parser],
+        formatter_class=RichHelpFormatter,
+    )
+    scans_cancel_parser.add_argument(
+        "scan_ids",
+        metavar="SCAN_ID",
+        nargs="*",
+        help="Identifiers of the scans to cancel",
+        default=None,
+    )
+    scans_cancel_parser.set_defaults(
+        command_handler=scans_cancel_command_handler,
+        parser=scans_cancel_parser,
+    )
+
     scans_resume_parser = scans_command_parser.add_parser(
         "resume",
+        help=SCANS_RESUME_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, scan_filters_parser, output_parser],
         formatter_class=RichHelpFormatter,
     )
@@ -117,7 +149,7 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
         "scan_ids",
         metavar="SCAN_ID",
         nargs="*",
-        help="IDs of scans to resume",
+        help="Identifiers of the scans to resume",
         default=None,
     )
     scans_resume_parser.add_argument(
@@ -128,20 +160,4 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
     scans_resume_parser.set_defaults(
         command_handler=scans_resume_command_handler,
         parser=scans_resume_parser,
-    )
-    scans_pause_parser = scans_command_parser.add_parser(
-        "pause",
-        parents=[configs_parser, scan_filters_parser, output_parser],
-        formatter_class=RichHelpFormatter,
-    )
-    scans_pause_parser.add_argument(
-        "scan_ids",
-        metavar="SCAN_ID",
-        nargs="*",
-        help="IDs of scans to pause",
-        default=None,
-    )
-    scans_pause_parser.set_defaults(
-        command_handler=scans_pause_command_handler,
-        parser=scans_pause_parser,
     )
