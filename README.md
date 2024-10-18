@@ -14,7 +14,7 @@ Probely is a vulnerability scanner for APIs and web applications, designed to em
 
 This package provides a Command-Line Interface (CLI) to interact with the Probely API, allowing you to perform actions like scanning targets, listing findings, and managing targets directly from your terminal.
 
-**For detailed documentation and usage examples, please visit our [CLI documentation](https://developers.probely.com/cli/).**
+**For detailed documentation and usage examples, please visit our [CLI documentation](https://developers.probely.com/cli/overview-cli-documentation).**
 
 ## Contributing
 
