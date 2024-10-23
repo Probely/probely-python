@@ -12,11 +12,6 @@ from probely.cli.enums import OutputEnum
 from probely.exceptions import ProbelyCLIValidation
 
 
-def show_help(args):
-    if args.is_no_action_parser:
-        args.parser.print_help()
-
-
 def validate_and_retrieve_yaml_content(yaml_file_path: Union[str, None]):
     if not yaml_file_path:
         return dict()

@@ -1,28 +1,31 @@
 import argparse
 
-from rich_argparse import RichHelpFormatter
-
-from probely.cli.commands.help_texts import (
+from probely.cli.commands.scans.cancel import scans_cancel_command_handler
+from probely.cli.commands.scans.get import scans_get_command_handler
+from probely.cli.commands.scans.pause import scans_pause_command_handler
+from probely.cli.commands.scans.resume import scans_resume_command_handler
+from probely.cli.parsers.common import (
+    build_configs_parser,
+    build_output_parser,
+    ProbelyArgumentParser,
+    show_help,
+)
+from probely.cli.parsers.help_texts import (
     SCANS_PAUSE_COMMAND_DESCRIPTION_TEXT,
     SCANS_CANCEL_COMMAND_DESCRIPTION_TEXT,
     SCANS_RESUME_COMMAND_DESCRIPTION_TEXT,
     SCANS_GET_COMMAND_DESCRIPTION_TEXT,
     SUB_COMMAND_AVAILABLE_ACTIONS_TITLE,
     SCANS_F_SEARCH_TEXT,
+    SCANS_COMMAND_DESCRIPTION_TEXT,
 )
-from probely.cli.commands.scans.cancel import scans_cancel_command_handler
-from probely.cli.commands.scans.get import scans_get_command_handler
-from probely.cli.commands.scans.pause import scans_pause_command_handler
-from probely.cli.commands.scans.resume import scans_resume_command_handler
-from probely.cli.common import show_help
 from probely.sdk.enums import ScanStatusEnum
 
 
 def build_scan_filters_parser() -> argparse.ArgumentParser:
-    scan_filters_parser = argparse.ArgumentParser(
-        description="Filters usable in Scan commands",
+    scan_filters_parser = ProbelyArgumentParser(
         add_help=False,
-        formatter_class=RichHelpFormatter,
+        description=SCANS_COMMAND_DESCRIPTION_TEXT,
     )
 
     scan_filters_parser.add_argument(
@@ -66,30 +69,31 @@ def build_scan_filters_parser() -> argparse.ArgumentParser:
     return scan_filters_parser
 
 
-def build_scans_parser(commands_parser, configs_parser, file_parser, output_parser):
-    scans_parser = commands_parser.add_parser(
-        "scans",
-        help="Manage existing scans",
-        formatter_class=RichHelpFormatter,
+def build_scans_parser():
+    scan_filters_parser = build_scan_filters_parser()
+
+    configs_parser = build_configs_parser()
+    output_parser = build_output_parser()
+
+    scans_parser = ProbelyArgumentParser(
+        prog="probely scans",
+        add_help=False,
+        description="Manage existing scans",
     )
     scans_parser.set_defaults(
         command_handler=show_help,
         is_no_action_parser=True,
         parser=scans_parser,
-        formatter_class=RichHelpFormatter,
     )
 
     scans_command_parser = scans_parser.add_subparsers(
         title=SUB_COMMAND_AVAILABLE_ACTIONS_TITLE,
     )
 
-    scan_filters_parser = build_scan_filters_parser()
-
     scans_get_parser = scans_command_parser.add_parser(
         "get",
         help=SCANS_GET_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, scan_filters_parser, output_parser],
-        formatter_class=RichHelpFormatter,
     )
     scans_get_parser.add_argument(
         "scan_ids",
@@ -107,7 +111,6 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
         "pause",
         help=SCANS_PAUSE_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, scan_filters_parser, output_parser],
-        formatter_class=RichHelpFormatter,
     )
     scans_pause_parser.add_argument(
         "scan_ids",
@@ -125,7 +128,6 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
         "cancel",
         help=SCANS_CANCEL_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, scan_filters_parser, output_parser],
-        formatter_class=RichHelpFormatter,
     )
     scans_cancel_parser.add_argument(
         "scan_ids",
@@ -143,7 +145,6 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
         "resume",
         help=SCANS_RESUME_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, scan_filters_parser, output_parser],
-        formatter_class=RichHelpFormatter,
     )
     scans_resume_parser.add_argument(
         "scan_ids",
@@ -161,3 +162,5 @@ def build_scans_parser(commands_parser, configs_parser, file_parser, output_pars
         command_handler=scans_resume_command_handler,
         parser=scans_resume_parser,
     )
+
+    return scans_parser

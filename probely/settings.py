@@ -88,7 +88,6 @@ IS_DEBUG_MODE = _get_probely_debug()
 
 CLI_ACCEPTED_FILE_EXTENSIONS = [".yaml", ".yml"]
 
-
 def get_probely_api_base_url():
     probely_api_url: str = os.getenv(
         "PROBELY_API_BASE_URL",

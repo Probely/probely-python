@@ -1,8 +1,18 @@
 import argparse
 
-from rich_argparse import RichHelpFormatter
-
-from probely.cli.commands.help_texts import (
+from probely.cli.commands.targets.add import targets_add_command_handler
+from probely.cli.commands.targets.delete import targets_delete_command_handler
+from probely.cli.commands.targets.get import targets_get_command_handler
+from probely.cli.commands.targets.start_scan import start_scans_command_handler
+from probely.cli.commands.targets.update import update_targets_command_handler
+from probely.cli.parsers.common import (
+    build_configs_parser,
+    build_file_parser,
+    build_output_parser,
+    ProbelyArgumentParser,
+    show_help,
+)
+from probely.cli.parsers.help_texts import (
     SUB_COMMAND_AVAILABLE_ACTIONS_TITLE,
     TARGETS_GET_COMMAND_DESCRIPTION_TEXT,
     TARGETS_ADD_COMMAND_DESCRIPTION_TEXT,
@@ -10,13 +20,8 @@ from probely.cli.commands.help_texts import (
     TARGETS_START_SCAN_COMMAND_DESCRIPTION_TEXT,
     TARGETS_DELETE_COMMAND_DESCRIPTION_TEXT,
     TARGETS_F_SEARCH_TEXT,
+    TARGET_COMMAND_DESCRIPTION_TEXT,
 )
-from probely.cli.commands.targets.add import targets_add_command_handler
-from probely.cli.commands.targets.delete import targets_delete_command_handler
-from probely.cli.commands.targets.get import targets_get_command_handler
-from probely.cli.commands.targets.start_scan import start_scans_command_handler
-from probely.cli.commands.targets.update import update_targets_command_handler
-from probely.cli.common import show_help
 from probely.sdk.enums import (
     TargetAPISchemaTypeEnum,
     TargetRiskEnum,
@@ -29,7 +34,6 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
     target_filters_parser = argparse.ArgumentParser(
         description="Filters usable in Targets commands",
         add_help=False,
-        formatter_class=RichHelpFormatter,
     )
     target_filters_parser.add_argument(
         "--f-has-unlimited-scans",
@@ -72,20 +76,21 @@ def build_targets_filters_parser() -> argparse.ArgumentParser:
     return target_filters_parser
 
 
-def build_targets_parser(commands_parser, configs_parser, file_parser, output_parser):
-
+def build_targets_parser():
     target_filters_parser = build_targets_filters_parser()
+    configs_parser = build_configs_parser()
+    file_parser = build_file_parser()
+    output_parser = build_output_parser()
 
-    targets_parser = commands_parser.add_parser(
-        "targets",
-        help="Create, manage and scan targets",
-        formatter_class=RichHelpFormatter,
+    targets_parser = ProbelyArgumentParser(
+        prog="probely targets",
+        add_help=False,
+        description=TARGET_COMMAND_DESCRIPTION_TEXT,
     )
     targets_parser.set_defaults(
         command_handler=show_help,
         is_no_action_parser=True,
         parser=targets_parser,
-        formatter_class=RichHelpFormatter,
     )
 
     targets_command_parser = targets_parser.add_subparsers(
@@ -96,7 +101,6 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         "get",
         help=TARGETS_GET_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, target_filters_parser, output_parser],
-        formatter_class=RichHelpFormatter,
     )
     targets_get_parser.add_argument(
         "target_ids",
@@ -114,7 +118,6 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         "add",
         help=TARGETS_ADD_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, file_parser, output_parser],
-        formatter_class=RichHelpFormatter,
     )
     targets_add_parser.add_argument(
         "target_url",
@@ -151,7 +154,6 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         "update",
         help=TARGETS_UPDATE_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, target_filters_parser, file_parser, output_parser],
-        formatter_class=RichHelpFormatter,
     )
     targets_update_parser.add_argument(
         "target_ids",
@@ -169,7 +171,6 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         "start-scan",
         help=TARGETS_START_SCAN_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, target_filters_parser, file_parser, output_parser],
-        formatter_class=RichHelpFormatter,
     )
     start_scan_parser.add_argument(
         "target_ids",
@@ -187,7 +188,6 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         "delete",
         help=TARGETS_DELETE_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, target_filters_parser],
-        formatter_class=RichHelpFormatter,
     )
     targets_delete_parser.add_argument(
         "target_ids",
@@ -200,3 +200,5 @@ def build_targets_parser(commands_parser, configs_parser, file_parser, output_pa
         command_handler=targets_delete_command_handler,
         parser=targets_delete_parser,
     )
+
+    return targets_parser

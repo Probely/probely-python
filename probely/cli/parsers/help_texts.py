@@ -1,5 +1,6 @@
 SUB_COMMAND_AVAILABLE_ACTIONS_TITLE = "Available Actions"
 
+TARGET_COMMAND_DESCRIPTION_TEXT = "Create, manage and scan targets"
 TARGETS_GET_COMMAND_DESCRIPTION_TEXT = (
     "List your account's targets. Use filters or identifiers to narrow the list"
 )
@@ -14,7 +15,7 @@ TARGETS_DELETE_COMMAND_DESCRIPTION_TEXT = (
     "Delete targets given by identifiers or the results of filters"
 )
 
-
+SCANS_COMMAND_DESCRIPTION_TEXT = "Filters usable in Scan commands"
 SCANS_GET_COMMAND_DESCRIPTION_TEXT = (
     "List scans. Use filters or identifiers to narrow the list"
 )
@@ -28,7 +29,7 @@ SCANS_RESUME_COMMAND_DESCRIPTION_TEXT = (
     "Resume paused scans given by identifiers or the results of filters"
 )
 
-
+FINDINGS_COMMAND_DESCRIPTION_TEXT = "List existing findings"
 FINDINGS_GET_COMMAND_DESCRIPTION_TEXT = (
     "List findings. Use filters or identifiers to narrow the list"
 )

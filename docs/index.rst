@@ -1,18 +1,19 @@
 Welcome to Probely's documentation!
 ===================================
 
-SDK and CLI
+CLI
 
 .. note::
 
-   This project is under active development.
+    This project is under active development.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
 
-   sdk
-   cli
+    targets
+    scans
+    findings
 
 Indices and tables
 ==================

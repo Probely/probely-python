@@ -3,12 +3,18 @@ import argparse
 from rich_argparse import RichHelpFormatter
 
 from probely.cli.commands.findings.get import findings_get_command_handler
-from probely.cli.commands.help_texts import (
+from probely.cli.parsers.common import (
+    build_configs_parser,
+    build_output_parser,
+    ProbelyArgumentParser,
+    show_help,
+)
+from probely.cli.parsers.help_texts import (
     SUB_COMMAND_AVAILABLE_ACTIONS_TITLE,
     FINDINGS_F_SEARCH_TEXT,
     FINDINGS_GET_COMMAND_DESCRIPTION_TEXT,
+    FINDINGS_COMMAND_DESCRIPTION_TEXT,
 )
-from probely.cli.common import show_help
 from probely.sdk.enums import FindingSeverityEnum, FindingStateEnum
 from probely.settings import FALSY_VALUES, TRUTHY_VALUES
 
@@ -70,19 +76,20 @@ def build_findings_filters_parser() -> argparse.ArgumentParser:
     return findings_filters_parser
 
 
-def build_findings_parser(commands_parser, configs_parser, output_parser):
+def build_findings_parser():
     findings_filter_parser = build_findings_filters_parser()
+    configs_parser = build_configs_parser()
+    output_parser = build_output_parser()
 
-    findings_parser = commands_parser.add_parser(
-        "findings",
-        help="List existing findings",
-        formatter_class=RichHelpFormatter,
+    findings_parser = ProbelyArgumentParser(
+        prog="probely findings",
+        add_help=False,
+        description=FINDINGS_COMMAND_DESCRIPTION_TEXT,
     )
     findings_parser.set_defaults(
         command_handler=show_help,
         is_no_action_parser=True,
         parser=findings_parser,
-        formatter_class=RichHelpFormatter,
     )
 
     findings_command_parser = findings_parser.add_subparsers(
@@ -93,7 +100,6 @@ def build_findings_parser(commands_parser, configs_parser, output_parser):
         "get",
         help=FINDINGS_GET_COMMAND_DESCRIPTION_TEXT,
         parents=[configs_parser, findings_filter_parser, output_parser],
-        formatter_class=RichHelpFormatter,
     )
 
     findings_get_parser.add_argument(
@@ -107,3 +113,5 @@ def build_findings_parser(commands_parser, configs_parser, output_parser):
         command_handler=findings_get_command_handler,
         parser=findings_get_parser,
     )
+
+    return findings_parser
