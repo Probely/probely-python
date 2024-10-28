@@ -44,6 +44,7 @@ dependencies = [
     "mergedeep",
     "python-dateutil", # Python <= 3.10's fromisoformat is not a full ISO-8601 format parser
     "toml", # Python < 3.11's doesn't support toml
+    "pydantic[email]",
 ]
 
 [project.optional-dependencies]

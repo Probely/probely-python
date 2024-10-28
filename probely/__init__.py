@@ -10,11 +10,10 @@ from .sdk.enums import (
     FindingSeverityEnum,
     FindingStateEnum,
     ScanStatusEnum,
+    TargetAPISchemaTypeEnum,
     TargetRiskEnum,
     TargetTypeEnum,
-    TargetAPISchemaTypeEnum,
 )
-from .sdk.findings import list_findings, retrieve_finding, retrieve_findings
 from .sdk.scans import (
     cancel_scan,
     cancel_scans,
@@ -61,9 +60,6 @@ __all__ = [
     "resume_scans",
     "pause_scan",
     "pause_scans",
-    "list_findings",
-    "retrieve_finding",
-    "retrieve_findings",
     "ProbelyException",
     "ProbelyObjectNotFound",
     "ProbelyMissConfig",

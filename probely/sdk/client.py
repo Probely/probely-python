@@ -10,6 +10,7 @@ from requests import Request, Session
 
 from probely import settings
 from probely.exceptions import ProbelyApiUnavailable, ProbelyMissConfig
+from probely.sdk.managers import FindingManager
 from probely.version import __version__
 
 logger = logging.getLogger(__name__)
@@ -24,6 +25,7 @@ class Probely:
     _instance = None
 
     def __init__(self, api_key=None):
+        self.findings = FindingManager()
         self.APP_CONFIG = {
             "api_key": settings.PROBELY_API_KEY,
             "is_cli": settings.IS_CLI,
@@ -53,6 +55,7 @@ class Probely:
             cls._instance = super().__new__(cls)
 
         cls._instance.__init__(api_key)
+        return cls._instance
 
     @classmethod
     def reset_config(cls):

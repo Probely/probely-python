@@ -1,5 +1,3 @@
-from typing import Dict
-
 from rich.table import Table
 
 from probely.cli.renderers import (
@@ -9,6 +7,7 @@ from probely.cli.renderers import (
 )
 from probely.cli.tables.base_table import BaseOutputTable
 from probely.sdk.enums import FindingSeverityEnum
+from probely.sdk._schemas import Finding
 
 DEFAULT_LAST_FOUND_DATE_VALUE = "NO_DATE"
 
@@ -29,19 +28,16 @@ class FindingTable(BaseOutputTable):
         return table
 
     @classmethod
-    def add_row(cls, table: Table, finding: Dict) -> None:
-        target = finding.get("target", {})
-
+    def add_row(cls, table: Table, finding: Finding) -> None:
+        target = finding.target
         table.add_row(
-            f"{target['id']}-{finding['id']}",  # Composite Finding ID
-            target["id"],  # target_id
-            get_printable_enum_value(
-                FindingSeverityEnum, finding["severity"]
-            ),  # severity
-            finding["definition"]["name"],  # title
+            f"{target.id}-{finding.id}",  # Composite Finding ID
+            target.id,
+            get_printable_enum_value(FindingSeverityEnum, finding.severity),  # severity
+            finding.definition.name,  # title
             get_printable_date(
-                finding["last_found"], DEFAULT_LAST_FOUND_DATE_VALUE
+                finding.last_found, DEFAULT_LAST_FOUND_DATE_VALUE
             ),  # last_found
-            finding["state"],  # state
-            get_printable_labels(finding["labels"]),  # labels
+            finding.state,
+            get_printable_labels(finding.labels),
         )

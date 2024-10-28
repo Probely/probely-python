@@ -6,7 +6,7 @@ from probely.cli.enums import OutputEnum
 from probely.cli.renderers import OutputRenderer
 from probely.cli.tables.finding_table import FindingTable
 from probely.exceptions import ProbelyCLIValidation
-from probely.sdk.findings import list_findings, retrieve_findings
+from probely.sdk.managers import FindingManager
 
 
 def findings_get_command_handler(args: argparse.Namespace):
@@ -15,9 +15,9 @@ def findings_get_command_handler(args: argparse.Namespace):
         raise ProbelyCLIValidation("filters and Finding IDs are mutually exclusive.")
 
     if args.findings_ids:
-        findings_generator = retrieve_findings(findings_ids=args.findings_ids)
+        findings_generator = FindingManager().get_multiple(ids=args.findings_ids)
     else:
-        findings_generator = list_findings(findings_filters=filters)
+        findings_generator = FindingManager().list(filters=filters)
 
     output_type = OutputEnum[args.output] if args.output else None
     renderer = OutputRenderer(

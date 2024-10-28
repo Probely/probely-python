@@ -1848,10 +1848,10 @@ RESUME_SCAN_200_RESPONSE = {**START_SCAN_200_RESPONSE, "status": "resuming"}
 PAUSE_SCAN_200_RESPONSE = {**START_SCAN_200_RESPONSE, "status": "pausing"}
 
 GET_FINDINGS_200_RESPONSE = {
-    "count": 110,
-    "page_total": 28,
+    "count": 4,
+    "page_total": 1,
     "page": 1,
-    "length": 4,
+    "length": 10,
     "results": [
         {
             "id": 28,

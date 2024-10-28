@@ -1,7 +1,6 @@
 from probely.cli.commands.targets.schemas import TargetApiFiltersSchema
 from probely.cli.common import prepare_filters_for_api
 from probely.cli.enums import OutputEnum
-
 from probely.cli.renderers import OutputRenderer
 from probely.cli.tables.targets_table import TargetTable
 from probely.exceptions import ProbelyCLIValidation

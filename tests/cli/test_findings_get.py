@@ -6,6 +6,9 @@ import pytest
 import yaml
 
 from probely.sdk.enums import FindingSeverityEnum, FindingStateEnum
+from probely.sdk.models import Finding
+from probely.sdk._schemas import Finding as FindingDataModel
+from probely.sdk._schemas import FindingLabel
 from tests.testable_api_responses import RETRIEVE_FINDING_200_RESPONSE
 
 
@@ -40,7 +43,7 @@ def test_findings_get__table_headers_output(
         ("2024-07-15T17:27:52.608557Z", "2024-07-15 17:27"),
     ],
 )
-@patch("probely.cli.commands.findings.get.list_findings")
+@patch("probely.cli.commands.findings.get.FindingManager.list")
 def test_findings_get__table_last_found_date_output(
     sdk_list_findings_mock: Mock,
     testing_value,
@@ -51,7 +54,9 @@ def test_findings_get__table_last_found_date_output(
     testable_finding = valid_get_findings_api_response["results"][0]
     testable_finding["last_found"] = testing_value
 
-    sdk_list_findings_mock.return_value = [testable_finding]
+    sdk_list_findings_mock.return_value = [
+        Finding(FindingDataModel(**testable_finding))
+    ]
 
     stdout, stderr = probely_cli("findings", "get", return_list=True)
 
@@ -72,17 +77,12 @@ def test_findings_get__table_last_found_date_output(
 @pytest.mark.parametrize(
     "testing_value,expected_output",
     [
-        (0, "UNKNOWN"),
         (10, FindingSeverityEnum.LOW.name),
         (20, FindingSeverityEnum.MEDIUM.name),
         (30, FindingSeverityEnum.HIGH.name),
-        (None, "UNKNOWN"),
-        (323232320, "UNKNOWN"),
-        ("323232320", "UNKNOWN"),
-        ("10", "UNKNOWN"),
     ],
 )
-@patch("probely.cli.commands.findings.get.list_findings")
+@patch("probely.cli.commands.findings.get.FindingManager.list")
 def test_findings_get__table_severity_output(
     sdk_list_findings_mock: Mock,
     testing_value,
@@ -92,18 +92,20 @@ def test_findings_get__table_severity_output(
 ):
     testable_finding = valid_get_findings_api_response["results"][0]
     testable_finding["severity"] = testing_value
-    sdk_list_findings_mock.return_value = [testable_finding]
+    sdk_list_findings_mock.return_value = [
+        Finding(FindingDataModel(**testable_finding))
+    ]
 
-    stdout, stderr = probely_cli("findings", "get", return_list=True)
+    stdout_lines, stderr_lines = probely_cli("findings", "get", return_list=True)
 
-    assert len(stderr) == 0
+    assert len(stderr_lines) == 0
     column_separator = "  "  # double space
 
-    table_header = stdout[0]
+    table_header = stdout_lines[0]
     table_columns = table_header.split()
     assert table_columns[2] == "SEVERITY"
 
-    finding_line = stdout[1]
+    finding_line = stdout_lines[1]
     three_spaces_pattern = r" {3,}"
     finding_line_without_extra_spaces = re.sub(
         three_spaces_pattern,
@@ -120,11 +122,10 @@ def test_findings_get__table_severity_output(
     [
         ([{"name": "one"}], "one"),
         ([{"name": "one"}, {"name": "two"}], "one, two"),
-        (None, "UNKNOWN_LABELS"),
-        ([{"no_name_key": "no"}], "UNKNOWN_LABELS"),
+        ([], ""),
     ],
 )
-@patch("probely.cli.commands.findings.get.list_findings")
+@patch("probely.cli.commands.findings.get.FindingManager.list")
 def test_findings_get__table_labels_output(
     sdk_list_findings_mock: Mock,
     testing_value,
@@ -132,22 +133,30 @@ def test_findings_get__table_labels_output(
     valid_get_findings_api_response,
     probely_cli,
 ):
-    testable_finding = valid_get_findings_api_response["results"][0]
-    testable_finding["labels"] = testing_value
-    sdk_list_findings_mock.return_value = [testable_finding]
+    testable_finding_response_data = valid_get_findings_api_response["results"][0]
+    finding = Finding(FindingDataModel(**testable_finding_response_data))
 
-    stdout, stderr = probely_cli("findings", "get", return_list=True)
+    if testing_value:
+        finding._data.labels = [
+            FindingLabel.model_construct(**label_data) for label_data in testing_value
+        ]
+    else:
+        finding._data.labels = testing_value
 
-    assert len(stderr) == 0
-    column_separator = "  "  # double space
+    sdk_list_findings_mock.return_value = [finding]
 
-    table_header = stdout[0]
+    stdout_lines, stderr_lines = probely_cli("findings", "get", return_list=True)
+
+    assert len(stderr_lines) == 0
+
+    table_header = stdout_lines[0]
     table_columns = table_header.split()
 
     assert table_columns[6] == "LABELS"
 
-    finding_line = stdout[1].strip()
+    finding_line = stdout_lines[1]
     three_spaces_pattern = r" {3,}"
+    column_separator = "  "  # double space
     finding_line_without_extra_spaces = re.sub(
         three_spaces_pattern,
         column_separator,
@@ -219,19 +228,19 @@ def test_findings_get__table_labels_output(
         ("--f-is-new false", {"new": False}),
     ],
 )
-@patch("probely.cli.commands.findings.get.list_findings")
+@patch("probely.cli.commands.findings.get.FindingManager.list")
 def test_findings_get__arg_filters_success(
     sdk_list_findings_mock: Mock,
     filter_arg,
     expected_filter_request,
     probely_cli,
 ):
-    stdout, stderr = probely_cli("findings", "get", filter_arg, return_list=True)
-
-    assert len(stderr) == 0, "Expected no errors"
-    sdk_list_findings_mock.assert_called_once_with(
-        findings_filters=expected_filter_request
+    stdout_lines, stderr_lines = probely_cli(
+        "findings", "get", filter_arg, return_list=True
     )
+
+    assert len(stderr_lines) == 0, "Expected no errors"
+    sdk_list_findings_mock.assert_called_once_with(filters=expected_filter_request)
 
 
 @pytest.mark.parametrize(
@@ -283,7 +292,7 @@ def test_findings_get__arg_filters_success(
         ),
     ],
 )
-@patch("probely.cli.commands.findings.get.list_findings")
+@patch("probely.cli.commands.findings.get.FindingManager.list")
 def test_findings_get__arg_filters_validations(
     _: Mock,
     filter_arg,
@@ -301,36 +310,37 @@ def test_findings_get__arg_filters_validations(
     assert expected_error_content in error_message
 
 
-@patch("probely.cli.commands.findings.get.retrieve_findings")
-def test_findings_get__retrieve_by_ids(retrieve_findings_mock: Mock, probely_cli):
-    finding_id1 = "f1"
-    finding_id2 = "f2"
+@patch("probely.cli.commands.findings.get.FindingManager.get_multiple")
+def test_findings_get__retrieve_by_ids(get_multiple_findings_mock: Mock, probely_cli):
+    finding1_id = "1111"
+    finding2_id = "2222"
 
-    finding_id1_content = RETRIEVE_FINDING_200_RESPONSE.copy()
-    finding_id2_content = RETRIEVE_FINDING_200_RESPONSE.copy()
+    finding1_response_data = RETRIEVE_FINDING_200_RESPONSE.copy()
+    finding2_response_data = RETRIEVE_FINDING_200_RESPONSE.copy()
 
-    finding_id1_content["id"] = finding_id1
-    finding_id2_content["id"] = finding_id2
+    finding1_response_data["id"] = finding1_id
+    finding2_response_data["id"] = finding2_id
 
-    retrieve_findings_mock.return_value = [finding_id1_content, finding_id2_content]
+    get_multiple_findings_mock.return_value = [
+        Finding(FindingDataModel(**finding1_response_data)),
+        Finding(FindingDataModel(**finding2_response_data)),
+    ]
 
     stdout_lines, stderr_lines = probely_cli(
         "findings",
         "get",
-        finding_id1,
-        finding_id2,
+        finding1_id,
+        finding2_id,
         return_list=True,
     )
 
-    retrieve_findings_mock.assert_called_once_with(
-        findings_ids=[finding_id1, finding_id2]
-    )
+    get_multiple_findings_mock.assert_called_once_with(ids=[finding1_id, finding2_id])
     assert len(stderr_lines) == 0
     assert (
         len(stdout_lines) == 3
     ), "Expected to have header and 2 entries for each target"
-    assert finding_id1 in stdout_lines[1]
-    assert finding_id2 in stdout_lines[2]
+    assert finding1_id in stdout_lines[1]
+    assert finding2_id in stdout_lines[2]
 
 
 def test_findings_get__mutually_exclusive_arguments(probely_cli):
@@ -350,52 +360,57 @@ def test_findings_get__mutually_exclusive_arguments(probely_cli):
     )
 
 
-@patch("probely.cli.commands.findings.get.retrieve_findings")
-def test_targets_get__output_argument_output(retrieve_findings_mock, probely_cli):
-    findings_id0 = "f0"
-    findings_id1 = "f1"
+@patch("probely.cli.commands.findings.get.FindingManager.get_multiple")
+def test_targets_get__output_argument_output(get_multiple_findings_mock, probely_cli):
+    finding1_id = "1111"
+    finding2_id = "2222"
 
-    findings_id1_content = RETRIEVE_FINDING_200_RESPONSE.copy()
-    findings_id2_content = RETRIEVE_FINDING_200_RESPONSE.copy()
+    finding1_response_data = RETRIEVE_FINDING_200_RESPONSE.copy()
+    finding2_response_data = RETRIEVE_FINDING_200_RESPONSE.copy()
 
-    findings_id1_content["id"] = findings_id0
-    findings_id2_content["id"] = findings_id1
+    finding1_response_data["id"] = finding1_id
+    finding2_response_data["id"] = finding2_id
 
-    retrieve_findings_mock.return_value = [findings_id1_content, findings_id2_content]
+    get_multiple_findings_mock.return_value = [
+        Finding(FindingDataModel(**finding1_response_data)),
+        Finding(FindingDataModel(**finding2_response_data)),
+    ]
 
     stdout, _ = probely_cli(
         "findings",
         "get",
-        findings_id0,
-        findings_id1,
+        str(finding1_id),
+        str(finding2_id),
     )
     header = ("ID", "TARGET_ID", "SEVERITY", "TITLE", "LAST_FOUND", "STATE", "LABELS")
     assert all(column in stdout for column in header), "Output with table expected"
-    assert findings_id0 in stdout, "findings_id0 entry expected"
-    assert findings_id1 in stdout, "findings_id0 entry expected"
+    assert (
+        finding1_id in stdout
+    ), f"Expected finding1_id {finding1_id} in stdout: {stdout}"
+    assert (
+        finding2_id in stdout
+    ), f"Expected finding1_id {finding2_id} in stdout: {stdout}"
 
-    stdout, stderr = probely_cli(
-        "findings", "get", findings_id0, findings_id1, "-o yaml"
-    )
+    stdout, stderr = probely_cli("findings", "get", finding1_id, finding2_id, "-o yaml")
 
     assert stderr == ""
     yaml_content = yaml.load(stdout, Loader=yaml.FullLoader)
     assert isinstance(yaml_content, list), "Expected a yaml list"
     assert len(yaml_content) == 2, "Expected 2 targets"
     assert (
-        yaml_content[0]["id"] == findings_id0
+        str(yaml_content[0]["id"]) == finding1_id
     ), "Expected findings_id0  in yaml content"
     assert (
-        yaml_content[1]["id"] == findings_id1
+        str(yaml_content[1]["id"]) == finding2_id
     ), "Expected findings_id1 in yaml content"
 
     stdout, stderr = probely_cli(
-        "findings", "get", findings_id0, findings_id1, "--output json"
+        "findings", "get", finding1_id, finding2_id, "--output json"
     )
 
     assert stderr == ""
     json_content = json.loads(stdout)
     assert isinstance(json_content, list), "Expected a json list"
     assert len(json_content) == 2, "Expected 2 targets"
-    assert json_content[0]["id"] == findings_id0, "Expected findings_id0  in json"
-    assert json_content[1]["id"] == findings_id1, "Expected findings_id1 in json"
+    assert str(json_content[0]["id"]) == finding1_id, "Expected findings_id0  in json"
+    assert str(json_content[1]["id"]) == finding2_id, "Expected findings_id1 in json"

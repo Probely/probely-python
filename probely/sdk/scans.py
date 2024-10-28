@@ -15,7 +15,6 @@ from probely.exceptions import (
 from probely.sdk.client import ProbelyAPIClient
 from probely.sdk.helpers import validate_resource_ids
 from probely.settings import (
-    PROBELY_API_SCANS_BULK_START_URL,
     PROBELY_API_PAGE_SIZE,
     PROBELY_API_SCAN_CANCEL_URL,
     PROBELY_API_SCAN_PAUSE_URL,
@@ -23,6 +22,7 @@ from probely.settings import (
     PROBELY_API_SCANS_BULK_CANCEL_URL,
     PROBELY_API_SCANS_BULK_PAUSE_URL,
     PROBELY_API_SCANS_BULK_RESUME_URL,
+    PROBELY_API_SCANS_BULK_START_URL,
     PROBELY_API_SCANS_URL,
     PROBELY_API_TARGETS_START_SCAN_URL,
     PROBELY_API_TARGETS_URL,

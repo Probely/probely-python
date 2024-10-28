@@ -16,7 +16,7 @@ from probely.exceptions import (
 )
 from probely.sdk.enums import TargetAPISchemaTypeEnum, TargetTypeEnum
 from probely.sdk.helpers import validate_resource_ids
-from .client import ProbelyAPIClient
+
 from ..settings import (
     PROBELY_API_PAGE_SIZE,
     PROBELY_API_TARGETS_BULK_DELETE_URL,
@@ -25,6 +25,7 @@ from ..settings import (
     PROBELY_API_TARGETS_RETRIEVE_URL,
     PROBELY_API_TARGETS_URL,
 )
+from .client import ProbelyAPIClient
 
 logger = logging.getLogger(__name__)
 
