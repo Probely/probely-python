@@ -73,9 +73,9 @@ probely = "probely.cli:app"
 [project.urls]
 Homepage = "https://probely.com"
 Documentation = "https://developers.probely.com"
-Repository = "https://github.com/probely/probely_cli.git"
-"Bug Tracker" = "https://github.com/probely/probely_cli/issues"
-#Changelog = "https://github.com/probely/probely_cli/blob/master/CHANGELOG.md"
+Repository = "https://github.com/probely/probely-python.git"
+"Bug Tracker" = "https://github.com/probely/probely-python/issues"
+#Changelog = "https://github.com/probely/probely-python/blob/master/CHANGELOG.md"
 
 
 [build-system]
